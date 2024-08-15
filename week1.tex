@@ -1,0 +1,347 @@
+\documentclass{beamer}
+\usefonttheme[onlymath]{serif}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{gensymb}
+\usepackage{parskip}
+\usepackage{mathtools}
+\usepackage{listings}
+\usepackage{hyperref}
+\usepackage{color}
+\usepackage{enumerate}
+
+\usepackage{verbatim}
+\usepackage{minted}
+\parskip 0pt
+
+
+\DeclareMathOperator{\lcm}{lcm}
+\newcommand\floor[1]{\left\lfloor#1\right\rfloor}
+\newcommand\ceil[1]{\left\lceil#1\right\rceil}
+\newcommand\abs[1]{\left|#1\right|}
+\newcommand\p[1]{\left(#1\right)}
+\newcommand\sqp[1]{\left[#1\right]}
+\newcommand\cp[1]{\left\{#1\right\}}
+\newcommand\norm[1]{\left\lVert#1\right\rVert}
+\renewcommand\Im{\operatorname{Im}}
+\renewcommand\Re{\operatorname{Re}}
+
+\usetheme{metropolis}
+\definecolor{dark yellow}{rgb} {0.6,0.6,0.0}
+\definecolor{dark green}{rgb} {0.0,0.6,0.0}
+
+\graphicspath{{myndir/}}
+
+\title{Introduction}
+\author{Atli FF}
+\institute{\href{http://ru.is/td}{School of Computer Science} \\[2pt] \href{http://ru.is}{Reykjavík University}}
+\titlegraphic{\hfill\includegraphics[height=0.6cm]{kattis}}
+\date{\textbf{Árangursrík forritun og lausn verkefna}}
+
+\begin{document}
+
+\begin{frame}[plain]
+    \titlepage
+\end{frame}
+
+\section*{Course Overview}
+
+\begin{frame}[plain]
+	\frametitle{Welcome}
+	\begin{itemize}
+		 \item T-414-AFLV, Árangursrík forritun og lausn verkefna
+         \vspace{10pt}
+        \item Atli FF, {\alert{aff6@hi.is}, \alert{atlif@ru.is}}
+         \item Arnar Bjarni Arnarson, {\alert{arnarar@ru.is}}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[plain]
+	\frametitle{Learning goals}
+	\begin{itemize}
+		 \item At its heart this course is about problem solving.
+		 \item In this course you will learn to take a problem and:
+		 \begin{itemize}
+		 	\item analyse the constraints of the problem,
+		 	\item take those and find applicable algorithms and data structures,
+		 	\item convert those ideas into a functional program,
+		 	\item do this quickly and under pressure,
+		 	\item producing a program without bugs or other errors.
+		 \end{itemize}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[plain]
+	\frametitle{Getting there}
+	\begin{itemize}
+		 \item We will get to this point by going over a number of things:
+		 \begin{itemize}
+		 	\item look at common problem types,
+		 	\item cover different kinds of problem solving paradigms,
+		 	\item show common algorithms and data structures you should know already in action,
+		 	\item introduce new less common algorithms and data structures,
+		 	\item go over useful theories from a few branches of mathematics,
+		 	\item practice solving problems,
+		 	\item practice more,
+		 	\item practice more,
+		 	\item and practice more!
+		 \end{itemize}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[plain]
+	\frametitle{Teaching material}
+	\begin{itemize}
+		 \item This course will loosely follow \alert{Competitive Programming} by Steven Halim
+		 \item First edition can be downloaded from the book homepage \textbf{https://cpbook.net/}
+		 \item A different set of slides for additional reading can also be found at \textbf{https://github.com/Kakalinn/tol607g-glaerur}
+         \item Other good material can be found on \textbf{cp-algorithms.com}, \textbf{codeforces.com}, \textbf{wiki.algo.is} and more
+         \item There are plenty of links on Canvas!
+     \end{itemize}
+\end{frame}
+
+\begin{frame}[plain]
+	\frametitle{Piazza}
+	\begin{itemize}
+		\item Piazza can be used to ask questions
+        \item \textbf{\url{https://piazza.com/ru.is/fall2024/t414aflv}}
+        \item Before posting questions, read the pinned announcement on what questions can be made publically
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[plain]
+	\frametitle{Course Schedule}
+	\scriptsize
+    \begin{center}
+        \begin{tabular}{cl|ll}
+            Week no. & Date & Topic \\ \hline
+            1 & 19.08 & Introduction \\
+            2 & 26.08 & Complexity and standard libraries \\
+            3 & 02.09 & Ad hoc and complete search \\
+            4 & 09.09 & Solving greedily \\
+            & 14.09 & FKHI (10-15 GMT) \\
+            5 & 16.09 & Divide and conquer, dynamic programming part 1 \\
+            6 & 23.09 & Dynamic programming part 2 \\
+            7 & 30.09 & Data structures \\
+            & 05.10 & NCPC (9-14 GMT) \\
+            8 & 07.10 & Graphs part 1 \\
+            9 & 14.10 & Graphs part 2 \\
+            10 & 21.10 & Number theory \\
+            11 & 28.10 & Combinatorics \\
+            12 & 04.11 & Geometry and strings \\
+             & 22.11 & NWERC \\
+        \end{tabular}
+    \end{center}
+\end{frame}
+
+\begin{frame}[plain]
+	\frametitle{Problem Sets}
+	\begin{itemize}
+		\item Each week covers a particular topic
+        \item Groups of up to three people can discuss the problems, but each individual must write and hand in their own code
+        \item We will check for similar submissions, and take action if we think that people are cheating
+        \item Kattis also has a built in anti-cheat feature, which in my personal experience has been plenty good enough to catch a lot of cheaters
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[plain]
+	\frametitle{Problem Sets cntd.}
+	\begin{itemize}
+	    \item Each problem set has $\sim 6$ problems
+        \item To get a perfect score you need to get at least a certain amount of points
+        \item The problems will give varying number of points depending on difficulty
+        \item The grade is not linear, getting half of the perfect score gets you $7.5$
+        \item The deadline for problem sets is always the week's Sunday
+        \item Late handins will not be accepted
+        \item Kattis' verdict is law
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[plain]
+	\frametitle{Bonus problems}
+	\begin{itemize}
+	    \item Each problem set contains 2 challenging bonus problems
+        \item Deadline for all bonus problems is the same as the deadline for the last problem set
+        \item Bonus problems are only included in the final grade if the student passes the course before inclusion
+        \item These can raise the final grade by up to $10\%$
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[plain]
+	\frametitle{Other bonuses}
+	\begin{itemize}
+	    \item Participating in FKHI and/or NCPC will count as a submitted problem set
+	    \item This can effectively replace the lowest or two lowest problem set grades
+	    \item Good class/piazza participation can also be rewarded per teacher's discretion
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[plain]
+	\frametitle{Evaluation}
+	\begin{center}
+        \begin{tabular}{lr}
+            Problem sets & $75\%$ \\
+            Final exam & $25\%$ \\
+            Bonus problems/participation & $10\%$ \\
+            \hline
+            Total & $110\%$ \\
+        \end{tabular}
+	\end{center}
+	
+	\begin{itemize}
+        \item Remember that bonus problems are only considered if the student passes the course, and is only used to raise the final grade
+        \item A final grade greater than 10 will be reduced down to 10
+        \item The final exam must be passed to pass the course
+	\end{itemize}
+\end{frame}
+
+
+\section*{Problem structure and Kattis}
+
+\begin{frame}[plain]
+	\frametitle{Problem Structure}
+	\begin{itemize}
+		\item A typical programming contest problem usually consists of a
+        \begin{itemize} 
+            \item Problem description
+            \item Input description
+            \item Output description
+            \item Example input/output
+            \item A time limit in seconds
+            \item A memory limit in bytes
+        \end{itemize}
+        \item You are asked to write a program that solves the problem for all valid inputs
+        \item The program must not exceed time or memory limits
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[plain]
+	\frametitle{Example Problem}
+	\begin{block}{Problem description}
+    		Write a program that multiplies pairs of integers.
+    \end{block}
+
+    \vspace{10pt}
+    
+    \begin{block}{Input description}
+    		Input starts with one line containing an integer $T$, where $1\leq T \leq
+    100$, denoting the number of test cases. Then $T$ lines follow, each
+    containing a test case. Each test case consists of two integers $A,B$,
+    where $-2^{20} \leq A,B \leq 2^{20}$, separated by a single space.
+    \end{block}
+
+    \vspace{10pt}
+    
+    \begin{block}{Output description}
+    		For each test case, output one line containing the value of $A\times B$.
+    \end{block}
+\end{frame}
+
+\begin{frame}[plain]
+	\frametitle{Example Problem}
+	\begin{center}
+		\begin{tabular}{|l|l|}
+            \hline
+            {\footnotesize Sample input} & {\footnotesize Sample output} \\
+            \hline
+            \ttfamily
+            4 &  \\
+            3 4 & 12 \\
+            13 0 & 0 \\
+            1 8 & 8 \\
+            100 100 & 10000 \\
+            \hline
+        \end{tabular}
+    \end{center}
+\end{frame}
+
+\begin{frame}[plain, fragile]
+    \frametitle{Possible Solution}
+	\begin{scriptsize}
+        \begin{minted}{cpp}
+#include <iostream>
+using namespace std;
+
+int main() {
+    int T;
+    cin >> T;
+    for(int t = 0; t < T; t++) {
+        int A, B;
+        cin >> A >> B;
+        cout << A * B << endl;
+    }
+    return 0;
+}
+        \end{minted}
+    \end{scriptsize}
+    \begin{itemize}
+       \item<2-> Is this correct? \only<5-> {\alert{No!}}
+       \item<3-> What if $A = B = 2^{20}$? \only<4-> {The output is $0$ }
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[plain, fragile]
+    \frametitle{Fixed Solution}
+	\begin{scriptsize}
+        \begin{minted}{cpp}
+#include <iostream>
+using namespace std;
+
+int main() {
+    int T;
+    cin >> T;
+    for(int t = 0; t < T; t++) {
+        long long A, B;
+        cin >> A >> B;
+        cout << A * B << endl;
+    }
+    return 0;
+}
+        \end{minted}
+    \end{scriptsize}
+    \begin{itemize}
+       \item<2-> Is this correct? \only<4-> {\alert{Yes!}}
+       \item<3-> The values are at most $2^{20}$ in absolute value, so their product is at most $2^{40}$ in absolute value, which fits. 
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[plain]
+    \frametitle{Automatic Judging}
+    \begin{itemize}
+        \item The problems will be available on \alert{Kattis}:
+        \item \textbf{https://ru.kattis.com/}
+        \vspace{20pt}
+        \item Kattis is an online judge
+        \item You will submit your solutions to Kattis, and get immediate feedback about the solution
+        \item You can submit in any of the supported languages:
+        \begin{itemize}
+            \item C, C++, Java, Pythom, C\#{}, Javascript
+            \item and \textbf{many} others
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[plain]
+    \frametitle{Verdicts}
+    \begin{itemize}
+        \item Feedback is (intentionally) limited
+        \item You will (almost always) receive one of the following verdicts:
+        \begin{itemize}
+            \item Accepted (AC)
+            \item Wrong Answer (WA)
+            \item Compile Error (CE)
+            \item Run Time Error (RTE)
+            \item Time Limit Exceeded (TLE)
+            \item Memory Limit Exceeded (MLE)
+        \end{itemize}
+        \item Neither we nor Kattis will give away info on the test data used to test solutions
+    \end{itemize}
+\end{frame}
+
+
+\end{document}
+
