@@ -982,7 +982,7 @@ h: [8]
 \begin{frame}[plain,fragile]{C++ NGE}
     \begin{minted}{cpp}
 template<typename T>
-vector<size_t> nge(vector<T>& v) {
+vector<size_t> nge(const vector<T>& v) {
   vector<size_t> res(v.size(), -1);
   stack<pair<size_t,T>> s; 
   s.push(make_pair(0,v[0]));
@@ -1072,13 +1072,13 @@ vector<size_t> nge(vector<T>& v) {
     \end{itemize}
 \end{frame}
 
-\begin{frame}[plain, fragile]{C++ implementation}
+\begin{frame}[plain, fragile]{C++ implementation (min-heap)}
     \scriptsize
     \begin{minted}{cpp}
 template<typename T> struct Heap {
     vector<T> h; Heap() : h(1) { }
-    size_t size() { return h.size() - 1; }
-    T peek() { return h[1]; }
+    constexpr size_t size() { return h.size() - 1; }
+    constexpr T peek() { return h[1]; }
     void swim(size_t i) {
         while(i != 1 && h[i] < h[i / 2]) {
             swap(h[i], h[i / 2]);
@@ -1142,10 +1142,11 @@ template<typename T> struct Heap {
     \tiny
     \begin{multicols}{2}
     \begin{minted}{cpp}
+template<typename K, typename V>
 struct HeapNode {
-    int32_t k, v; HeapNode *lch, *sib;
+    K k; V v; HeapNode *lch, *sib;
     HeapNode() : lch(NULL), sib(NULL) { }
-    HeapNode(int32_t _k, int32_t _v, HeapNode *_lch, 
+    HeapNode(K _k, V _v, HeapNode *_lch, 
         HeapNode *_sib) :
         k(_k), v(_v), lch(_lch), sib(_sib) { }
     void add_child(HeapNode *node) {
@@ -1180,10 +1181,10 @@ struct PairingHeap {
         A->sib = NULL; B->sib = NULL;
         return merge(merge(A, B), twopass(nw));
     }
-    pair<int32_t,int32_t> top() {
+    constexpr pair<K,V> top() {
         return make_pair(root->k, root->v);
     }
-    void insert(int32_t k, int32_t v) {
+    void insert(K k, V v) {
         root = merge(root, 
             new HeapNode(k, v, NULL, NULL));
         sz++;
