@@ -84,7 +84,7 @@
     \begin{itemize}
         \item If fast I/O is needed, \texttt{sys.stdin} and \texttt{sys.stdout} are slightly faster in python.
         \item Similarly for fast I/O in Java, look up Kattio, it is much \textit{much} faster. It can be found on github.
-        \item To speed up C++ I/O somewhat one can use \texttt{ios\_{}base::sync\_{}with\_{}stdio(false)}. Note that if this is done \texttt{scanf} or \texttt{printf} no longer sync up with \texttt{cin} and \texttt{cout}, so you have to pick one set and stick to it.
+        \item To speed up C++ I/O somewhat one can use \texttt{ios\_{}base::sync\_{}with\_{}stdio(false)}. Note that if this is done \texttt{scanf} or \texttt{printf} no longer sync up with \texttt{cin} and \texttt{cout}, so you have to pick one set and stick to it. Similarly \texttt{cin.tie(nullptr)} can speed things up as cout will no longer flush before cin is used, but this can cause problems when this behaviour is desired.
     \end{itemize}
 \end{frame}
 
@@ -252,6 +252,18 @@
     \end{itemize}
 \end{frame}
 
+\begin{frame}[plain]
+    \frametitle{Language features}
+    \begin{itemize}
+        \item The C++ standard library has many useful features like this
+        \item \texttt{reverse} can reverse a vector or array in place
+        \item \texttt{rotate} can rotate a vector or array in place
+        \item \texttt{count} and \texttt{count\_if} can count elements, or count elements satisfying a predicate function
+        \item \texttt{find} and \texttt{find\_if} can find an element, or find an element satisfying a predicate function
+        \item And many more!
+    \end{itemize}
+\end{frame}
+
 \section*{Data structures}
 
 \begin{frame}[plain]{Why do we need data structures?}
@@ -351,7 +363,7 @@
     \begin{tabular}{l|l}
     Operation & Complexity \\ \hline
     Push element & $\mathcal{O}(1)$ \\
-    Access most recent lement & $\mathcal{O}(1)$ \\
+    Access most recent element & $\mathcal{O}(1)$ \\
     Pop most recent element & $\mathcal{O}(1)$ \\
     \end{tabular}
     \end{center}
@@ -368,7 +380,7 @@
     \begin{tabular}{l|l}
     Operation & Complexity \\ \hline
     Push element & $\mathcal{O}(1)$ \\
-    Access oldest lement & $\mathcal{O}(1)$ \\
+    Access oldest element & $\mathcal{O}(1)$ \\
     Pop oldest element & $\mathcal{O}(1)$ \\
     \end{tabular}
     \end{center}
@@ -1014,6 +1026,45 @@ vector<size_t> nge(vector<T>& v) {
 \end{frame}
 
 \begin{frame}[plain]{Heaps}
+    \begin{center}
+    \begin{tikzpicture}[scale=0.8]
+    \def\spa{2}
+    \node[minimum size=1cm, draw, circle] (A) at (0, 0) {$50$};
+    \node[minimum size=1cm, draw, circle] (B) at (-\spa, -\spa) {$21$};
+    \node[minimum size=1cm, draw, circle] (C) at (\spa, -\spa) {$43$};
+    \node[minimum size=1cm, draw, circle] (D) at (-1.5*\spa, -2*\spa) {$11$};
+    \node[minimum size=1cm, draw, circle] (E) at (-0.5*\spa, -2*\spa) {$7$};
+    \node[minimum size=1cm, draw, circle] (F) at (0.5*\spa, -2*\spa) {$1$};
+    \node[minimum size=1cm, draw, circle] (G) at (1.5*\spa, -2*\spa) {$29$};
+    \node[minimum size=1cm, draw, circle] (H) at (-2*\spa, -3*\spa) {$10$};
+    \node[minimum size=1cm, draw, circle] (I) at (-\spa, -3*\spa) {$2$};
+    
+    \node (Ai) [above right=0.1cm of A] {\texttt{0}};
+    \node (Bi) [above left=0.1cm of B] {\texttt{1}};
+    \node (Ci) [above right=0.1cm of C] {\texttt{2}};
+    \node (Di) [above left=0.1cm of D] {\texttt{3}};
+    \node (Ei) [above=0.1cm of E] {\texttt{4}};
+    \node (Fi) [above=0.1cm of F] {\texttt{5}};
+    \node (Gi) [above right=0.1cm of G] {\texttt{6}};
+    \node (Hi) [above left=0.1cm of H] {\texttt{7}};
+    \node (Ii) [above right=0.1cm of I] {\texttt{8}};
+    
+    \draw[->, thick] (A) -- (B);
+    \draw[->, thick] (A) -- (C);
+    \draw[->, thick] (B) -- (D);
+    \draw[->, thick] (B) -- (E);
+    \draw[->, thick] (C) -- (F);
+    \draw[->, thick] (C) -- (G);
+    \draw[->, thick] (D) -- (H);
+    \draw[->, thick] (D) -- (I);
+    \end{tikzpicture}
+    \end{center}
+    \begin{large}
+    \texttt{ARRAY: [SIZE, 50, 21, 43, 11, 7, 1, 29, 10, 2]}
+    \end{large}
+\end{frame}
+
+\begin{frame}[plain]{Heaps}
     \begin{itemize}
         \item Items can be inserted by pushing them to the back and fixing the heap condition upwards from them.
         \item Items can be deleted by replacing the smallest value with a leaf and then fixing the heap condition downwards.
@@ -1026,15 +1077,15 @@ vector<size_t> nge(vector<T>& v) {
     \begin{minted}{cpp}
 template<typename T> struct Heap {
     vector<T> h; Heap() : h(1) { }
-    int size() { return h.size() - 1; }
+    size_t size() { return h.size() - 1; }
     T peek() { return h[1]; }
-    void swim(int i) {
+    void swim(size_t i) {
         while(i != 1 && h[i] < h[i / 2]) {
             swap(h[i], h[i / 2]);
             i /= 2; } }
-    void sink(int i) {
+    void sink(size_t i) {
         while(true) {
-            int mn = i;
+            size_t mn = i;
             if(2 * i + 1 < h.size() && h[mn] > h[2 * i + 1]) mn = 2 * i + 1;
             if(2 * i  < h.size() && h[mn] > h[2 * i]) mn = 2 * i;
             if(mn != i) swap(h[i], h[mn]), i = mn;
@@ -1092,9 +1143,9 @@ template<typename T> struct Heap {
     \begin{multicols}{2}
     \begin{minted}{cpp}
 struct HeapNode {
-    int k, v; HeapNode *lch, *sib;
+    int32_t k, v; HeapNode *lch, *sib;
     HeapNode() : lch(NULL), sib(NULL) { }
-    HeapNode(int _k, int _v, HeapNode *_lch, 
+    HeapNode(int32_t _k, int32_t _v, HeapNode *_lch, 
         HeapNode *_sib) :
         k(_k), v(_v), lch(_lch), sib(_sib) { }
     void add_child(HeapNode *node) {
@@ -1106,7 +1157,7 @@ struct HeapNode {
     }
 };
 struct PairingHeap {
-    HeapNode* root; int sz;
+    HeapNode* root; size_t sz;
     PairingHeap() : root(NULL), sz(0) { }
     HeapNode* merge(HeapNode* A, HeapNode* B) {
         if(A == NULL) return B;
@@ -1129,10 +1180,10 @@ struct PairingHeap {
         A->sib = NULL; B->sib = NULL;
         return merge(merge(A, B), twopass(nw));
     }
-    ii top() {
-        return ii(root->k, root->v);
+    pair<int32_t,int32_t> top() {
+        return make_pair(root->k, root->v);
     }
-    void insert(int k, int v) {
+    void insert(int32_t k, int32_t v) {
         root = merge(root, 
             new HeapNode(k, v, NULL, NULL));
         sz++;
