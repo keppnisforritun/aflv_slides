@@ -1,0 +1,388 @@
+\documentclass{beamer}
+\usefonttheme[onlymath]{serif}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{gensymb}
+\usepackage{parskip}
+\usepackage{mathtools}
+\usepackage{listings}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{color}
+\usepackage{enumerate}
+\usepackage{tikz}
+\usetikzlibrary{calc}
+\usetikzlibrary{positioning}
+\usetikzlibrary{angles}
+\usetikzlibrary{shapes}
+\usetikzlibrary{arrows}
+\usepackage{verbatim}
+\usepackage{multicol}
+\usepackage{array}
+\usepackage{minted}
+\parskip 0pt
+
+
+\DeclareMathOperator{\lcm}{lcm}
+\newcommand\floor[1]{\left\lfloor#1\right\rfloor}
+\newcommand\ceil[1]{\left\lceil#1\right\rceil}
+\newcommand\abs[1]{\left|#1\right|}
+\newcommand\p[1]{\left(#1\right)}
+\newcommand\sqp[1]{\left[#1\right]}
+\newcommand\cp[1]{\left\{#1\right\}}
+\newcommand\norm[1]{\left\lVert#1\right\rVert}
+\renewcommand\Im{\operatorname{Im}}
+\renewcommand\Re{\operatorname{Re}}
+
+\usetheme{metropolis}
+\definecolor{dark yellow}{rgb} {0.6,0.6,0.0}
+\definecolor{dark green}{rgb} {0.0,0.6,0.0}
+
+\graphicspath{{myndir/}}
+
+\title{Ad hoc and complete search}
+\author{Atli FF}
+\institute{\href{http://ru.is/td}{School of Computer Science} \\[2pt] \href{http://ru.is}{Reykjavík University}}
+\titlegraphic{\hfill\includegraphics[height=0.6cm]{kattis}}
+
+\begin{document}
+\maketitle
+
+\section*{Ad hoc}
+
+\begin{frame}[plain]{Todo}
+    \begin{itemize}
+        \item Todo
+    \end{itemize}
+\end{frame}
+
+\section*{Complete search}
+
+\begin{frame}[plain]{Complete search}
+    \begin{itemize}
+        \item We have a finite set of objects
+        \item We want to find an element in that set which satisfies some constraints
+        \begin{itemize}
+            \item or find \textbf{all} elements in that set which satisfy some constraints
+        \end{itemize}
+
+        \vspace{5pt}
+        \item Simple! Just go through all elements in the set, and for each of them check if they satisify the constraints
+        \item Of course it's not going to be very efficient...
+        \item But remember, we always want the simplest solution that runs in time
+        \item Complete search should be the first problem solving paradigm you think about when you're trying to solve a problem
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[plain]{Example problem: Closest Sums}
+    \begin{itemize}
+        \item https://open.kattis.com/problems/closestsums
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[plain]{Complete search}
+    \begin{itemize}
+        \item What if the search space is more complex?
+            \begin{itemize}
+                \item All permutations of $n$ items
+                \item All subsets of $n$ items
+                \item All ways to put $n$ queens on an $n\times n$ chessboard without any queen attacking any other queen
+            \end{itemize}
+        \item How are we supposed to iterate through the search space?
+        \item Let's take a better look at these examples
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[plain,fragile]{Iterating through permutations}
+    \begin{itemize}
+        \item Already implemented in many standard libraries:
+            \begin{itemize}
+                \item \texttt{next\_{}permutation} in C++
+                \item \texttt{itertools.permutations} in Python
+            \end{itemize}
+    \end{itemize}
+
+            \begin{minted}{cpp}
+int n = 5;
+vector<int> perm(n);
+for (int i = 0; i < n; i++) perm[i] = i + 1;
+
+do {
+    for (int i = 0; i < n; i++) {
+        printf("%d ", perm[i]);
+    }
+    printf("\n");
+
+} while (next_permutation(perm.begin(), perm.end()));
+            \end{minted}
+
+\end{frame}
+
+\begin{frame}[plain]{Iterating through permutations}
+    \begin{itemize}
+        \item Even simpler in Python
+        \vspace{20pt}
+        \item Remember that there are $n!$ permutations of length $n$, so usually you can only go through all permutations if $n \leq 10$
+            \begin{itemize}
+                \item Otherwise you need to find a more clever approach than complete search
+            \end{itemize}
+            \vspace{20pt}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[plain]{Example problem: Veci}
+    \begin{itemize}
+        \item https://open.kattis.com/problems/veci
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[plain,fragile]{Iterating through subsets}
+    \begin{itemize}
+        \item Remember the bit representation of subsets?
+        \item Each integer from $0$ to $2^n - 1$ represents a different subset of the set $\{1,2,\ldots,n\}$
+        \item Just iterate through the integers
+    \end{itemize}
+
+            \begin{minted}{cpp}
+int n = 5;
+for (int subset = 0; subset < (1 << n); subset++) {
+    for (int i = 0; i < n; i++) {
+        if ((subset & (1 << i)) != 0) {
+            printf("%d ", i+1);
+        }
+    }
+    printf("\n");
+}
+            \end{minted}
+\end{frame}
+
+\begin{frame}[plain]{Iterating through subsets}
+    \begin{itemize}
+        \item Similar in Python
+        \vspace{20pt}
+        \item Remember that there are $2^n$ subsets of $n$ elements, so usually you can only go through all subsets if $n \leq 25$
+            \begin{itemize}
+                \item Otherwise you need to find a more clever approach than complete search
+            \end{itemize}
+            \vspace{20pt}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[plain]{Example problem: Exam Manipulation}
+    \begin{itemize}
+        \item https://open.kattis.com/problems/exammanipulation
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[plain,fragile]{Backtracking}
+    \begin{itemize}
+        \item We've seen two ways to go through a complex search space, but both of the solutions were rather specific
+        \item Would be nice to have a more general ``framework''
+        \vspace{10pt}
+        \item Backtracking!
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[plain,fragile]{Backtracking}
+    \begin{itemize}
+        \item Define states
+            \begin{itemize}
+                \item We have one initial ``empty'' state
+                \item Some states are partial
+                \item Some states are complete
+            \end{itemize}
+        \vspace{10pt}
+        \item Define transitions from a state to possible next states
+        \vspace{10pt}
+        \item Basic idea:
+            \begin{enumerate}
+                \item Start with the empty state
+                \item Use recursion to traverse all states by going through the transitions
+                \item If the current state is invalid, then stop exploring this branch
+                \item Process all complete states (these are the states we're looking for)
+            \end{enumerate}
+    \end{itemize}
+\end{frame}
+
+
+\begin{frame}[plain,fragile]{Backtracking}
+    \begin{itemize}
+        \item General solution form:
+    \end{itemize}
+
+    \begin{minted}[fontsize=\scriptsize]{cpp}
+state S;
+
+void generate() {
+    if (!is_valid(S))
+        return;
+
+    if (is_complete(S))
+        print(S);
+
+    foreach (possible next move P) {
+        apply move P;
+        generate();
+        undo move P;
+    }
+}
+
+S = empty state;
+generate();
+    \end{minted}
+\end{frame}
+
+
+\begin{frame}[plain,fragile]{Generating all subsets}
+    \begin{itemize}
+        \item Also simple to do with backtracking:
+    \end{itemize}
+    \begin{minted}[fontsize=\tiny]{cpp}
+const int n = 5;
+bool pick[n];
+
+void generate(int at) {
+    if (at == n) {
+        for (int i = 0; i < n; i++) {
+            if (pick[i]) {
+                printf("%d ", i+1);
+            }
+        }
+        printf("\n");
+    } else {
+
+        // either pick element no. at
+        pick[at] = true;
+        generate(at + 1);
+
+        // or don't pick element no. at
+        pick[at] = false;
+        generate(at + 1);
+    }
+}
+
+generate(0);
+    \end{minted}
+\end{frame}
+
+
+\begin{frame}[plain,fragile]{Generating all permutations}
+    \begin{itemize}
+        \item Also simple to do with backtracking:
+    \end{itemize}
+    \begin{minted}[fontsize=\tiny]{cpp}
+const int n = 5;
+int perm[n];
+bool used[n];
+
+void generate(int at) {
+    if (at == n) {
+        for (int i = 0; i < n; i++) {
+            printf("%d ", perm[i]+1);
+        }
+        printf("\n");
+    } else {
+
+        // decide what the at-th element should be
+        for (int i = 0; i < n; i++) {
+            if (!used[i]) {
+                used[i] = true;
+                perm[at] = i;
+
+                generate(at + 1);
+
+                // remember to undo the move:
+                used[i] = false;
+            }
+        }
+    }
+}
+
+memset(used, 0, n);
+generate(0);
+    \end{minted}
+\end{frame}
+
+\begin{frame}[plain,fragile]{$n$ queens}
+    \begin{itemize}
+        \item Given $n$ queens and an $n\times n$ chessboard, find all ways to
+            put the $n$ queens on the chessboard such that no queen can attack
+            any other queen
+
+        \vspace{10pt}
+
+        \item This is a very specific set we want to iterate through, so we probably won't find this in the standard library
+        \item We could use our bit trick to iterate through all subsets of the $n\times n$ cells of size $n$, but that would be very slow
+        \vspace{20pt}
+        \item Let's use backtracking
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[plain,fragile]{$n$ queens}
+    \begin{itemize}
+        \item Go through the cells in increasing order
+        \item Either put a queen on that cell or not (transition)
+        \item Don't put down a queen if she's able to attack another queen already on the table
+    \end{itemize}
+
+    \vspace{10pt}
+
+    \begin{minted}{cpp}
+const int n = 8;
+bool has_queen[n][n];
+int queens_left = n;
+
+// generate function
+
+memset(has_queen, 0, sizeof(has_queen));
+generate(0, 0);
+    \end{minted}
+\end{frame}
+
+\begin{frame}[plain,fragile]{$n$ queens}
+    \begin{minted}[fontsize=\tiny]{cpp}
+void generate(int x, int y) {
+    if (y == n) {
+        generate(x+1, 0);
+    } else if (x == n) {
+        if (queens_left == 0) {
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j < n; j++) {
+                    printf("%c", has_queen[i][j] ? 'Q' : '.');
+                }
+                printf("\n");
+            }
+        }
+    } else {
+
+        if (queens_left > 0 and no queen can attack cell (x,y)) {
+            // try putting a queen on this cell
+            has_queen[x][y] = true;
+            queens_left--;
+
+            generate(x, y+1);
+
+            // undo the move
+            has_queen[x][y] = false;
+            queens_left++;
+        }
+
+        // try leaving this cell empty
+        generate(x, y+1);
+    }
+}
+    \end{minted}
+\end{frame}
+
+\begin{frame}[plain]{Example problem: Lucky Numbers}
+    \begin{itemize}
+        \item https://open.kattis.com/problems/luckynumber
+    \end{itemize}
+\end{frame}
+
+\end{document}
+
