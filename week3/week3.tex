@@ -54,9 +54,12 @@
 
 \section*{Ad hoc}
 
-\begin{frame}[plain]{Todo}
+\begin{frame}[plain]{Ad hoc}
     \begin{itemize}
-        \item Todo
+        \item Ekki mikið að segja um ad hoc dæmi
+        \item Ad hoc þýðir að gera eigi það sem dæmið segir
+        \item Engin brögð, engin trikk, bara vinna
+        \item Þýðir \textit{ekki} að þau séu auðveld
     \end{itemize}
 \end{frame}
 
@@ -186,6 +189,8 @@ for (int subset = 0; subset < (1 << n); subset++) {
         \item Backtracking!
     \end{itemize}
 \end{frame}
+
+\section*{Backtracking}
 
 \begin{frame}[plain,fragile]{Backtracking}
     \begin{itemize}
@@ -381,6 +386,52 @@ void generate(int x, int y) {
 \begin{frame}[plain]{Example problem: Lucky Numbers}
     \begin{itemize}
         \item https://open.kattis.com/problems/luckynumber
+        \item As a note, another classic use case is solving sudokus
+    \end{itemize}
+\end{frame}
+
+\section*{Meet in the middle}
+
+\begin{frame}[plain,fragile]{Halving the exponent}
+    \begin{itemize}
+        \item We now know at least two different ways we could solve the subset sum problem, i.e. given some numbers check if there is a subset summing to some given target value
+        \item They would have time complexity $\mathcal{O}(2^n)$ or even $\mathcal{O}(n2^n)$, which is quite a lot.
+        \item But there is a trick we can employ to get $\mathcal{O}(n2^{n/2})$ instead.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[plain,fragile]{Halves}
+    \begin{itemize}
+        \item Split the numbers into two groups $A, B$, then iterate over every subset of $A$ and put it into a set. This takes $\mathcal{O}(n2^{n/2})$ time.
+        \item Then iterate over every subset in $B$, and each time check if the target value minus the sum of $B$ is in our set of sums. This also takes $\mathcal{O}(n2^{n/2})$ time.
+        \item This way we do the problem one half at a time, and meet in the middle.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[plain,fragile]{Middle}
+    \begin{itemize}
+        \item This can be applied more generally, searching from both ends of a problem.
+        \item It is a fairly common tactic in cryptography as well.
+        \item Sometimes it can also be combined with backtracking, backtracking from two ends at once.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[plain,fragile]{Not quite half}
+    \begin{itemize}
+        \item Sometimes the gain isn't quite a square root of the base of the exponential run-time, but gains can still be large.
+        \item Take the problem of having a set of numbers $\{x_1, \dots, x_n\}$ and wanting to find two different non-empty subsets $\{x_{i_1}, \dots, x_{i_r}\}$ and $\{x_{j_1}, \dots, x_{j_s}\}$ with the same sum.
+        \item The straight forward way would be $\mathcal{O}(4^n)$, but iterating over all subsets and counting how many get to any given sum is $\mathcal{O}(n2^n)$.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[plain,fragile]{Not quite half}
+    \begin{itemize}
+        \item But we can split $x_1, \dots, x_n$ in two halves, then rewrite the condition
+        \[ x_{i_1} + \dots+ x_{i_r} = x_{j_1} + \dots + x_{j_s}\]
+        as
+        \[ x_{i_1} + \dots + x_{i_r'} - x_{j_1} - \dots - x_{j_s'} = x_{j_s'+1} + \dots + x_{j_s} - x_{i_r' + 1} - \dots - x_{i_r}\]
+        so that we move every term in the first half to the left hand side and every term in the second half to the right side.
+        \item Then we can meet in the middle on all ways to ignore, add or subtract the element from the sum to get a $\mathcal{O}(n3^{n/2})$.
     \end{itemize}
 \end{frame}
 
