@@ -224,7 +224,7 @@ int main() {
     \begin{itemize}
         \item Let's now show it actually stays ahead of any optimal solution
         \item Let $J$ be the set of jumps from our greedy algorithm and $J^*$ be an optimal set of jumps
-        \item Then $|J| \leq |J^*|$ since it's optimal
+        \item Then $|J| \geq |J^*|$ since it's optimal
         \item Let $p(i, J)$ be the position after taking the first $i$ jumps in $J$
         \item Let's prove that for all $i$ we have $p(i, J) \geq p(i, J^*)$
     \end{itemize}
