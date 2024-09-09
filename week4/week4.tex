@@ -84,6 +84,22 @@
     \end{itemize}
 \end{frame}
 
+\begin{frame}[plain]{Lilypad jump}
+    \begin{itemize}
+        \item Consider a frog jumping on a sequence of lily pads, there is one at $x = 0$ and one at $x = n$, with some amount of lilypads in between
+        \item The frog can jump at most distance $r$
+        \item When at a given lily pad, what's the best move?
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[plain]{Lilypad jump}
+    \begin{itemize}
+        \item Clearly just jump as far right as possible!
+        \item But be careful, this is very contingent on the frog being able to jump any distance in $[0, r]$
+        \item If it could jump any distance in $[r/2, r]$, it would not be true for example
+    \end{itemize}
+\end{frame}
+
 \begin{frame}[plain]{Taxi assignment}
     \begin{itemize}
         \item Let's consider another problem. You are managing a taxi company and today $n$ drivers showed up and you have $m$ cars. 
@@ -150,6 +166,14 @@ int main() {
         \item Say the solutions agree on the first $r$ jobs (possibly $0$). 
         \item Now neither $i_{r+1}$ nor $j_{r+1}$ clash with the jobs $i_1 = j_1, i_2 = j_2, \dots, i_r = j_r$. But because we ordered things by end time, we must have that job $i_{r+1}$ ends no later than $j_{r+1}$. But then we could just as well have picked $i_{r+1}$. But this holds for any $r$, so by induction we have that $i_1, \dots, i_k$ is no worse than $j_1, \dots, j_l$, which gives a contradiction.
         \item Thus the algorithm is optimal.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[plain]{Many more}
+    \begin{itemize}
+        \item There are many many more and we will see plenty in the course
+        \item Many famous algorithms are famous because they perform non-trivial greedy steps
+        \item Dijkstra's algorithm, Huffman coding, Kruskal's algorithm, Horn satisfiability and many more
     \end{itemize}
 \end{frame}
 
