@@ -177,4 +177,157 @@ int main() {
     \end{itemize}
 \end{frame}
 
+\begin{frame}[plain]{Proving correctness}
+    \begin{itemize}
+        \item How do we prove the greedy algorithms are correct?
+        \item When in programming contests this is usually overkill, but at a workplace it is generally not
+        \item There are two main common arguments that tackle this, but often novel methods are needed
+        \item These are usually called "Greedy stays ahead" and "Exchange arguments"
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[plain]{Proving correctness}
+    \begin{itemize}
+        \item "Greedy stays ahead" aims to prove that during each greedy step it consistently stays ahead of all other possible choices
+        \item "Exchange arguments" aims to show that you can turn any solution into the greedy solution with a sequence of "exchanges" without making them any worse, so the greedy solution is as good as it gets
+        \item Sometimes a part of this is showing that the greedy solution outputs a valid solution at all, as that is not obvious in every case
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[plain]{Proving correctness}
+    \begin{itemize}
+        \item Consider the lilypads again.
+        \item We'll now prove it's optimal, which is more work than it may seem at first
+        \item First we prove that the greedy solution reaches the final lily pad if there is a path there
+        \item Note again this is not true for many minor variants of the problem!
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[plain]{Proving correctness}
+    By contradiction; suppose it did not. 
+    Let the positions of the lilypads be $x_1 < x_2 < \dots < x_m$. 
+    Since our algorithm didn't find a path, it must have stopped 
+    at some lilypad $x_k$ and not been able to jump to a 
+    future lilypad. In particular, this means it could not 
+    jump to lilypad $k + 1$, so $x_k + r < x_{k+1}$.
+	Since there is a path from lilypad 1 to the lilypad $m$, 
+	there must be some jump in that path that starts
+	before lilypad $k + 1$ and ends at or after lilypad $k + 1$.
+	This jump can't be made from lilypad $k$, so it must
+	have been made from lilypad $s$ for some $s < k$. But 
+	then we have $x_s + r < x_k + r < x_{k+1}$, so this jump is illegal.
+	We have reached a contradiction, so our assumption
+	was wrong and our algorithm always finds a path.
+\end{frame}
+
+\begin{frame}[plain]{Proving correctness}
+    \begin{itemize}
+        \item Let's now show it actually stays ahead of any optimal solution
+        \item Let $J$ be the set of jumps from our greedy algorithm and $J^*$ be an optimal set of jumps
+        \item Then $|J| \leq |J^*|$ since it's optimal
+        \item Let $p(i, J)$ be the position after taking the first $i$ jumps in $J$
+        \item Let's prove that for all $i$ we have $p(i, J) \geq p(i, J^*)$
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[plain]{Proving correctness}
+We proceed by induction. 
+As a base case, if $i = 0$, then
+$p(0, J) = 0 \geq 0 = p(0, J*)$ since the frog hasn't moved.
+For the inductive step, assume that the claim holds
+for some $0 \leq i < | J^*|$. We will prove the claim holds
+for $i + 1$ by considering two cases:
+\begin{itemize}
+\item Case 1: $p(i, J) \geq p(i + 1, J^*)$. Since each jump moves forward, 
+we have $p(i + 1, J) \geq p(i, J)$, so we have $p(i + 1, J) \geq p(i + 1, J^*)$.
+\item Case 2: $p(i, J) < p(i + 1, J^*)$. Each jump is of size at most $r$, 
+so $p(i + 1, J^*) \leq p(i, J^*) + r$. By the inductive hypothesis, we
+know $p(i, J) \geq p(i, J^*)$, so $p(i + 1, J^*) \leq p(i, J) + r$. Therefore, 
+the greedy algorithm can jump to position at least $p(i + 1, J^*)$. Therefore,
+$p(i + 1, J) \geq p(i + 1, J^*)$.
+\end{itemize}
+So $p(i + 1, J) \geq p(i + 1, J^*)$, completing the induction.
+\end{frame}
+
+\begin{frame}[plain]{Proving correctness}
+    \begin{itemize}
+        \item And now we are almost done!
+        \item Finally we just have to prove that $|J| = |J^*|$, which would mean the greedy is always optimal
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[plain]{Proving correctness}
+Since $J^*$ is an optimal solution, we know that
+$| J^*| \leq | J|$. We will prove $| J^*| \geq | J|$.
+Suppose for contradiction that $| J^*| < | J|$. Let
+$k = | J^*|$. From before, we have $p(k, J^*) \leq p(k, J)$.
+Because the frog arrives at position $n$ after $k$ jumps
+along series $J^*$, we know $n \leq p(k, J)$. Because the
+greedy algorithm never jumps past position $n$, we
+know $p(k, J) \leq n$, so $n = p(k, J).$ Since $| J^*| < | J|$,
+the greedy algorithm must have taken another
+jump after its $k$-th jump, contradicting that the
+algorithm stops after reaching position $n$.
+We have reached a contradiction, so our
+assumption was wrong and $| J^*| = | J|$, so the
+greedy algorithm produces an optimal solution.
+\end{frame}
+
+\begin{frame}[plain]{Proving correctness}
+    \begin{itemize}
+        \item That was a lot of effort!
+        \item Now, which kind of greedy proof was that?
+        \item<2-> It was a "Greedy stays ahead" proof, so let us next see an exchange proof
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[plain]{Proving correctness}
+    \begin{itemize}
+        \item To consider exchange arguments we have to do things slightly out of order and nab an algorithm from the future week of graph theory
+        \item Consider a set of houses, we want to lay fibre cable between them such that each house is connected to every other house through some set of cables
+        \item Doesn't have to be a direct connection, just some path exists between them
+        \item For each pair of houses we are given the cost of laying a cable between them
+        \item What's the cheapest cable-laying procedure?
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[plain]{Proving correctness}
+    \begin{itemize}
+        \item Our greedy algorithm will be as follows
+        \item Start with just a single house and consider it "active"
+        \item Choose the cheapest cable that goes between an active house and one that is not active
+        \item Make the newly connected house active, and keep going
+        \item Now we prove this is optimal!
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[plain]{Proving correctness}
+    Let $T$ be the set of cables chosen by our algorithm and $T^*$ be some optimal set.
+    Let $c(T)$ denote the total cost of a set of cables. We will prove $c(T) = c(T^*)$.
+    If $T = T^*$ the result is obvious, so we can assume $T \neq T^*$.
+    Then let $(u, v)$ be a cable in $T \setminus T^*$. Let $S$ be the set of active houses
+    when $(u, v)$ was added to $T$ and $H$ be the set of all houses. Then $(u, v)$ is the cheapest
+    edge between $S$ and $H \setminus S$. Since $T^*$ connects all houses it must contain some
+    path from $u$ to $v$. This path begins in $S$ and ends in $H \setminus S$ so there must be some
+    cable $(x, y)$ such that $x \in S$ and $y \in H \setminus S$. Since $(u, v)$ is the cheapest such
+    edge we must have $c(\{(u, v)\}) \leq c(\{(x, y)\})$. Let $T' = T^* \cup \{(u, v)\} \setminus \{(x, y)\}$.
+\end{frame}
+
+\begin{frame}[plain]{Proving correctness}
+    Since every house in $S$ can reach every other house in $S$ without using $(u, v)$, $T'$ is valid for
+    those houses, and the same goes for $H \setminus S$. But then $T'$ allows any house in $S$ to reach
+    $u$, then go to $v$, then to any house in $H \setminus S$. So $T'$ is a valid set of connections. But note
+    that $c(T') = c(T^*)  - c(\{(x, y)\}) + c(\{(u, v)\}) \leq c(T^*)$. Since $T^*$ is optimal this means
+    $c(T') \geq c(T^*)$, so $c(T') = c(T^*)$. Note that $|T \setminus T'| = |T \setminus T^*| - 1$, so if
+    we repeat this same argument once for each edge in $T \setminus T^*$ we will have converted
+    $T^*$ into $T$ without changing $T$, thus $c(T) = c(T^*)$.
+\end{frame}
+
+\begin{frame}[plain]{Proving correctness}
+    \begin{itemize}
+        \item Very mathy!
+        \item But that is an example of an "Exchange argument" proof of correctness
+    \end{itemize}
+\end{frame}
+
 \end{document}
