@@ -125,8 +125,8 @@ value dp(problem P) {
     \end{itemize}
 
     \begin{align*}
+        \mathrm{fibonacci}(0) &= 0\\
         \mathrm{fibonacci}(1) &= 1\\
-        \mathrm{fibonacci}(2) &= 1\\
         \mathrm{fibonacci}(n) &= \mathrm{fibonacci}(n - 2) + \mathrm{fibonacci}(n - 1)
     \end{align*}
 \end{frame}
@@ -524,12 +524,12 @@ int opt(int i, int x) {
 \begin{frame}[plain]{Longest increasing subsequence}
     \begin{itemize}
 \item Given an array $a[0]$, $a[1]$, \ldots, $a[n-1]$ of integers, what is the length of the longest increasing subsequence?
-    \vspace{5pt}
+    \vspace{3pt}
 \item First, what is a subsequence?
 \item If we delete zero or more elements from $a$, then we have a subsequence of $a$
-    \vspace{5pt}
+    \vspace{3pt}
 \item Example: $a = [5,1,8,1,9,2]$
-    \vspace{5pt}
+    \vspace{3pt}
 \item $[5,8,9]$ is a subsequence
 \item $[1,1]$ is a subsequence
 \item $[5,1,8,1,9,2]$ is a subsequence
@@ -542,16 +542,16 @@ int opt(int i, int x) {
 \begin{frame}[plain]{Longest increasing subsequence}
     \begin{itemize}
 \item Given an array $a[0]$, $a[1]$, \ldots, $a[n-1]$ of integers, what is the length of the longest increasing subsequence?
-    \vspace{5pt}
+    \vspace{3pt}
 \item An increasing subsequence of $a$ is a subsequence of $a$ such that the elements are in (strictly) increasing order
-    \vspace{5pt}
+    \vspace{3pt}
 \item $[5,8,9]$ and $[1,8,9]$ are the longest increasing subsequences of $a = [5,1,8,1,9,2]$
 
-    \vspace{5pt}
+    \vspace{3pt}
 \item How do we compute the length of the longest increasing subsequence?
 \item There are $2^n$ subsequences, so we can go through all of them
 \item That would result in an $O(n2^n)$ algorithm, which can only handle $n\leq 23$
-    \vspace{5pt}
+    \vspace{3pt}
 \item What about dynamic programming?
 
     \end{itemize}
@@ -923,7 +923,7 @@ int main() {
         \item Let $f(i, s)$ be a boolean function answering whether there exists a subset of $a_1, \dots, a_i$ with sum $s$.
         
         \item Then      
-        \[f(i, s) = \begin{cases}\texttt{true} \text{ if } i = s = 0 \\ \texttt{false} \text{ if } i = 0, s \neq 0 \\ \texttt{false} \text{ if } s < 0 \\ f(i - 1, j) \texttt{ or } f(i - 1, j - a_i) \text{ otherwise} \end{cases}\]
+        \[f(i, s) = \begin{cases}\texttt{true} \text{ if } i = s = 0 \\ \texttt{false} \text{ if } i = 0, s \neq 0 \\ \texttt{false} \text{ if } s < 0 \\ f(i - 1, s) \texttt{ or } f(i - 1, s - a_i) \text{ otherwise} \end{cases}\]
         
         \item The different variants can then be read from the values of $f$. Each state takes $O(1)$ to compute, and there are $n(a_1 + \dots + a_n)$ states. Denoting the sum by $\Sigma$ this makes our time complexity $O(n\Sigma)$, which isn't great, but is often better than $O(2^n)$.
     \end{itemize}
