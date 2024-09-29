@@ -349,9 +349,9 @@ def distinct_k(n, k, s):
   return best_ind, best_len
         \end{minted}
     \end{tiny}
+    \vspace*{-0.3cm}
     \begin{itemize}
-        \item<2-> What is the time complexity?
-        \item<3-> It may seem quadratic at first
+        \item<2-> What is the time complexity? \only<3-> { It may seem quadratic at first}
         \item<4-> Each element gets added and removed once, so $\mathcal{O}(N)$.
         \item<5-> Lets introduce $C$, the number of different symbols possible.
         \item<6-> The time complexity is actually $\mathcal{O}(NC)$, but we can do better!
@@ -1119,7 +1119,6 @@ int query(segment_tree *tree, int l, int r) {
         \item<1-> Simple to use Segment Trees for $\min$, $\max$, $\gcd$, and other similar operators, basically the same code.
         \item<2-> Any associative operator will work.
         \item<3-> So any operator $f$ such that $f(a, f(b, c)) = f(f(a, b), c)$ for all $a, b, c$.
-        \item<4-> Also possible to update a range of values in $O(\log n)$, which will be covered in bonus slides.
     \end{itemize}
 \end{frame}
 
