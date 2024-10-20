@@ -1047,24 +1047,24 @@ pair<int, int> floyd(F&& f, T x0) {
 
 \begin{frame}[plain]
 \frametitle{Pollard rho factorization}
-
+\begin{small}
 \begin{itemize}
-
-\item<1-> The idea is now to let $g(x) = x^2 + 1 \ (mod \ n)$ and create the sequence $x, g(x), g(g(x)), \dots$ where $x$ is chosen randomly.
-\item<2-> Denote these numbers $x_1, x_2, \dots$. We calculate these values and check if $\operatorname{gcd}(x_i - x_j, n) > 1$.
-\item<3-> Then the sequence has begun repeating not just modulo $n$ but modulo $d$ where $d$ divides $n$.
-\item<4-> If $\operatorname{gcd}(x_i - x_j, n) = 1$ for all values then either $n$ is not prime or we just didn't manage to find a divisor.
-\item<5-> Thus we generally test a few starting values of $x$ before giving up. This is usually only useful for quite big numbers since it doesn't pay off until $x > 2^{32}$ at least.
-\item<6-> The time complexity is an open question, but it's conjectured to be the square root of the largest factor of $N$.
-\item<7-> It is thus quite slow for primes, but much faster for composite numbers. Checking for primality first using Miller-Rabin can be useful.
-
+    \item<1-> Let $g(x) = x^2 + 1 \ (mod \ n)$ and create the sequence $x_1 = x, x_2 = g(x), x_3 = g(g(x)), \dots$ where $x$ is chosen randomly.
+    \item<2-> Check if $\operatorname{gcd}(x_i - x_j, n) > 1$.
+    \item<3-> The sequence has begun repeating not just modulo $n$ but modulo $d$ where $d$ divides $n$.
+    \item<4-> If $\operatorname{gcd}(x_i - x_j, n) = 1$ for all values then either $n$ is not prime or we just didn't manage to find a divisor.
+    \item<5-> Test a few starting values of $x$ before giving up. Usually good for $n > 2^{32}$.
+    \item<6-> The time complexity is an open question, but it's conjectured to be the square root of the largest factor of $N$.
+    \item<7-> Slow for primes, but much faster for composite numbers.
+    \item<8-> Checking for primality first using Miller-Rabin can be useful.
 \end{itemize}
+\end{small}
 
 \end{frame}
 
 \begin{frame}[fragile,plain]
 \frametitle{Pollard rho implementation}
-  \begin{scriptsize}
+  \begin{tiny}
     \begin{minted}{cpp}
 template <typename T>
 T rho(T n) {
@@ -1085,7 +1085,7 @@ T rho(T n) {
     return -1;
 }
     \end{minted}
-  \end{scriptsize}
+  \end{tiny}
 \end{frame}
 
 \begin{frame}[plain]{Number theory functions}
