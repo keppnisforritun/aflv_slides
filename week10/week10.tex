@@ -638,7 +638,7 @@ T mod_inv(T a, T m) {
 \begin{frame}[plain, fragile]
 \frametitle{Miller-Rabin implementation}
 
-\begin{small}
+\begin{tiny}
 \begin{minted}{cpp}
 template <typename T>
 bool is_probably_prime(T n, int k) {
@@ -661,7 +661,7 @@ bool is_probably_prime(T n, int k) {
     return true;
 }
 \end{minted}
-\end{small}
+\end{tiny}
 
 \end{frame}
 
@@ -914,6 +914,7 @@ bool is_probably_prime(T n, int k) {
 
 \begin{frame}[plain,fragile]
   \frametitle{Sieve of Eratosthenes}
+    \begin{small}
       \begin{minted}{cpp}
 template <typename T>
 vector<T> eratosthenes(T n){
@@ -932,6 +933,7 @@ vector<T> eratosthenes(T n){
     return primes;
 }
     \end{minted}
+    \end{small}
 \end{frame}
 
 
