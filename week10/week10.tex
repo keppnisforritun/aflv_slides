@@ -259,13 +259,14 @@
     \onslide<3->
     \item Simple algorithm
       \begin{minted}{cpp}
-vector<int> toBase(int base, int val) {
-    vector<int> res;
+template <typename T>
+vector<T> toBase(T base, T val) {
+    vector<T> res;
     while(val) {
         res.push_back(val % base);
         val /= base;
     }
-    return val;
+    return res;
 }
       \end{minted}
     \item Starts from the $0$-th digit, and calculates the multiple of each power.
@@ -324,7 +325,7 @@ vector<int> toBase(int base, int val) {
     \item {\color{red}Greatest Common Divisor} of two integers $a$ and $b$ is the
       largest number that divides both $a$ and $b$.
     \item {\color{red}Least Common Multiple} of two integers $a$ and $b$ is
-      the smallest integer that both $a$ and $b$ divide.
+      the smallest positive integer that both $a$ and $b$ divide.
   \end{itemize}
 \end{frame}
 
@@ -349,9 +350,10 @@ vector<int> toBase(int base, int val) {
 
 \begin{frame}[plain,fragile]{$\mathcal{O}(\sqrt{n})$ check}
 \begin{minted}{cpp}
-bool is_prime(ll x) {
-    if(x <= 1) return 0;
-    for(ll i = 2; i * i <= x; ++i)
+template <typename T>
+bool is_prime(T x) {
+    if(x <= 1) return false;
+    for(T i = T(2); i * i <= x; ++i)
         if(x % i == 0)
             return false;
     return true;
@@ -941,7 +943,7 @@ vector<T> eratosthenes(T n){
   \vspace{10pt}
   The fundamental theorem of arithmetic states that
   \begin{itemize}
-    \item Every integer greater than $1$ is a unique product of primes.
+    \item Every integer greater than $1$ is a unique product of primes, up to order.
     \onslide<2->
     \[
       n = p_1^{e_1}p_2^{e_2}p_3^{e_3}\cdots p_k^{e_k}
