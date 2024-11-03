@@ -1,0 +1,3087 @@
+\documentclass{beamer}
+\usefonttheme[onlymath]{serif}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{gensymb}
+\usepackage{parskip}
+\usepackage{mathtools}
+\usepackage{listings}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{color}
+\usepackage{enumerate}
+\usepackage{tikz}
+\usetikzlibrary{calc}
+\usetikzlibrary{positioning}
+\usetikzlibrary{angles}
+\usetikzlibrary{shapes}
+\usetikzlibrary{arrows}
+\usepackage{verbatim}
+\usepackage{multicol}
+\usepackage{array}
+\usepackage{minted}
+\parskip 0pt
+
+\usepackage{colortbl}
+\usepackage{pgf}
+\usepackage{pgfkeys}
+\usetikzlibrary{fpu}
+\usepackage{tkz-euclide}
+
+\DeclareMathOperator{\lcm}{lcm}
+\newcommand\floor[1]{\left\lfloor#1\right\rfloor}
+\newcommand\ceil[1]{\left\lceil#1\right\rceil}
+\newcommand\abs[1]{\left|#1\right|}
+\newcommand\p[1]{\left(#1\right)}
+\newcommand\sqp[1]{\left[#1\right]}
+\newcommand\cp[1]{\left\{#1\right\}}
+\newcommand\norm[1]{\left\lVert#1\right\rVert}
+\renewcommand\Im{\operatorname{Im}}
+\renewcommand\Re{\operatorname{Re}}
+
+\usetheme{metropolis}
+\definecolor{dark yellow}{rgb} {0.6,0.6,0.0}
+\definecolor{dark green}{rgb} {0.0,0.6,0.0}
+
+\tikzstyle{vertex}=[circle,fill=black!50,minimum size=15pt,inner sep=0pt, font=\small]
+\tikzstyle{selected vertex} = [vertex, fill=red!24]
+\tikzstyle{edge} = [draw,thick,-]
+\tikzstyle{dedge} = [draw,thick,->]
+\tikzstyle{weight} = [font=\scriptsize,pos=0.5]
+\tikzstyle{selected edge} = [draw,line width=2pt,-,red!50]
+\tikzstyle{ignored edge} = [draw,line width=5pt,-,black!20]
+
+\tikzset{
+  treenode/.style = {align=center, inner sep=0pt, text centered,
+    font=\sffamily},
+  vertex/.style = {treenode, circle, black, font=\sffamily\bfseries\tiny, draw=black, text width=1.8em},% arbre rouge noir, noeud noir
+  rvertex/.style = {treenode, circle, black, font=\sffamily\bfseries\tiny, draw=red, text width=1.8em},% arbre rouge noir, noeud noir
+}
+
+\definecolor{offwhite}{RGB}{249,242,215}
+\definecolor{foreground}{HTML}{23373b}
+\definecolor{background}{RGB}{24,24,24}
+\definecolor{title}{RGB}{107,174,214}
+\definecolor{gray}{RGB}{155,155,155}
+\definecolor{subtitle}{RGB}{102,255,204}
+\definecolor{lolight}{RGB}{155,155,155}
+\definecolor{green}{RGB}{125,250,125}
+
+\definecolor{hilight}{RGB}{235,129,27}
+\definecolor{vhilight}{HTML}{14B03D}
+
+\def\hepta{\draw[foreground](A) -- (B) -- (C) -- (D) -- (E) -- (F) -- (G) -- cycle;}
+
+\newcommand{\slice}[1]{%
+    \hepta
+    \draw[foreground] \foreach \x/\y in {#1} {(\x)--(\y)};
+}
+
+\graphicspath{{myndir/}}
+
+\title{Strings \& Geometry}
+\author{Atli FF}
+\institute{\href{http://ru.is/td}{School of Computer Science} \\[2pt] \href{http://ru.is}{Reykjavík University}}
+\titlegraphic{\hfill\includegraphics[height=0.6cm]{kattis}}
+
+\begin{document}
+\maketitle
+
+\begin{frame}[plain]{Today we're going to cover}
+    \begin{itemize}
+    		\item Trigonometry
+    		\item Geometry
+    		\item Computational geometry
+        \item String matching (naive, KMP)
+        \item Tries
+        \item Aho-Corasick
+    \end{itemize}
+\end{frame}
+
+\section*{Trigonometry}
+
+\begin{frame}[plain]{Trigonometry}
+    \begin{columns}
+        \begin{column}{0.7\textwidth}
+            \begin{itemize}
+                \item Before we even dive into the geometry and how to do it on a computer, let's jog your memories.
+                \item You should all hopefully be familiar with the trigonometric functions.
+                \item We consider a triangle to be right-angled if it has a corner that's $90^{\circ}$.
+                \item For such triangles we have:
+                \begin{itemize}
+                    \item $\dfrac{A}{L} = \cos\theta$.
+                    \item $\dfrac{M}{L} = \sin\theta$.
+                    \item $\dfrac{M}{A} = \dfrac{M}{L}\dfrac{L}{A} = \dfrac{\sin\theta}{\cos\theta} = \tan\theta$.
+                \end{itemize}
+                \item We also have the pythagorean theorem $L^2 = A^2 + M^2$.
+            \end{itemize}
+        \end{column}
+		\begin{column}{0.3\textwidth}
+			\scalebox{0.75} {
+				\begin{tikzpicture}
+					\coordinate (A) at (0, 0) {};
+					\coordinate (B) at (4, 0) {};
+					\coordinate (C) at (0, 3) {};
+					\node at (3.2, 0.3) {$\theta$};
+
+					\draw (A) -- node[below] {$A$} (B);
+					\draw (B) -- node[above] {$L$} (C);
+					\draw (C) -- node[left] {$M$} (A);
+					\draw pic[draw, angle radius = 0.5cm] {angle=C--B--A};
+                \end{tikzpicture}
+            }
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}[plain]{More trig}
+	\begin{columns}
+		\begin{column}{0.7\textwidth}
+			\begin{itemize}
+				\item More generally we have:
+				\begin{itemize}
+					\item $\dfrac{\sin a}{A} = \dfrac{\sin b}{B} = \dfrac{\sin c}{C}$ (sine law).
+					\item $A^2 = B^2 + C^2 - 2BC\cos a$ (cosine law)
+                \end{itemize}
+				\item {\bf Exercise:} Prove the pythagorean theorem using the cosine law.
+            \end{itemize}
+        \end{column}
+		\begin{column}{0.3\textwidth}
+			\scalebox{0.8} {
+				\begin{tikzpicture}
+					\coordinate (A) at (0, 0) {};
+					\node at (0.60, 0.4) {$b$};
+					\coordinate (B) at (4, 0) {};
+					\node at (3.4, 0.4) {$c$};
+					\coordinate (C) at (2, 3) {};
+					\node at (2, 2.2) {$a$};
+
+					\draw (A) -- node[below] {$A$} (B);
+					\draw (B) -- node[above] {$B$} (C);
+					\draw (C) -- node[left] {$C$} (A);
+					\draw pic[draw, angle radius = 0.5cm] {angle=B--A--C};
+					\draw pic[draw, angle radius = 0.5cm] {angle=A--C--B};
+					\draw pic[draw, angle radius = 0.5cm] {angle=C--B--A};
+                \end{tikzpicture}
+			}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}[plain]{Example: NN and the Optical Illusion}
+	\begin{itemize}
+        \item You are given an integer $n$ and a real number $r$.
+        \item You then draw a circle of radius $r$.
+        \item You then want to draw $n$ circles of the same size tangent to the outside of this circle and such that they are tangent to their neighbours.
+        \item What radius will the outer circles have?
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[plain]{$N = 6$ image}
+	\center
+	\begin{tikzpicture}
+		\coordinate (O) at (0, 0) {};
+		\coordinate (A) at (1, 0) {};
+		\coordinate (B) at (-1, 0) {};
+		\coordinate (C) at (0.5, 0.8660254038) {};
+		\coordinate (D) at (0.5, -0.8660254038) {};
+		\coordinate (E) at (-0.5, -0.8660254038) {};
+		\coordinate (F) at (-0.5, 0.8660254038) {};
+
+		\coordinate (AA) at (2,0) {};
+		\coordinate (BB) at (-2,0) {};
+		\coordinate (CC) at (1,1.732050808) {};
+		\coordinate (DD) at (1,-1.732050808) {};
+		\coordinate (EE) at (-1,-1.732050808) {};
+		\coordinate (FF) at (-1,1.732050808) {};
+
+		\draw (O) circle (1);
+		\draw[dashed] (AA) circle (1);
+		\draw[dashed] (BB) circle (1);
+		\draw[dashed] (CC) circle (1);
+		\draw[dashed] (DD) circle (1);
+		\draw[dashed] (EE) circle (1);
+		\draw[dashed] (FF) circle (1);
+
+		\draw (O) -- node[above] {$r$} (A);
+		\draw (E) -- node[left] {$R$} (EE);
+    \end{tikzpicture}
+\end{frame}
+
+\begin{frame}[plain]{Towards a solution}
+    We see that the distance from the center of the circle in the middle to the
+    center of an outer circle is $r + R$. We thus get an isosceles triangle.
+	\center
+	\begin{tikzpicture}
+		\coordinate (O) at (0, 0) {};
+		\coordinate (A) at (1, 0) {};
+		\coordinate (B) at (-1, 0) {};
+		\coordinate (C) at (0.5, 0.8660254038) {};
+		\coordinate (D) at (0.5, -0.8660254038) {};
+		\coordinate (E) at (-0.5, -0.8660254038) {};
+		\coordinate (F) at (-0.5, 0.8660254038) {};
+
+		\coordinate (AA) at (2,0) {};
+		\coordinate (BB) at (-2,0) {};
+		\coordinate (CC) at (1,1.732050808) {};
+		\coordinate (DD) at (1,-1.732050808) {};
+		\coordinate (EE) at (-1,-1.732050808) {};
+		\coordinate (FF) at (-1,1.732050808) {};
+
+		\draw (O) circle (1);
+		\draw[dashed] (AA) circle (1);
+		\draw[dashed] (BB) circle (1);
+		\draw[dashed] (CC) circle (1);
+		\draw[dashed] (DD) circle (1);
+		\draw[dashed] (EE) circle (1);
+		\draw[dashed] (FF) circle (1);
+
+		\draw (O) -- node[above] {$r + R$} (AA);
+		\draw (O) -- node[left] {$r + R$} (DD);
+		\draw (AA) -- node[right] {$2R$} (DD);
+    \end{tikzpicture}
+\end{frame}
+
+\begin{frame}[plain]{Closer and closer}
+	\begin{itemize}
+	    \item Now we have
+		$\theta = \dfrac{360^{\circ}}{n}$
+		and
+		$\omega = \dfrac{180^{\circ} - \theta}{2}$.
+    \end{itemize}
+	\center
+	\begin{tikzpicture}
+		\coordinate (O) at (0, 0) {};
+		\coordinate (A) at (1, 0) {};
+		\coordinate (B) at (-1, 0) {};
+		\coordinate (C) at (0.5, 0.8660254038) {};
+		\coordinate (D) at (0.5, -0.8660254038) {};
+		\coordinate (E) at (-0.5, -0.8660254038) {};
+		\coordinate (F) at (-0.5, 0.8660254038) {};
+
+		\coordinate (AA) at (2,0) {};
+		\coordinate (BB) at (-2,0) {};
+		\coordinate (CC) at (1,1.732050808) {};
+		\coordinate (DD) at (1,-1.732050808) {};
+		\coordinate (EE) at (-1,-1.732050808) {};
+		\coordinate (FF) at (-1,1.732050808) {};
+
+		\draw (O) -- node[above] {$r + R$} (AA);
+		\draw (O) -- node[left] {$r + R$} (DD);
+		\draw (AA) -- node[right] {$2R$} (DD);
+
+		\draw pic[draw, angle radius = 0.5cm] {angle=O--AA--DD};
+		\draw pic[draw, angle radius = 0.5cm] {angle=AA--DD--O};
+		\draw pic[draw, angle radius = 0.5cm] {angle=DD--O--AA};
+		\node at (0.6, -0.4) {$\theta$};
+		\node at (1, -1.032050808) {$\omega$};
+		\node at (1.4, -0.4) {$\omega$};
+    \end{tikzpicture}
+\end{frame}
+
+\begin{frame}[plain]{Solution}
+	\begin{itemize}
+		\item Finally the law of sines gives us
+		\begin{align*}
+			\frac{2R}{\sin \theta} = \frac{r + R}{\sin \omega}
+				& \Rightarrow 2R\sin\omega = r\sin\theta + R\sin\theta\\
+				& \Rightarrow 2R\sin\omega - R\sin\theta = r\sin\theta \\
+				& \Rightarrow R = \frac{r\sin\theta}{2\sin\omega - \sin\theta}.
+        \end{align*}
+    \end{itemize}
+	\center
+	\begin{tikzpicture}
+		\coordinate (O) at (0, 0) {};
+		\coordinate (A) at (1, 0) {};
+		\coordinate (B) at (-1, 0) {};
+		\coordinate (C) at (0.5, 0.8660254038) {};
+		\coordinate (D) at (0.5, -0.8660254038) {};
+		\coordinate (E) at (-0.5, -0.8660254038) {};
+		\coordinate (F) at (-0.5, 0.8660254038) {};
+
+		\coordinate (AA) at (2,0) {};
+		\coordinate (BB) at (-2,0) {};
+		\coordinate (CC) at (1,1.732050808) {};
+		\coordinate (DD) at (1,-1.732050808) {};
+		\coordinate (EE) at (-1,-1.732050808) {};
+		\coordinate (FF) at (-1,1.732050808) {};
+
+		\draw (O) -- node[above] {$r + R$} (AA);
+		\draw (O) -- node[left] {$r + R$} (DD);
+		\draw (AA) -- node[right] {$2R$} (DD);
+
+		\draw pic[draw, angle radius = 0.5cm] {angle=O--AA--DD};
+		\draw pic[draw, angle radius = 0.5cm] {angle=AA--DD--O};
+		\draw pic[draw, angle radius = 0.5cm] {angle=DD--O--AA};
+		\node at (0.6, -0.4) {$\theta$};
+		\node at (1, -1.032050808) {$\omega$};
+		\node at (1.4, -0.4) {$\omega$};
+    \end{tikzpicture}
+\end{frame}
+
+\section*{Computer representation}
+
+\begin{frame}[plain]
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+      \begin{figure}
+        \begin{tikzpicture}
+          \draw[step=.5cm, very thin, foreground, opacity=0.2] (0,0) grid (5,5);
+          \draw[thick, ->] (1,1) -- (0,1);
+          \draw[thick, ->] (1,1) -- (5,1);
+          \draw[thick, ->] (1,1) -- (1,0);
+          \draw[thick, ->] (1,1) -- (1,5);
+
+          \visible<2->{
+            \draw[hilight,fill] (3,4) circle[radius=2pt];
+            \draw (3,4) node[anchor=north west] {\scriptsize $(3,6)$};
+            \draw[hilight,fill] (4,2.5) circle[radius=2pt];
+            \draw (4,2.5) node[anchor=north west] {\scriptsize $(6,3)$};
+            \draw[hilight,fill] (1.5,2.5) circle[radius=2pt];
+            \draw (1.5,2.5) node[anchor=south] {\scriptsize $(1,3)$};
+          }
+
+          \visible<3->{
+            \draw[hilight,thick,->] (1,1) -- (3,4);
+            \draw[hilight,thick,->] (1,1) -- (4,2.5);
+            \draw[hilight,thick,->] (1,1) -- (1.5,2.5);
+          }
+        \end{tikzpicture}
+      \end{figure}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \begin{itemize}
+        \onslide<2->
+        \item Points are represented by a pair of numbers, $(x,y)$.
+        \onslide<3->
+        \item Vectors are represented in the same way.
+        \item Thinking of points as vectors allows us to do many things.
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}[plain,fragile]
+  %Points and vectors can be represented by a pair of numbers, $x$ and $y$.
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+      \begin{figure}
+        \footnotesize
+        \begin{tikzpicture}
+          \draw[step=.5cm, very thin, foreground, opacity=0.2] (0,0) grid (5,5);
+          \draw[thick, ->] (1,1) -- (0,1);
+          \draw[thick, ->] (1,1) -- (5,1);
+          \draw[thick, ->] (1,1) -- (1,0);
+          \draw[thick, ->] (1,1) -- (1,5);
+
+          \draw[hilight,fill] (4,3) circle[radius=2pt];
+          \draw[title,fill] (1.5,2.5) circle[radius=2pt];
+
+          \draw[hilight,thick,->] (1,1) -- node[right=3pt, near end] {$\vec u$} (4,3);
+          \draw[title,thick,->] (1,1) -- node[left=-2pt,near end] {$\vec v$} (1.5,2.5);
+
+          \visible<3>{
+            \draw[vhilight,fill] (4.5,4.5) circle[radius=2pt];
+            \draw[hilight,thick,opacity=0.4] (1.5,2.5) -- (4.5, 4.5);
+            \draw[title,thick,opacity=0.4] (4,3) -- (4.5, 4.5);
+            \draw[vhilight,thick,->] (1,1) -- node[left=10pt, near end] {$\vec u + \vec v$} (4.5, 4.5);
+          }
+          \visible<5>{
+            \draw[title,thick,->, opacity=0.7] (4,3) -- (3.5,1.5);
+            \draw[vhilight,fill] (3.5,1.5) circle[radius=2pt];
+            \draw (3.5,1.5) node[right=4pt] {{\color{vhilight}$\vec u - \vec v$}};
+            \draw[vhilight,thick,->] (1,1) --  (3.5, 1.5);
+            \draw[vhilight,thick,->, opacity=0.5] (1.5,2.5) -- (4,3);
+          }
+        \end{tikzpicture}
+      \end{figure}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      %\footnotesize
+      \begin{itemize}
+        \onslide<2->
+        \item Simplest operation, addition is defined as
+          \[
+            {\color{title!80!black}
+            \begin{pmatrix}
+              x_0 \\
+              y_0
+            \end{pmatrix}
+            }
+            +
+            {\color{hilight!90!black}
+            \begin{pmatrix}
+              x_1 \\
+              y_1
+            \end{pmatrix}
+            }
+            =
+            {\color{vhilight!80!black}
+            \begin{pmatrix}
+              x_0 + x_1 \\
+              y_0 + y_1
+            \end{pmatrix}
+            }
+          \]
+        \onslide<4->
+        \item Subtraction is defined in the same manner
+          \[
+            {\color{hilight!90!black}
+            \begin{pmatrix}
+              x_0 \\
+              y_0
+            \end{pmatrix}
+            }
+            -
+            {\color{title!80!black}
+            \begin{pmatrix}
+              x_1 \\
+              y_1
+            \end{pmatrix}
+            }
+            =
+            {\color{vhilight!80!black}
+            \begin{pmatrix}
+              x_0 - x_1 \\
+              y_0 - y_1
+            \end{pmatrix}
+            }
+          \]
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}[plain,fragile]
+  \begin{minted}{cpp}
+struct point {
+    double x, y;
+    point(double _x, double _y) { 
+        x = _x, y = _y;
+    }
+
+    point operator+(const point &oth){
+        return point(x + oth.x, y + oth.y);
+    }
+
+    point operator-(const point &oth){
+        return point(x - oth.x, y - oth.y);
+    }
+};
+  \end{minted}
+\end{frame}
+
+\begin{frame}[plain,fragile]
+  \vspace{20pt}
+  \ldots or we could use the \texttt{complex<double>} class. 
+  \begin{minted}{cpp}
+typedef complex<double> point;
+  \end{minted}
+  \onslide<2->
+  \vspace{10pt}
+  The \texttt{complex} class in \texttt{C++} and \texttt{Java} has methods defined for
+  \begin{itemize}
+    \item Addition
+    \item Subtraction
+    \item Multiplication by a scalar
+    \item Length
+    \item Trigonometric functions
+    \item And much more!
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[plain]{Complex numbers}
+	\begin{itemize}
+        \item We define $\mathbb{C} \coloneqq \mathbb{R} \times \mathbb{R}$.
+        \item Then we define addition on $\mathbb{C}$ such that for $(a, b), (c, d) \in \mathbb{C}$ we get
+			\[
+				(a, b) + (c, d) = (a + c, b + d).
+			\]
+        \item We also define multiplication on $\mathbb{C}$ such that for $(a, b), (c, d) \in \mathbb{C}$ we get
+			\[
+				(a, b) \cdot (c, d) = (ac - bd, ad + bc).
+			\]
+        \item We usually denote $(0, 1) \in \mathbb{C}$ by $i$ and $(x, y) \in \mathbb{C}$ by $x + yi$.
+        \item Note that $(x, y) = (x, 0) + i \cdot (y, 0)$ here.
+        \item We call these numbers in $\mathbb{C}$ \emph{complex numbers}.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[plain]{Complex numbers ctd.}
+	\begin{itemize}
+        \item If $z = x + yi \in \mathbb{C}$ then
+		\begin{itemize}
+            \item We call $x$ the \emph{real part} of $z$ and $y$ the \emph{imaginary part} of $z$.
+            \item We define the \emph{magnitude} of $z$ by $|z| = \sqrt{x^2 + y^2}$.
+            \item We call $x - yi$ the \emph{conjugate} of $z$, denoted by $\overline{z}$.
+            \item We call the angle $(x, y)$ makes with the positive $x$-axis the \emph{argument} of $z$ and
+                denote it by $\operatorname{Arg}(z)$.
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[plain]{Operations}
+	\begin{itemize}
+        \item Let $w, z \in \mathbb{C}$.
+        \item Then $w + z$ will be $z$ translated by $w$, as if we were adding vectors.
+        \item If $|w| = 1$ then $z \cdot w$ will be $z$ rotated around $0$ by $\operatorname{Arg}(w)$ radians.
+        \item If $|z| = r$ and $\operatorname{Arg}(z) = \theta$ we can write $z = re^{i\theta}$.
+        \item If $z = r_1e^{i\theta_1}$ and $w = r_2e^{i\theta_2}$ then $z \cdot w = r_1 r_2 e^{i(\theta_1 + \theta_2)}$.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[plain]{Using complex in C++}
+    \begin{itemize}
+        \item Usually we do \texttt{typedef complex<double> point}
+        \item Then we can initialize a point with \texttt{point z(x, y)}
+        \begin{itemize}
+            \item \texttt{real(z)} returns the $x$-coordinate
+            \item \texttt{imag(z)} returns the $y$-coordinate
+            \item \texttt{abs(z)} returns the magnitude $|z|$
+            \item \texttt{abs(z - w)} returns the distance from $z$ to $w$
+            \item \texttt{arg(z)} returns the argument of $z$
+            \item \texttt{conj(z)} returns the conjugate $\overline{z}$
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[plain]{Example}
+	\begin{itemize}
+        \item Let us consider a problem.
+        \item You start at $(0, 0)$ and get a sequence of commands.
+        \item All the commands consist of a single letter and a number. The commands are:
+		\begin{itemize}
+			\item ...\texttt{f x} you move forward $x$ meters..
+			\item ...\texttt{b x} you move backwards $x$ meters.
+			\item ...\texttt{r x} you rotate $x$ radians to the right.
+			\item ...\texttt{l x} you rotate $x$ radians to the left.
+        \end{itemize}
+        \item How far from $(0, 0)$ do you end up after following the commands?
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[plain]{Solution}
+	\begin{itemize}
+        \item If we are stood at $p \in \mathbb{C}$ and want to take a step of $r$ meters in the direction $\theta$ we simply add $re^{i\theta}$ to $p$.
+        \item What direction we are facing at the start makes no difference since it gives the same distance at the end.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[plain, fragile]{Code}
+\small
+    \begin{minted}{cpp}
+#include<bits/stdc++.h>
+using namespace std;
+typedef complex<double> point;
+int main() {
+    int n; cin >> n;
+    double x, r = 0.0;
+    point p(0, 0);
+    while (n--) {
+        char c; cin >> c >> x;
+        if (c == 'f')      p += x*exp(1i*r);
+        else if (c == 'b') p -= x*exp(1i*r);
+        else if (c == 'l') r += x;
+        else if (c == 'r') r -= x;
+        else assert(0);
+	}
+    cout << setprecision(15) << abs(p) << endl;
+}
+    \end{minted}
+\end{frame}
+
+\begin{frame}[plain,fragile]
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+      \begin{figure}
+        \footnotesize
+        \begin{tikzpicture}
+          \draw[step=.5cm, very thin, foreground, opacity=0.2] (0,0) grid (5,5);
+          \draw[thick, ->] (1,1) -- (0,1);
+          \draw[thick, ->] (1,1) -- (5,1);
+          \draw[thick, ->] (1,1) -- (1,0);
+          \draw[thick, ->] (1,1) -- (1,5);
+          \visible<1>{
+            \draw[hilight,fill] (1.5,3) circle[radius=2pt];
+            %\draw (1.5,3) node[anchor=south] {\scriptsize$(1,4)$};
+            \draw[hilight,fill] (4,2) circle[radius=2pt];
+            %\draw (4,2) node[anchor=north west] {\scriptsize$(6,2)$};
+            \draw[hilight,thick] (1.5,3) -- (4,2);
+          }
+
+          \visible<1-2>{
+            \draw[hilight,fill] (2.5,1.5) circle[radius=2pt];
+            \draw[hilight,fill] (4.5,4.5) circle[radius=2pt];
+            \draw[hilight,thick] (2.5,1.5) -- (4.5,4.5);
+          }
+
+          \visible<2>{
+            \draw (2.5,1.5) node[anchor=north west] {{\color{hilight}$p_0$}};
+            \draw (4.5,4.5) node[anchor=north west] {{\color{hilight}$p_1$}};
+            \draw[vhilight,very thick,->] (1,1) -- (3,4);
+            \draw (3,4) node[anchor=south east] {{\color{vhilight}$p_1 - p_0$}};
+          }
+
+          \visible<3>{
+            \draw[title,very thick] (1,1) -- (3,1);
+            \draw[title,very thick] (3,1) -- (3,4);
+            \draw[vhilight,very thick,->] (1,1) -- (3,4);
+            \draw (3,4) node[anchor=south east] {{\color{vhilight}$p_1 - p_0$}};
+          }
+        \end{tikzpicture}
+      \end{figure}
+    \end{column}
+    \begin{column}{0.55\textwidth}
+      \begin{itemize}
+        \item Line segments are represented by a pair of points, $((x_0,y_0), (x_1,y_1))$.
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}[plain,fragile]
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+      \begin{figure}
+        \footnotesize
+        \begin{tikzpicture}
+          \draw[step=.5cm, very thin, foreground, opacity=0.2] (0,0) grid (5,5);
+          \draw[thick, ->] (1,1) -- (0,1);
+          \draw[thick, ->] (1,1) -- (5,1);
+          \draw[thick, ->] (1,1) -- (1,0);
+          \draw[thick, ->] (1,1) -- (1,5);
+
+          \draw[hilight,fill] (2,3) circle[radius=2pt];
+          \draw[hilight,fill] (4,2) circle[radius=2pt];
+          \draw[hilight,thick] (2,3) -- (4,2);
+
+          \draw[hilight,fill] (2.5,1.5) circle[radius=2pt];
+          \draw[hilight,fill] (4,4.5) circle[radius=2pt];
+          \draw[hilight,thick] (2.5,1.5) -- (4,4.5);
+
+          \visible<2>{
+            \draw (4,2) node[anchor=north east] {{\color{vhilight}$q_1$}};
+            \draw (4,4.5) node[anchor=north west] {{\color{vhilight}$p_1$}};
+            \draw (2,3) node[anchor=south] {{\color{vhilight}$q_0$}};
+            \draw (2.5,1.5) node[anchor=north west] {{\color{vhilight}$p_0$}};
+          }
+          \visible<2->{
+            \draw[hilight,thick] (5,1.5) -- (0,4);
+            \draw[hilight,thick] (1.75,0) -- (4.25,5);
+
+            \draw[vhilight,fill] (2,3) circle[radius=2pt];
+            \draw[vhilight,fill] (4,2) circle[radius=2pt];
+
+            \draw[vhilight,fill] (2.5,1.5) circle[radius=2pt];
+            \draw[vhilight,fill] (4,4.5) circle[radius=2pt];
+          }
+
+          \visible<3->{
+            \draw[vhilight,fill] (4,2) circle[radius=2pt];
+            \draw[title,very thick,->] (2,3) -- (4,2);
+            \draw[vhilight,fill] (2,3) circle[radius=2pt];
+
+            \draw[vhilight,fill] (4,4.5) circle[radius=2pt];
+            \draw[title,very thick,->] (2.5,1.5) -- (4,4.5);
+            \draw[vhilight,fill] (2.5,1.5) circle[radius=2pt];
+
+            \draw (2,3) node[anchor=south] {{\color{vhilight}$p_1$}};
+            \draw (2.5,1.5) node[anchor=north west] {{\color{vhilight}$p_0$}};
+
+            \draw (3.5,3.5) node[anchor=west] {{\color{title}$\vec{r_0}$}};
+            \draw (4,2.3) node[anchor=south east] {{\color{title}$\vec{r_1}$}};
+          }
+        \end{tikzpicture}
+      \end{figure}
+    \end{column}
+    \begin{column}{0.6\textwidth}
+      %\vspace{20pt}
+      \begin{itemize}
+        \item Line representation same as line segments.
+        \onslide<2->
+        \item Treat them as lines passing through the two points.
+        \onslide<3->
+        \item Or as a point and a direction vector.
+          \[
+            {\color{vhilight}p} + {\color{hilight}t} \cdot {\color{title}\vec{r}}
+          \]
+        \onslide<4->
+        \vspace{-10pt}
+        \item Either way
+          \begin{minted}{cpp}
+pair<point,point>
+          \end{minted}
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}[plain,fragile]
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+      \begin{figure}
+        \footnotesize
+        \begin{tikzpicture}
+          \draw[step=.5cm, very thin, foreground, opacity=0.2] (0,0) grid (5,5);
+          \draw[thick, ->] (1,1) -- (0,1);
+          \draw[thick, ->] (1,1) -- (5,1);
+          \draw[thick, ->] (1,1) -- (1,0);
+          \draw[thick, ->] (1,1) -- (1,5);
+
+          \draw[hilight,thick] (2,2) circle[radius=1.5cm];
+          \draw[hilight,thick] (4,2.5) circle[radius=0.9cm];
+          %\draw (3,4) node[anchor=north west] {\scriptsize$(3,6)$};
+
+          \visible<2->{
+            \draw[title,fill] (2,2) circle[radius=2pt];
+            \draw (2,2) node[anchor=north] {$p_0$};
+            \draw[title,fill] (4,2.5) circle[radius=2pt];
+            \draw (4,2.5) node[anchor=north] {$p_1$};
+          }
+
+          \visible<3->{
+            %\draw (2,2) -- (0,10);
+            \draw[vhilight,very thick] (2,2) --  +(117:1.5cm) ;
+            \draw[vhilight,very thick] (4,2.5) --  +(117:0.9cm) ;
+            \draw (2,2.5) node[anchor=south] {$r_0$};
+            \draw (4,2.8) node[anchor=south] {$r_1$};
+          }
+        \end{tikzpicture}
+      \end{figure}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \vspace{20pt}
+      \begin{itemize}
+        \item Circles are very easy to represent.
+        \onslide<2->
+        \item Center point ${\color{title}p = (x,y)}$.
+        \onslide<3->
+        \item And the radius ${\color{vhilight}r}$.
+        \onslide<4->
+        \begin{minted}{cpp}
+pair<point,double>
+        \end{minted}
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\section*{Computational geometry}
+
+\begin{frame}[plain]
+  \vspace{20pt}
+  Given two vectors 
+  \[
+    \vec{u} = \begin{pmatrix} x_0 \\ y_0 \end{pmatrix} \quad\quad
+    \vec{v} = \begin{pmatrix} x_1 \\ y_1 \end{pmatrix}
+  \]
+  the dot product of $\vec{u}$ and $\vec{v}$ is defined as 
+  \[
+    \begin{pmatrix} x_0 \\ y_0 \end{pmatrix} \cdot
+    \begin{pmatrix} x_1 \\ y_1 \end{pmatrix} = 
+    x_0 \cdot x_1 + y_0 \cdot y_1
+  \]
+  \onslide<2->
+  Which in geometric terms is
+  \[
+    \vec{u} \cdot \vec{v} = 
+    \lvert \vec{u} \rvert \lvert \vec{v} \rvert \cos \theta
+  \]
+\end{frame}
+
+%\begin{frame}[plain]
+  %\begin{columns}
+    %\begin{column}{0.4\textwidth}
+      %\vspace{20pt}
+      %\begin{figure}
+        %\begin{tikzpicture}
+          %\draw[fill=title!50] (0,0) -- (40:.75cm) arc (40:0:.75cm);
+          %\draw[->,thick,hilight] (0,0) -- node[near end, below] {$\vec u$} (0:4cm);
+          %\draw[->,thick,vhilight] (0,0) -- node[near end, left=4pt] {$\vec v$} (40:3.2cm);
+          %\draw(22:0.5cm) node {\color{background}$\theta$};
+
+          %\visible<2->{
+            %\draw[dashed] (40:3.2cm) -- (0:2.45134221cm);
+            %\draw[title,thick,->] (0,0) -- node[below] {$\vec{v}_{\vec{u}}$} (0:2.45134221cm);
+          %}
+        %\end{tikzpicture}
+      %\end{figure}
+    %\end{column}
+    %\begin{column}{0.6\textwidth}
+      %\begin{itemize}
+        %\item Allows us to calculate the angle between $\vec u$ and $\vec v$.
+          %\[
+            %\theta = \arccos\left(\frac{\vec{u} \cdot \vec{v}}{\lvert \vec u \rvert \lvert \vec v \rvert}\right)
+          %\]
+        %\onslide<2->
+        %\item And the projection of $\vec v$ onto $\vec u$.
+          %\[
+            %\vec{v}_{\vec{u}} = \left(\frac{\vec{u}\cdot\vec{v}}{\lvert u \rvert}\right) \vec{u}
+          %\]
+      %\end{itemize}
+    %\end{column}
+  %\end{columns}
+%\end{frame}
+
+\begin{frame}[plain]
+  \begin{columns}
+    \begin{column}{0.4\textwidth}
+      \vspace{20pt}
+      \begin{figure}
+        \begin{tikzpicture}
+          \draw[fill=title!50] (0,0) -- (40:.75cm) arc (40:0:.75cm);
+          \draw[->,thick,hilight] (0,0) -- node[near end, below] {$\vec u$} (0:4cm);
+          \draw[->,thick,vhilight] (0,0) -- node[near end, left=4pt] {$\vec v$} (40:3.2cm);
+          \draw(22:0.5cm) node {\color{background}$\theta$};
+
+          \visible<2->{
+            \draw[dashed] (40:3.2cm) -- (0:2.45134221cm);
+            \draw[title,thick,->] (0,0) -- node[below] {$\vec{v}_{\vec{u}}$} (0:2.45134221cm);
+          }
+
+          \visible<3->{
+            \draw (40:3.2cm) node[above] {$p$};
+            \draw[fill,vhilight] (40:3.2cm) circle[radius=2pt];
+            \draw (0:2.45134221cm) node[above right] {$q$};
+            \draw[fill,title] (0:2.45134221cm) circle[radius=2pt];
+          }
+        \end{tikzpicture}
+      \end{figure}
+    \end{column}
+    \begin{column}{0.6\textwidth}
+      \begin{itemize}
+        \only<1-2>{
+          \item Allows us to calculate the angle between $\vec u$ and $\vec v$.
+            \[
+              \theta = \arccos\left(\frac{\vec{u} \cdot \vec{v}}{\lvert \vec u \rvert \lvert \vec v \rvert}\right)
+            \]
+        }
+        \only<2>{
+          \item And the projection of $\vec v$ onto $\vec u$.
+            \[
+              \vec{v}_{\vec{u}} = \left(\frac{\vec{u}\cdot\vec{v}}{\lvert u \rvert^2}\right) \vec{u}
+            \]
+        }
+        \only<3->{
+          \vspace{20pt}
+          \item The closest point on $\vec{u}$ to $p$ is $q$.
+        }
+        \only<4->{
+          \item The distance from $p$ to $\vec{u}$ is the distance from $p$ to $q$.
+        }
+        \only<5->{
+          \item Unless $q$ is outside $\vec{u}$, then the closest point is either of the endpoints.
+        }
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}[plain,fragile]
+  \vspace{20pt}
+  Rest of the code will use the \texttt{complex} class.
+  \footnotesize
+  \begin{minted}{cpp}
+#define P(p) const point &p
+#define L(p0, p1) P(p0), P(p1)
+double dot(P(a), P(b)) { 
+    return real(a) * real(b) + imag(a) * imag(b);
+}
+double angle(P(a), P(b), P(c)) {
+    return acos(dot(b - a, c - b) / abs(b - a) / abs(c - b)); 
+}
+point closest_point(L(a, b), P(c), bool segment = false) {
+    if (segment) {
+        if (dot(b - a, c - b) > 0) return b;
+        if (dot(a - b, c - a) > 0) return a;
+    }
+    double t = dot(c - a, b - a) / norm(b - a);
+    return a + t * (b - a);
+}
+  \end{minted}
+\end{frame}
+\begin{frame}[plain]
+  \vspace{20pt}
+  Given two vectors
+  \[
+    \vec{u} = \begin{pmatrix} x_0 \\ y_0 \end{pmatrix} \quad\quad
+    \vec{v} = \begin{pmatrix} x_1 \\ y_1 \end{pmatrix}
+  \]
+  the cross product of $\vec{u}$ and $\vec{v}$ is defined as 
+  \[
+    \left\lvert \begin{pmatrix} x_0 \\ y_0 \end{pmatrix} \times
+    \begin{pmatrix} x_1 \\ y_1 \end{pmatrix}\right\rvert  = 
+    x_0\cdot y_1 - y_0 \cdot x_1
+  \]
+  \onslide<2->
+  Which in geometric terms is
+  \[
+    \lvert \vec{u} \times \vec{v} \vert = 
+    \lvert \vec{u} \rvert \lvert \vec{v} \rvert \sin \theta
+  \]
+\end{frame}
+
+\begin{frame}[plain]
+  \begin{columns}
+    \begin{column}{0.4\textwidth}
+      \vspace{20pt}
+      \begin{figure}
+        \begin{tikzpicture}
+          \coordinate (A) at (0,0);
+          \coordinate (B) at (0:3cm);
+          \coordinate (D) at (60:2.7cm);
+          \coordinate (C) at ($ (B) + (D) $);
+
+          \tkzDrawPolygon[color=foreground](A,B,C,D);
+          \draw[fill=title!50] (0,0) -- (60:.75cm) arc (60:0:.75cm);
+          \draw[->,thick,hilight] (0,0) -- node[near end, below] {$\vec u$} (B);
+          \draw[->,thick,vhilight] (0,0) -- node[near end, left=4pt] {$\vec v$} (D);
+          \draw(30:0.5cm) node {\color{background}$\theta$};
+
+          \visible<2->{
+            %\draw[title,thick,->] (0,0) -- node[below] {$\vec{v}_{\vec{u}}$} (0:2.45134221cm);
+            \tkzDrawPolygon[fill=title,opacity=0.4](A,B,D);
+            \draw (20:1.6cm) node {\color{background}$\frac{1}{2}\lvert \vec{u} \times \vec{v} \rvert$};
+            \draw[->,thick,hilight] (0,0) -- node[near end, below] {$\vec u$} (B);
+            \draw[->,thick,vhilight] (0,0) -- node[near end, left=4pt] {$\vec v$} (D);
+            \draw[fill=title!50] (0,0) -- (60:.75cm) arc (60:0:.75cm);
+            \draw(30:0.5cm) node {\color{background}$\theta$};
+          }
+        \end{tikzpicture}
+      \end{figure}
+    \end{column}
+    \begin{column}{0.6\textwidth}
+      \begin{itemize}
+        \item Allows us to calculate the area of the triangle formed by $\vec u$ and $\vec v$.
+          \[
+            \frac{\lvert \vec{u} \times \vec{v} \rvert}{2}
+          \]
+        \onslide<3->
+        \item And can tell us if the angle between $\vec u$ and $\vec v$ is positive or negative.
+          \begin{align*}
+            \lvert \vec{u} \times \vec{v} \rvert &< 0 \quad\text{ iff }\quad \theta < \pi \\
+            \lvert \vec{u} \times \vec{v} \rvert &= 0 \quad\text{ iff }\quad \theta = \pi \\
+            \lvert \vec{u} \times \vec{v} \rvert &> 0 \quad\text{ iff }\quad \theta > \pi
+          \end{align*}
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}[plain]
+  \begin{columns}
+    \begin{column}{0.4\textwidth}
+      \begin{figure}
+        \footnotesize
+        \begin{tikzpicture}
+          \coordinate(A) at (0,0);
+          \coordinate(B) at (2,2);
+          \coordinate(C) at (0,4);
+          \coordinate(D) at (-1,2);
+
+          \coordinate(E) at (1,0);
+          \coordinate(F) at (1,2);
+          \coordinate(G) at (1,4);
+
+          \visible<1-3>{
+            \draw[hilight,fill] (A) circle[radius=2pt];
+            \draw[hilight,fill] (B) circle[radius=2pt];
+            \draw[hilight,fill] (C) circle[radius=2pt];
+            \draw (A) node[below=10pt] {$A$};
+            \draw (B) node[right=20pt] {$B$};
+            \draw (C) node[above right] {$C$};
+          }
+
+          \visible<1-2>{
+            \draw[thick,hilight,->] (B) -- node[above right] {$\vec v$} (C);
+            \draw[thick,hilight,->] (B) -- node[below right] {$\vec u$} (A) ;
+          }
+
+          \visible<2>{
+            \tkzDrawPolygon[fill=title,opacity=0.3](A,B,C);
+            \draw (B) node[left=20pt] {\Large$+$};
+            \draw[outer color=title,fill=title,opacity=0.5] (B) -- ++(135:.35cm) arc (135:225:.35cm);
+          }
+
+          \visible<3>{
+            \tkzDrawPolygon[fill=vhilight,opacity=0.2](A,B,C);
+            \draw (B) node[left=20pt] {\Large$-$};
+            \draw[thick,hilight,->] (B) -- node[above right] {$\vec u$} (C);
+            \draw[thick,hilight,->] (B) -- node[below right] {$\vec v$} (A) ;
+            \draw[outer color=title,fill=title,opacity=0.5] (B) -- ++(225:.35cm) arc (225:495:.35cm);
+          }
+
+          \visible<4>{
+            \draw[thick,hilight,->] (F) -- node[right] {$\vec v$} (E);
+            \draw[thick,hilight,->] (F) -- node[right] {$\vec u$} (G) ;
+            \draw[hilight,fill] (E) circle[radius=2pt];
+            \draw[hilight,fill] (F) circle[radius=2pt];
+            \draw[hilight,fill] (G) circle[radius=2pt];
+            \draw (E) node[below right] {$A$};
+            \draw (F) node[right] {$B$};
+            \draw (G) node[above right] {$C$};
+          }
+
+        \end{tikzpicture}
+      \end{figure}
+    \end{column}
+    \begin{column}{0.7\textwidth}
+      %\footnotesize
+      \begin{itemize}
+        \only<1-2>{
+          \item Given three points $A$, $B$ and $C$, we want to know if they form
+            a counter-clockwise angle in that order.
+            \[
+              A \rightarrow B \rightarrow C
+            \]
+          }
+        \only<2>{
+          \item We can examine the cross product of and the area of the triangle formed by
+            \begin{align*}
+              \vec{u} = B - C &\quad \vec{v} = B - A \\
+              \vec{u} &\times \vec{v} > 0
+            \end{align*}
+        }
+
+        \only<3->{
+          \item The points in the reverse order do not form a counter clockwise angle.
+            \[
+              C \rightarrow B \rightarrow A
+            \]
+          \item In the reverse order the vectors swap places
+            \begin{align*}
+              \vec{u} = B - A &\quad \vec{v} = B - C \\
+              \vec{u} &\times \vec{v} < 0
+            \end{align*}
+        }
+
+        \only<4>{
+          \item If the points $A$, $B$ and $C$ are on the same line, then the area will be $0$.
+        }
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}[plain,fragile]
+  \vspace{20pt}
+  \begin{minted}{cpp}
+double cross(P(a), P(b)) {
+    return real(a)*imag(b) - imag(a)*real(b);
+}
+double ccw(P(a), P(b), P(c)) {
+    return cross(b - a, c - b);
+}
+bool collinear(P(a), P(b), P(c)) {
+    return abs(ccw(a, b, c)) < EPS;
+}
+  \end{minted}
+\end{frame}
+
+\begin{frame}[plain]
+  Very common task is to find the intersection of two lines or line segments.
+  \begin{itemize}
+    \onslide<2->
+    \item Given a pair of points $(x_0, y_0)$, $(x_1, y_1)$, representing a
+      line we want to start by obtaining the form $Ax + By = C$.
+    \onslide<3->
+    \item We can do so by setting
+      \begin{align*}
+        A &= y_1 - y_0 \\
+        B &= x_0 - x_1 \\
+        C &= A\cdot x_0 + B\cdot y_1
+      \end{align*}
+    \onslide<4->
+    \vspace{-10pt}
+    \item If we have two lines given by such equations, we simply need to solve
+      for the two unknowns, $x$ and $y$.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[plain]
+  For two lines
+  \begin{align*}
+    A_0 x + B_0 y = C_0  \\
+    A_1 x + B_1 y = C_1
+  \end{align*}
+  The intersection point is
+  \begin{align*}
+      x &= \frac{(B_1 \cdot C_0 - B_0 \cdot C_1)}{D} \\
+      y &= \frac{(A_0 \cdot C_1 - A_1 \cdot C_0)}{D}
+  \end{align*}
+  Where
+  \[
+    D = A_0 \cdot B_1 - A_1 \cdot B_0
+  \]
+\end{frame}
+
+\begin{frame}[plain,fragile]
+  Quite similar problem is to find the intersections of two circles.
+  \begin{columns}
+    \begin{column}{0.6\textwidth}
+      \begin{figure}
+        \begin{tikzpicture}[auto,swap]
+          \scriptsize
+          \coordinate (A) at (0,0);
+          \coordinate (B) at (3,0);
+
+          \coordinate (P) at (1.2083333,0);
+          \coordinate (Q) at (1.2083333,0.88878037);
+          \coordinate (R) at (1.2083333,-0.88878037);
+
+          \draw[title,thick] (A) -- node[above left] {$r_A$} (Q);
+          \draw[title,thick] (B) -- node[above right] {$r_B$} (Q);
+
+          \draw (A) node[left] {\scriptsize $A$};
+          \draw (B) node[right] {\scriptsize $B$};
+          \draw[fill,vhilight] (A) circle[radius=1.2pt];
+          \draw[fill,vhilight] (B) circle[radius=1.2pt];
+          \draw[hilight,thick] (A) circle[radius=1.5cm];
+          \draw[hilight,thick] (B) circle[radius=2cm];
+
+          \visible<1-5>{
+            \draw[vhilight,thick] (A) --  node[below,xshift=5pt] {\scriptsize$d$} (B);
+          }
+
+          \visible<6->{
+            \draw[gray,thick] (A) circle[radius=1.5cm];
+            \draw[gray,thick] (B) circle[radius=2cm];
+            \draw[fill,vhilight] (A) circle[radius=1.2pt];
+            \draw[fill,vhilight] (B) circle[radius=1.2pt];
+
+            \draw[gray,thick] (P) -- (R);
+            \draw[hilight,thick] (Q) -- node[right=7pt] {$h$} (P);
+
+            \draw[vhilight, thick] (A) -- node[below] {$a$} (P);
+            \draw[vhilight, thick] (B) -- node[below] {$b$} (P);
+
+            \draw[fill,hilight] (P) circle[radius=1.2pt];
+            \draw[fill,hilight] (Q) circle[radius=1.2pt];
+            \draw[fill,hilight] (R) circle[radius=1.2pt];
+          }
+
+        \end{tikzpicture}
+      \end{figure}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \footnotesize
+      \only<2-5>{
+        \begin{itemize}
+            \onslide<2-5>{
+            \item If $d > r_0 + r_1$ the circles do not intersect.
+            }
+            \onslide<3-5>{
+            \item If $d < \lvert r_0 - r_1 \rvert $, one circles is contained within the other.
+            }
+            \onslide<4-5>{
+            \item If $d = 0$ and $r_0 = r_1$, the circles are the same.
+            }
+            \onslide<5>{
+            \item Let's look at the last case.
+            }
+        \end{itemize}
+      }
+      \only<6->{
+          \begin{itemize}
+            \onslide<6->{
+            \item We can solve for the vectors $a$ and $h$ from the equations
+                \[
+                a^2 + h^2 = r_0^2 \quad b^2 + h^2 = r_1^2
+                \]
+            }
+            \onslide<7->{
+            \item We get
+                \[
+                a = \frac{r_A^2 - r_B^2 + d^2)}{2\cdot d}
+                \]
+                \[
+                h^2 = r_A^2 - a^2
+                \]
+            }
+        \end{itemize}
+      }
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}[plain]
+  \begin{columns}
+    \begin{column}{0.4\textwidth}
+      \begin{figure}
+        \begin{tikzpicture}
+          \coordinate(A) at (0,0);
+          \coordinate(B) at (3,0);
+          \coordinate(C) at (2.7,1.2);
+          \coordinate(D) at (3.7,2);
+          \coordinate(E) at (2,4);
+          \coordinate(F) at (1,1.5);
+          \coordinate(G) at (-1,2);
+
+          \tkzDrawPolygon[color=foreground](A,B,C,D,E,F,G);
+
+          \visible<3->{
+            \draw[fill,hilight] (B) circle[radius=2pt];
+          }
+
+          \visible<4>{
+            \tkzDrawPolygon[color=foreground,fill=title,opacity=0.3,thin](A,B,G);
+          }
+
+          \visible<5>{
+            \tkzDrawPolygon[color=foreground,fill=title,opacity=0.3,thin](B,G,F);
+          }
+
+          \visible<6>{
+            \tkzDrawPolygon[color=foreground,fill=title,opacity=0.3,thin](B,F,E);
+          }
+
+          \visible<7>{
+            \tkzDrawPolygon[color=foreground,fill=title,opacity=0.3,thin](B,E,D);
+          }
+
+          \visible<8>{
+            \tkzDrawPolygon[color=foreground,fill=vhilight,opacity=0.2,thin](B,D,C);
+          }
+
+          \visible<9>{
+            \tkzDrawPolygon[color=foreground,fill=title,opacity=0.3,thin](A,B,G);
+            \tkzDrawPolygon[color=foreground,fill=title,opacity=0.3,thin](B,G,F);
+            \tkzDrawPolygon[color=foreground,fill=title,opacity=0.3,thin](B,F,E);
+            \tkzDrawPolygon[color=foreground,fill=title,opacity=0.3,thin](B,E,D);
+            \tkzDrawPolygon[color=foreground,fill=vhilight,opacity=0.2,thin](B,D,C);
+          }
+        \end{tikzpicture}
+      \end{figure}
+    \end{column}
+    \begin{column}{0.6\textwidth}
+      \begin{itemize}
+        \item Polygons are represented by a list of points in the order
+          representing the edges.
+        \onslide<2->
+        \item To calculate the area
+          \begin{itemize}
+            \onslide<3->
+            \item We pick one starting point.
+            \onslide<4->
+            \item Go through all the other adjacent pair of points and sum the
+              area of the triangulation.
+            \onslide<8->
+            \item Even if we sum up area outside the polygon, due to the cross
+              product, it is subtracted later.
+          \end{itemize}
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}[plain,fragile]
+  \vspace{20pt}
+  \footnotesize
+  \begin{minted}{cpp}
+double polygon_area_signed(const vector<point> &p) {
+    double area = 0;
+    int cnt = size(p);
+    for (int i = 1; i + 1 < cnt; i++){
+        area += cross(p[i] - p[0], p[i + 1] - p[0])/2;
+    }
+    return area;
+}
+double polygon_area(vector<point> &p) {
+    return abs(polygon_area_signed(p));
+}
+  \end{minted}
+\end{frame}
+
+\begin{frame}[plain,fragile]
+  \begin{itemize}
+    \item Given a set of points, we want to find the convex hull of the points.
+    \onslide<2->
+    \item The convex hull of points can be visualized as the shape formed by a rubber band around the set of points.
+  \end{itemize}
+  \onslide<3->
+  \begin{figure}
+    \begin{tikzpicture}
+      \coordinate(A) at (0,0);
+      \coordinate(B) at (3,0);
+      \coordinate(C) at (2.7,1.2);
+      \coordinate(D) at (3.7,2);
+      \coordinate(E) at (2,4);
+      \coordinate(F) at (1,1.5);
+      \coordinate(G) at (-1,3);
+      \coordinate(H) at (3,4.2);
+      \coordinate(I) at (1,2.43);
+      \coordinate(J) at (1.45, 2.87);
+      \coordinate(K) at (-0.1, 4);
+      \coordinate(L) at (-1.1,2.2);
+      \coordinate(M) at (-0.3,1.9);
+
+      \draw[fill,hilight] (A) circle[radius=2pt];
+      \draw[fill,hilight] (B) circle[radius=2pt];
+      \draw[fill,hilight] (C) circle[radius=2pt];
+      \draw[fill,hilight] (D) circle[radius=2pt];
+      \draw[fill,hilight] (E) circle[radius=2pt];
+      \draw[fill,hilight] (F) circle[radius=2pt];
+      \draw[fill,hilight] (G) circle[radius=2pt];
+      \draw[fill,hilight] (H) circle[radius=2pt];
+      \draw[fill,hilight] (I) circle[radius=2pt];
+      \draw[fill,hilight] (J) circle[radius=2pt];
+      \draw[fill,hilight] (K) circle[radius=2pt];
+      \draw[fill,hilight] (L) circle[radius=2pt];
+      \draw[fill,hilight] (M) circle[radius=2pt];
+
+      \visible<4->{
+        \draw[hilight,thick] (A) -- (B) -- (D) -- (H) -- (K) -- (G) -- (L) -- cycle;
+      }
+    \end{tikzpicture}
+  \end{figure}
+\end{frame}
+
+\begin{frame}[plain,fragile]
+  \vspace{20pt}
+  Graham scan:
+  \begin{itemize}
+    \onslide<2->
+    \item Pick the point $p_0$ with the lowest $y$ coordinate.
+    \onslide<3->
+    \item Sort all the points by polar angle with $p_0$.
+    \onslide<4->
+    \item Iterate through all the points
+    \onslide<5->
+    \item If the current point forms a clockwise angle with the last two
+      points, remove last point from the convex set.
+    \onslide<6->
+    \item Otherwise, add the current point to the convex set.
+  \end{itemize}
+  \onslide<7->
+  Time complexity $O(N \log N)$.
+\end{frame}
+
+\begin{frame}[plain]
+  \begin{figure}
+    \begin{tikzpicture}
+      \coordinate(A) at (0,0);
+      \coordinate(B) at (3,0);
+      \coordinate(C) at (2.7,1.2);
+      \coordinate(D) at (3.7,2);
+      \coordinate(E) at (2,4);
+      \coordinate(F) at (1,1.5);
+      \coordinate(G) at (-1,3);
+      \coordinate(H) at (3,4.2);
+      \coordinate(I) at (1,2.43);
+      \coordinate(J) at (1.45, 2.87);
+      \coordinate(K) at (-0.1, 4);
+      \coordinate(L) at (-1.1,2.2);
+      \coordinate(M) at (-0.3,1.9);
+
+      %\draw[fill,hilight] (A) circle[radius=2pt];
+      \onslide<2->{
+        \draw[fill,hilight] (B) circle[radius=2pt];
+        \draw[fill,hilight] (C) circle[radius=2pt];
+        \draw[fill,hilight] (D) circle[radius=2pt];
+        \draw[fill,hilight] (E) circle[radius=2pt];
+        \draw[fill,hilight] (F) circle[radius=2pt];
+        \draw[fill,hilight] (G) circle[radius=2pt];
+        \draw[fill,hilight] (H) circle[radius=2pt];
+        \draw[fill,hilight] (I) circle[radius=2pt];
+        \draw[fill,hilight] (J) circle[radius=2pt];
+        \draw[fill,hilight] (K) circle[radius=2pt];
+        \draw[fill,hilight] (L) circle[radius=2pt];
+        \draw[fill,hilight] (M) circle[radius=2pt];
+        \draw[fill,vhilight] (A) circle[radius=2pt];
+      }
+
+      \visible<3-4>{
+        \draw[very thin,foreground] (A) -- (B);
+        \draw[very thin,foreground] (A) -- (C);
+        \draw[very thin,foreground] (A) -- (D);
+        \draw[very thin,foreground] (A) -- (E);
+        \draw[very thin,foreground] (A) -- (F);
+        \draw[very thin,foreground] (A) -- (G);
+        \draw[very thin,foreground] (A) -- (H);
+        \draw[very thin,foreground] (A) -- (I);
+        \draw[very thin,foreground] (A) -- (J);
+        \draw[very thin,foreground] (A) -- (K);
+        \draw[very thin,foreground] (A) -- (L);
+        \draw[very thin,foreground] (A) -- (M);
+      }
+
+      \visible<4->{
+        \draw (A) node[below] {$p_0$};
+        \draw (B) node[right] {$1$};
+        \draw (C) node[below left] {$2$};
+        \draw (D) node[above right] {$3$};
+        \draw (E) node[above] {$7$};
+        \draw (F) node[below right] {$5$};
+        \draw (G) node[above] {$11$};
+        \draw (H) node[above] {$4$};
+        \draw (I) node[above] {$8$};
+        \draw (J) node[above left] {$6$};
+        \draw (K) node[above] {$9$};
+        \draw (L) node[above] {$12$};
+        \draw (M) node[above] {$10$};
+      }
+
+      \visible<5->{
+        \draw[fill,vhilight] (B) circle[radius=2pt];
+
+      }
+      \visible<5-7>{
+        \draw[fill,vhilight] (C) circle[radius=2pt];
+      }
+      \visible<5>{
+        \draw[thick, vhilight] (B) -- (C);
+      }
+      \visible<5->{
+        \draw[thick, vhilight] (A) -- (B);
+      }
+      \visible<6->{
+        \draw[fill,gray] (C) circle[radius=2pt];
+      }
+      \visible<6->{
+        \draw[fill,vhilight] (D) circle[radius=2pt];
+      }
+      \visible<6->{
+        \draw[thick, vhilight] (B) -- (D);
+      }
+      %\visible<7->{
+        %\draw[fill,title] (A) circle[radius=2pt];
+        %\draw[thick, title] (A) -- (B);
+      %}
+      \visible<7>{
+        \draw[thick, vhilight] (B) -- (D);
+      }
+      %\visible<8->{
+        %\draw[fill,title] (B) circle[radius=2pt];
+        %\draw[thick, title] (B) -- (D);
+      %}
+      \visible<7->{
+        \draw[thick, vhilight] (D) -- (H);
+      }
+      \visible<7->{
+        \draw[fill,vhilight] (H) circle[radius=2pt];
+      }
+      \visible<8>{
+        \draw[thick, vhilight] (H) -- (F);
+        \draw[fill,vhilight] (F) circle[radius=2pt];
+      }
+      \visible<9->{
+        \draw[fill,gray] (F) circle[radius=2pt];
+      }
+      \visible<9>{
+        \draw[thick, vhilight] (H) -- (J);
+        \draw[fill,vhilight] (J) circle[radius=2pt];
+      }
+      \visible<10->{
+        \draw[fill,gray] (J) circle[radius=2pt];
+      }
+      \visible<10-11>{
+        \draw[thick, vhilight] (H) -- (E);
+        \draw[fill,vhilight] (E) circle[radius=2pt];
+      }
+      %\visible<11-12>{
+        %\draw[fill,gray] (E) circle[radius=2pt];
+      %}
+      \visible<11>{
+        \draw[thick, vhilight] (E) -- (I);
+        \draw[fill,vhilight] (I) circle[radius=2pt];
+      }
+
+      \visible<12->{
+        \draw[fill,gray] (E) circle[radius=2pt];
+        \draw[fill,gray] (I) circle[radius=2pt];
+      }
+      \visible<12->{
+        \draw[thick, vhilight] (H) -- (K);
+      }
+      \visible<12->{
+        \draw[fill,vhilight] (K) circle[radius=2pt];
+      }
+      %\visible<13->{
+        %\draw[thick, title] (D) -- (H);
+        %\draw[fill,title] (D) circle[radius=2pt];
+      %}
+      \visible<13>{
+        \draw[thick, vhilight] (K) -- (M);
+        \draw[fill,vhilight] (M) circle[radius=2pt];
+      }
+      \visible<14->{
+        \draw[fill,gray] (M) circle[radius=2pt];
+      }
+      \visible<14->{
+        \draw[thick, vhilight] (K) -- (G);
+      }
+      \visible<14->{
+        \draw[fill,vhilight] (G) circle[radius=2pt];
+      }
+      %\visible<15->{
+        %\draw[fill,title] (H) circle[radius=2pt];
+        %\draw[thick, title] (H) -- (K);
+      %}
+      \visible<15->{
+        \draw[thick, vhilight] (G) -- (L);
+        \draw[fill,vhilight] (L) circle[radius=2pt];
+      }
+      %\visible<16->{
+        %\draw[fill,title] (K) circle[radius=2pt];
+        %\draw[thick, title] (K) -- (G);
+      %}
+      \visible<16>{
+        \draw[thick, vhilight] (L) -- (A);
+        \draw[fill,vhilight] (A) circle[radius=2pt];
+      }
+      \visible<17->{
+        \draw[thick, title] (A) -- (B);
+        \draw[thick, title] (B) -- (D);
+        \draw[thick, title] (D) -- (H);
+        \draw[thick, title] (H) -- (K);
+        \draw[thick, title] (K) -- (G);
+        \draw[thick, title] (G) -- (L);
+        \draw[thick, title] (L) -- (A);
+        \draw[fill,title] (A) circle[radius=2pt];
+        \draw[fill,title] (B) circle[radius=2pt];
+        \draw[fill,title] (D) circle[radius=2pt];
+        \draw[fill,title] (H) circle[radius=2pt];
+        \draw[fill,title] (K) circle[radius=2pt];
+        \draw[fill,title] (G) circle[radius=2pt];
+        \draw[fill,title] (L) circle[radius=2pt];
+      }
+
+    \end{tikzpicture}
+  \end{figure}
+\end{frame}
+
+\begin{frame}[plain,fragile]
+  \footnotesize
+  \begin{minted}{cpp}
+point hull[MAXN];
+bool cmp(const point &a, const point &b) {
+  return abs(real(a) - real(b)) > EPS ?
+    real(a) < real(b) : imag(a) < imag(b); }
+int convex_hull(vector<point> p) {
+    int n = size(p), l = 0;
+    sort(p.begin(), p.end(), cmp);
+    for (int i = 0; i < n; i++) {
+        if (i > 0 && p[i] == p[i - 1]) 
+            continue;
+        while (l >= 2 && ccw(hull[l - 2], hull[l - 1], p[i]) >= 0)
+            l--;
+        hull[l++] = p[i]; }
+    int r = l;
+    for (int i = n - 2; i >= 0; i--) {
+        if (p[i] == p[i + 1])
+            continue;
+        while (r - l >= 1 && ccw(hull[r - 2], hull[r - 1], p[i]) >= 0)
+            r--;
+        hull[r++] = p[i]; }
+    return l == 1 ? 1 : r - 1; }
+  \end{minted}
+\end{frame}
+
+\begin{frame}[plain]
+  \vspace{40pt}
+  Many other algorithms exist
+  \begin{itemize}
+    \onslide<2->
+    \item Gift wrapping aka Jarvis march.
+    \onslide<3->
+    \item Quick hull, similar idea to quicksort.
+    \onslide<4->
+    \item Divide and conquer.
+  \end{itemize}
+  \onslide<5->
+  Some can be extended to three dimensions, or higher.
+\end{frame}
+
+\begin{frame}[plain]
+  Simple algorithm to check if a point is in a convex polygon.
+  \begin{columns}
+    \begin{column}{0.6\textwidth}
+      \begin{figure}
+        \begin{tikzpicture}
+          \coordinate(A) at (0,0);
+          \coordinate(B) at (3,0);
+          \coordinate(C) at (3.7,1.7);
+          \coordinate(D) at (3,3);
+          \coordinate(E) at (1, 2.7);
+          \coordinate(F) at (-0.3,2.4);
+          \coordinate(G) at (-0.2,1.2);
+
+          \coordinate(P) at (4,4);
+          \coordinate(Q) at (2,2);
+
+          \draw[fill,title] (A) circle[radius=2pt];
+          \draw[fill,title] (B) circle[radius=2pt];
+          \draw[fill,title] (C) circle[radius=2pt];
+          \draw[fill,title] (D) circle[radius=2pt];
+          \draw[fill,title] (E) circle[radius=2pt];
+          \draw[fill,title] (F) circle[radius=2pt];
+          \draw[fill,title] (G) circle[radius=2pt];
+
+          \visible<1-10>{
+            \draw[fill,title] (P) circle[radius=2pt];
+          }
+
+          \visible<11->{
+            \draw[fill,title] (Q) circle[radius=2pt];
+          }
+
+          \draw[title,thick] (A) -- (B) -- (C) -- (D) -- (E) -- (F) -- (G) -- cycle;
+          \visible<2>{
+            \tkzDrawPolygon[color=title,fill=title,opacity=0.4,ultra thin](A,B,C,D,E,F,G);
+          }
+          \visible<3-10>{
+            \tkzDrawPolygon[color=title,fill=title,opacity=0.4,ultra thin](A,B,P);
+          }
+          \visible<4-10>{
+            \tkzDrawPolygon[color=title,fill=title,opacity=0.4,ultra thin](B,C,P);
+          }
+          \visible<5-10>{
+            \tkzDrawPolygon[color=title,fill=title,opacity=0.4,ultra thin](C,D,P);
+          }
+          \visible<6-10>{
+            \tkzDrawPolygon[color=title,fill=title,opacity=0.4,ultra thin](D,E,P);
+          }
+          \visible<7-10>{
+            \tkzDrawPolygon[color=title,fill=title,opacity=0.4,ultra thin](E,F,P);
+          }
+          \visible<8-10>{
+            \tkzDrawPolygon[color=title,fill=title,opacity=0.4,ultra thin](F,G,P);
+          }
+          \visible<9-10>{
+            \tkzDrawPolygon[color=title,fill=title,opacity=0.4,ultra thin](G,A,P);
+          }
+
+          \visible<11->{
+            \tkzDrawPolygon[color=title,fill=title,opacity=0.4,ultra thin](A,B,Q);
+          }
+          \visible<12->{
+            \tkzDrawPolygon[color=title,fill=title,opacity=0.4,ultra thin](B,C,Q);
+          }
+          \visible<13->{
+            \tkzDrawPolygon[color=title,fill=title,opacity=0.4,ultra thin](C,D,Q);
+          }
+          \visible<14->{
+            \tkzDrawPolygon[color=title,fill=title,opacity=0.4,ultra thin](D,E,Q);
+          }
+          \visible<15->{
+            \tkzDrawPolygon[color=title,fill=title,opacity=0.4,ultra thin](E,F,Q);
+          }
+          \visible<16->{
+            \tkzDrawPolygon[color=title,fill=title,opacity=0.4,ultra thin](F,G,Q);
+          }
+          \visible<17->{
+            \tkzDrawPolygon[color=title,fill=title,opacity=0.4,ultra thin](G,A,Q);
+          }
+
+        \end{tikzpicture}
+      \end{figure}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \footnotesize
+      \begin{itemize}
+        \onslide<2->
+        \item We start by calculating the area of the polygon.
+        \onslide<3->
+        \item To check if our point is contained in the polygon we sum up the
+          area of the triangles formed the point and every two adjacent points.
+        \onslide<10->
+        \item The total area of the triangles is equal to the area of the
+          polygon iff the point is inside the polygon.
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}[plain]
+  \vspace{40pt}
+  How about non convex polygon?
+  \begin{itemize}
+    \onslide<2->
+    \item The \emph{even-odd rule} algorithm.
+    \onslide<3->
+    \item We examine a ray passing through the polygon to the point.
+    \onslide<4->
+    \item If the ray crosses the boundary of the polygon, then it alternately
+      goes from outside to inside, and outside to inside.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[plain]
+  \begin{columns}
+    \begin{column}{0.6\textwidth}
+      \begin{figure}
+        \begin{tikzpicture}
+            \coordinate(A) at (0,0);
+            \coordinate(B) at (3.5,0);
+            \coordinate(C) at (2.7,1.2);
+            \coordinate(D) at (4.2,3);
+            \coordinate(E) at (2.5,1.3);
+            \coordinate(F) at (1.7,4);
+            \coordinate(G) at (0.8,1.2);
+            \coordinate(H) at (-1,2.5);
+
+            \coordinate(P) at (-1.7,1.7);
+            \coordinate(Q) at (5,1.7);
+
+            \coordinate(R) at (1,4);
+            \coordinate(S) at (0.3, 2);
+
+            \coordinate(O) at (3.4, 1.7);
+            \onslide<1-2>{
+              \draw[fill,hilight] (O) circle[radius=2pt];
+            }
+
+            \tkzInterLL(B,D)(P,Q) \tkzGetPoint{LL1};
+            \tkzInterLL(D,E)(P,Q) \tkzGetPoint{LL2};
+            \tkzInterLL(E,F)(P,Q) \tkzGetPoint{LL3};
+            \tkzInterLL(F,G)(P,Q) \tkzGetPoint{LL4};
+            \tkzInterLL(G,H)(P,Q) \tkzGetPoint{LL5};
+            \tkzInterLL(H,A)(P,Q) \tkzGetPoint{LL6};
+
+            \tkzInterLL(D,E)(R,O) \tkzGetPoint{LL7};
+            \tkzInterLL(E,F)(R,O) \tkzGetPoint{LL8};
+            \tkzInterLL(F,G)(R,O) \tkzGetPoint{LL9};
+
+            \tkzInterLL(B,D)(S,Q) \tkzGetPoint{LL10};
+            \tkzInterLL(D,E)(S,Q) \tkzGetPoint{LL11};
+            \tkzInterLL(E,F)(S,Q) \tkzGetPoint{LL12};
+            \tkzInterLL(F,G)(S,Q) \tkzGetPoint{LL13};
+
+            \tkzDrawPolygon[color=foreground,opacity=0.85](A,B,D,E,F,G,H);
+
+            \onslide<2-4>{
+              %\tkzDrawPolygon[color=foreground,opacity=0.7](A,B,D,E,F,G,H);
+              \draw[vhilight,title] (P) -- (O);
+              \draw[fill,hilight] (O) circle[radius=2pt];
+            }
+
+            \onslide<3-4>{
+              \draw[fill,vhilight] (LL2) circle[radius=2pt];
+              \draw[fill,vhilight] (LL3) circle[radius=2pt];
+              \draw[fill,vhilight] (LL4) circle[radius=2pt];
+              \draw[fill,vhilight] (LL5) circle[radius=2pt];
+              \draw[fill,vhilight] (LL6) circle[radius=2pt];
+            }
+
+            \onslide<5-6>{
+              \draw[vhilight,title] (R) -- (O);
+              \draw[fill,hilight] (O) circle[radius=2pt];
+            }
+
+            \onslide<6>{
+              \draw[fill,vhilight] (LL7) circle[radius=2pt];
+              \draw[fill,vhilight] (LL8) circle[radius=2pt];
+              \draw[fill,vhilight] (LL9) circle[radius=2pt];
+            }
+
+            \onslide<7-8>{
+              %\tkzDrawPolygon[color=foreground,opacity=0.7](A,B,D,E,F,G,H);
+              \draw[vhilight,title] (Q) -- (S);
+              \draw[fill,hilight] (S) circle[radius=2pt];
+            }
+
+            \onslide<8>{
+              \draw[fill,vhilight] (LL10) circle[radius=2pt];
+              \draw[fill,vhilight] (LL11) circle[radius=2pt];
+              \draw[fill,vhilight] (LL12) circle[radius=2pt];
+              \draw[fill,vhilight] (LL13) circle[radius=2pt];
+            }
+
+        \end{tikzpicture}
+      \end{figure}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \begin{itemize}
+        \onslide<2->
+        \item Ray from the outside of the polygon to the point.
+        \onslide<3->
+        \item Count the number of intersection points.
+        \onslide<4->
+        \item If odd, then the point is inside the polygon.
+        \item If even, then the point is outside the polygon.
+        \onslide<5->
+        \item Does not matter which ray we pick.
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}[plain]{An algorithm}
+	\begin{itemize}
+        \item Computational geometry has a lot of impressive and technical algorithms.
+        \item The most famous one is probably Delaunay triangulation.
+        \item But that one is a bit too hard for this course, so we will instead look at the classical closest point algorithm.
+        \item We are given $n$ points in the plan, find the pair of points that are closest to one another.
+        \item We can clearly solve this in $\mathcal{O}(n^2)$ time, but can we do better?
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[plain]{Divide and conquer}
+	\begin{itemize}
+        \item We sort the points by $x$-coordinate and split the list in half.
+        \item Let $x_0$ be such that it's between the coordinates of the left and right halves.
+        \item Start by solving each half recursively.
+        \item We now have to find if there's some pair with one point in each half that does better.
+        \item We can't simply try all pairs, that's too slow. Suppose the smallest distance we found recursively was $d$.
+        \item Then we can ignore all points with $x$-coordinte outside $[x_0 - d, x_0 + d]$.
+        \item Sort the points inside of this interval by their $y$-coordinate.
+        \item The big trick is now that we only need to consider a few neighbours for each point.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[plain]{Neighbours}
+	\begin{itemize}
+        \item Divide the area above $x_i$ into 8 squares, each with side length $d/2$.
+        \item If he distance between all points in each half is at least $d$, then we can have at most each point per square.
+        \item All points outside these squares are at a distance of at least $d$ from $x_i$, so we can ignore them.
+        \item Thus we only need to look at the distance from $x_i$ to $x_j$ when $j - i \leq 7$.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[plain]{Diagram}
+	\begin{center}
+		\begin{tikzpicture}
+			\draw (-2, 0) -- (-2, 8);
+			\draw (-2, 8) -- (2, 8);
+			\draw (2, 8) -- (2, 0);
+			\draw (2, 0) -- (-2, 0);
+			\draw (0, 0) -- (0, 8);
+			\draw (-2, 3) -- (2, 3);
+			\draw (-2, 4) -- (2, 4);
+			\draw (-2, 5) -- (2, 5);
+			\draw (-1, 3) -- (-1, 5);
+			\draw (1, 3) -- (1, 5);
+			\node[draw, fill, circle, white] at (-3, 0) {}; %alignment
+			\node[draw, fill, circle, white] at (3, 0) {}; %alignment
+
+			\node[draw, fill, circle, inner sep = 0.5pt] at (1, 0.3) {};
+			\node[draw, fill, circle, inner sep = 0.5pt] at (-1.9, 0.4) {};
+			\node[draw, fill, circle, inner sep = 0.5pt] at (-0.3, 1.3) {};
+			\node[draw, fill, circle, inner sep = 0.5pt] at (1.3, 3) {};
+			\node[draw, fill, circle, inner sep = 0.5pt] at (0.5, 4.7) {};
+			\node[draw, fill, circle, inner sep = 0.5pt] at (-0.6, 4.4) {};
+			\node[draw, fill, circle, inner sep = 0.5pt] at (-1.9, 3.1) {};
+			\node[draw, fill, circle, inner sep = 0.5pt] at (-0.3, 6.2) {};
+			\node[draw, fill, circle, inner sep = 0.5pt] at (0.6, 7.5) {};
+			\node at (1.4,3.1) {\tiny $i$};
+        \end{tikzpicture}
+    \end{center}
+\end{frame}
+
+\begin{frame}[plain]{Diagram}
+	\begin{center}
+		\begin{tikzpicture}
+			\draw (-2, 0) -- (-2, 8);
+			\draw (-2, 8) -- (2, 8);
+			\draw (2, 8) -- (2, 0);
+			\draw (2, 0) -- (-2, 0);
+			\draw (0, 0) -- (0, 8);
+			\draw (-2, 3) -- (2, 3);
+			\draw (-2, 4) -- (2, 4);
+			\draw (-2, 5) -- (2, 5);
+			\draw (-1, 3) -- (-1, 5);
+			\draw (1, 3) -- (1, 5);
+			\node[draw, fill, circle, white] at (-3, 0) {}; %alignment
+			\node[draw, fill, circle, white] at (3, 0) {}; %alignment
+
+			\node[draw, fill, circle, inner sep = 0.5pt] at (1, 0.3) {};
+			\node[draw, fill, circle, inner sep = 0.5pt] at (-1.9, 0.4) {};
+			\node[draw, fill, circle, inner sep = 0.5pt] at (-0.3, 1.3) {};
+			\node[draw, fill, circle, inner sep = 0.5pt] at (2, 3) {};
+			\node[draw, fill, circle, inner sep = 0.5pt] at (0.05, 3) {};
+			\node[draw, fill, circle, inner sep = 0.5pt] at (-0.05, 3) {};
+			\node[draw, fill, circle, inner sep = 0.5pt] at (-2, 3) {};
+			\node[draw, fill, circle, inner sep = 0.5pt] at (2, 5) {};
+			\node[draw, fill, circle, inner sep = 0.5pt] at (0.05, 5) {};
+			\node[draw, fill, circle, inner sep = 0.5pt] at (-0.05, 5) {};
+			\node[draw, fill, circle, inner sep = 0.5pt] at (-2, 5) {};
+			\node[draw, fill, circle, inner sep = 0.5pt] at (-0.3, 6.2) {};
+			\node[draw, fill, circle, inner sep = 0.5pt] at (0.6, 7.5) {};
+			\node at (1.9, 3.1) {\tiny $i$};
+			\node at (-0.2, 6.3) {\tiny $j$};
+        \end{tikzpicture}
+    \end{center}
+\end{frame}
+
+\begin{frame}[plain]{Complexity}
+	\begin{itemize}
+        \item Each recursive call is $\mathcal{O}(n\log(n))$. 
+        \item Thus by the master theorem the total complexity is $\mathcal{O}(n\log^2(n))$.
+        \item If we sort the $y$ values as we go using mergesort, we can actually do each call in $\mathcal{O}(n)$.
+        \item This way the complexity is actually $\mathcal{O}(n\log(n))$.
+    \end{itemize}
+\end{frame}
+
+
+\section*{Strings}
+
+\begin{frame}[plain]{String problems}
+    \begin{itemize}
+        \item Strings frequently appear in our kind of problems
+        \begin{itemize}
+            \item I/O
+            \item Parsing
+            \item Identifiers/names
+            \item Data
+        \end{itemize}
+        \vspace{5pt}
+        \item But sometimes strings play the key role
+        \begin{itemize}
+            \item We want to find properties of some given strings
+            \item Is the string a palindrome?
+        \end{itemize}
+        \vspace{5pt}
+        \item Here we're going to talk about things related to the latter type of problems
+        \vspace{5pt}
+        \item These problems can be hard, because the length of the strings are often huge
+    \end{itemize}
+\end{frame}
+
+\section*{String Matching}
+
+\begin{frame}[plain]{String matching}
+	\begin{itemize}
+		\item Given a string $S$ of length $n$,
+		\item and a string $T$ of length $m$,
+		\item find all occurrences of $T$ in $S$
+    \end{itemize}
+    \begin{itemize}
+		\item Note:
+        \begin{itemize}
+            \item Occurrences may overlap
+            \item Assume strings contain characters from some alphabet $\Sigma$
+        \end{itemize}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[plain]{String matching}
+	Example:
+	\begin{itemize}
+		\item $S = \mathrm{cabcababacaba}$
+		\item $T = \mathrm{aba}$
+	\end{itemize}
+    \begin{itemize}
+        \item<2-> Three occurrences:
+            \begin{itemize}
+                \item<3-> $\mathrm{cabc{\color{red}{aba}}bacaba}$
+                \item<4-> $\mathrm{cabcab{\color{red}{aba}}caba}$
+                \item<5-> $\mathrm{cabcababac{\color{red}{aba}}}$
+            \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[plain]{Naive string matching algorithm}
+	\begin{itemize}
+	\item For each substring of length $m$ in $S$,
+	\item check if that substring is equal to $T$.
+	\end{itemize}
+		
+\end{frame}
+
+
+\begin{frame}[plain]{Naive string matching algorithm}
+    \begin{itemize}
+        \item $S$: \texttt{\textcolor{red}{b}acbababaabcbab}
+        \item $T$: \phantom{\texttt{}}\texttt{\textcolor{red}{a}babaca}
+    \end{itemize}
+\end{frame}
+\begin{frame}[plain]{Naive string matching algorithm}
+    \begin{itemize}
+        \item $S$: \texttt{b\textcolor{green}{a}\textcolor{red}{c}bababaabcbab}
+        \item $T$: \phantom{\texttt{a}}\texttt{\textcolor{green}{a}\textcolor{red}{b}abaca}
+    \end{itemize}
+\end{frame}
+\begin{frame}[plain]{Naive string matching algorithm}
+    \begin{itemize}
+        \item $S$: \texttt{ba\textcolor{red}{c}bababaabcbab}
+        \item $T$: \phantom{\texttt{aa}}\texttt{\textcolor{red}{a}babaca}
+    \end{itemize}
+\end{frame}
+\begin{frame}[plain]{Naive string matching algorithm}
+    \begin{itemize}
+        \item $S$: \texttt{bac\textcolor{red}{b}ababaabcbab}
+        \item $T$: \phantom{\texttt{aaa}}\texttt{\textcolor{red}{a}babaca}
+    \end{itemize}
+\end{frame}
+\begin{frame}[plain]{Naive string matching algorithm}
+    \begin{itemize}
+        \item $S$: \texttt{bacb\textcolor{green}{ababa}\textcolor{red}{a}bcbab}
+        \item $T$: \phantom{\texttt{aaaa}}\texttt{\textcolor{green}{ababa}\textcolor{red}{c}a}
+    \end{itemize}
+\end{frame}
+\begin{frame}[plain]{Naive string matching algorithm}
+    \begin{itemize}
+        \item $S$: \texttt{bacba\textcolor{red}{b}abaabcbab}
+        \item $T$: \phantom{\texttt{aaaaa}}\texttt{\textcolor{red}{a}babaca}
+    \end{itemize}
+\end{frame}
+\begin{frame}[plain]{Naive string matching algorithm}
+    \begin{itemize}
+        \item $S$: \texttt{bacbab\textcolor{green}{aba}\textcolor{red}{a}bcbab}
+        \item $T$: \phantom{\texttt{aaaaaa}}\texttt{\textcolor{green}{aba}\textcolor{red}{b}aca}
+    \end{itemize}
+\end{frame}
+\begin{frame}[plain]{Naive string matching algorithm}
+    \begin{itemize}
+        \item $S$: \texttt{bacbaba\textcolor{red}{b}aabcbab}
+        \item $T$: \phantom{\texttt{aaaaaaa}}\texttt{\textcolor{red}{a}babaca}
+    \end{itemize}
+\end{frame}
+\begin{frame}[plain]{Naive string matching algorithm}
+    \begin{itemize}
+        \item $S$: \texttt{bacbabab\textcolor{green}{a}\textcolor{red}{a}bcbab}
+        \item $T$: \phantom{\texttt{aaaaaaaa}}\texttt{\textcolor{green}{a}\textcolor{red}{b}abaca}
+    \end{itemize}
+    % \item<2-> $T$ is always shifted one forward
+\end{frame}
+
+\begin{frame}[plain,fragile]{Naive string matching algorithm}
+    \begin{minted}[fontsize=\footnotesize]{cpp}
+int string_match(const string &s, const string &t) {
+    int n = s.size(),
+        m = t.size();
+
+    for (int i = 0; i + m - 1 < n; i++) {
+        bool found = true;
+        for (int j = 0; j < m; j++) {
+            if (s[i + j] != t[j]) {
+                found = false;
+                break;
+            }
+        }
+        if (found) {
+            return i;
+        }
+    }
+
+    return -1;
+}
+    \end{minted}
+\end{frame}
+
+\begin{frame}[plain]{Naive string matching algorithm}
+    \begin{itemize}
+        \item Double for-loop
+            \begin{itemize}
+                \item outer loop is $O(n)$ iterations
+                \item inner loop is $O(m)$ iterations worst case
+            \end{itemize}
+        \item Time complexity is $O(nm)$ worst case
+        \item<2-> Can we do better?
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[plain]
+    \frametitle{Knuth--Morris--Pratt algorithm}
+    \begin{itemize}
+    \item The KMP algorithm avoids useless comparisons:
+        \begin{itemize}
+            \item $S$: \texttt{\textcolor{red}{b}acbababaabcbab}
+            \item $T$: \phantom{\texttt{}}\texttt{\textcolor{red}{a}babaca}
+        \end{itemize}
+    \item[] \phantom{The number of shifts depend on which characters are currently matched}
+    \end{itemize}
+\end{frame}
+\begin{frame}[plain]
+    \frametitle{Knuth--Morris--Pratt algorithm}
+    \begin{itemize}
+    \item The KMP algorithm avoids useless comparisons:
+        \begin{itemize}
+            \item $S$: \texttt{b\textcolor{green}{a}\textcolor{red}{c}bababaabcbab}
+            \item $T$: \phantom{\texttt{a}}\texttt{\textcolor{green}{a}\textcolor{red}{b}abaca}
+        \end{itemize}
+    \item[] \phantom{The number of shifts depend on which characters are currently matched}
+    \end{itemize}
+\end{frame}
+\begin{frame}[plain]
+    \frametitle{Knuth--Morris--Pratt algorithm}
+    \begin{itemize}
+    \item The KMP algorithm avoids useless comparisons:
+        \begin{itemize}
+            \item $S$: \texttt{ba\textcolor{red}{c}bababaabcbab}
+            \item $T$: \phantom{\texttt{aa}}\texttt{\textcolor{red}{a}babaca}
+        \end{itemize}
+    \item[] \phantom{The number of shifts depend on which characters are currently matched}
+    \end{itemize}
+\end{frame}
+\begin{frame}[plain]
+    \frametitle{Knuth--Morris--Pratt algorithm}
+    \begin{itemize}
+    \item The KMP algorithm avoids useless comparisons:
+        \begin{itemize}
+            \item $S$: \texttt{bac\textcolor{red}{b}ababaabcbab}
+            \item $T$: \phantom{\texttt{aaa}}\texttt{\textcolor{red}{a}babaca}
+        \end{itemize}
+    \item[] \phantom{The number of shifts depend on which characters are currently matched}
+    \end{itemize}
+\end{frame}
+\begin{frame}[plain]
+    \frametitle{Knuth--Morris--Pratt algorithm}
+    \begin{itemize}
+    \item The KMP algorithm avoids useless comparisons:
+        \begin{itemize}
+            \item $S$: \texttt{bacb\textcolor{green}{ababa}\textcolor{red}{a}bcbab}
+            \item $T$: \phantom{\texttt{aaaa}}\texttt{\textcolor{green}{ababa}\textcolor{red}{c}a}
+        \end{itemize}
+    \item[] \phantom{The number of shifts depend on which characters are currently matched}
+    \end{itemize}
+\end{frame}
+\begin{frame}[plain]
+    \frametitle{Knuth--Morris--Pratt algorithm}
+    \begin{itemize}
+    \item The KMP algorithm avoids useless comparisons:
+        \begin{itemize}
+            \item $S$: \texttt{bacbab\textcolor{green}{aba}\textcolor{red}{a}bcbab}
+            \item $T$: \phantom{\texttt{aaaaaa}}\texttt{\textcolor{green}{aba}\textcolor{red}{b}aca}
+        \end{itemize}
+    \item[] \phantom{The number of shifts depend on which characters are currently matched}
+    \end{itemize}
+\end{frame}
+\begin{frame}[plain]
+    \frametitle{Knuth--Morris--Pratt algorithm}
+    \begin{itemize}
+    \item The KMP algorithm avoids useless comparisons:
+        \begin{itemize}
+            \item $S$: \texttt{bacbabab\textcolor{green}{a}\textcolor{red}{a}bcbab}
+            \item $T$: \phantom{\texttt{aaaaaaaa}}\texttt{\textcolor{green}{a}\textcolor{red}{b}abaca}
+        \end{itemize}
+    \item<2-> The number of shifts depend on which characters are currently matched
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[plain]
+    \frametitle{Knuth--Morris--Pratt algorithm}
+    \begin{itemize}
+        \item How are the number of shifts determined?
+            \vspace{5pt}
+        \item Let {\footnotesize $\pi[q] = \max \{ k : k < q \textrm{ and } T[1\ldots k] \textrm{ is a suffix of } T[1\ldots q] \}$}
+            \vspace{5pt}
+        \item<2-> Example:\\
+            \begin{center}
+                % \hspace{-50px}
+                \begin{tabular}{cccccccc}
+                    $i$ & $1$ & $2$ & $3$ & $4$ & $5$ & $6$ & $7$ \\
+                    \hline
+                    $T[i]$&\texttt{a}&\texttt{b}&\texttt{a}&\texttt{b}&\texttt{a}&\texttt{c}&\texttt{a} \\
+                    $\pi[i]$ & $0$ & $0$ & $1$ & $2$ & $3$ & $0$ & $1$\\
+                \end{tabular}
+            \end{center}
+    \vspace{5pt}
+        \item<3-> If, at position $i$, $q$ characters match (i.e. $T[1\ldots q] = S[i\ldots i+q-1]$), then
+            \begin{itemize}
+                \item if $q = 0$, shift pattern $1$ position right
+                \item otherwise, shift pattern $q - \pi[q]$ positions right
+            \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[plain]
+    \frametitle{Knuth--Morris--Pratt algorithm}
+    \begin{itemize}
+        \item Example:
+        \begin{itemize}
+            \item $S$: \texttt{bacb\textcolor{green}{ababa}\textcolor{red}{a}bcbab}
+            \item $T$: \phantom{\texttt{aaaa}}\texttt{\textcolor{green}{ababa}\textcolor{red}{c}a}
+            \item<2-> $5$ characters match, so $q = 5$
+            \item<3-> $\pi[q] = \pi[5] = 3$
+            \item<4-> Then shift $q - \pi[q] = 5 - 3 = 2$ positions
+            \item<5-> $S$: \texttt{bacbab\textcolor{green}{aba}\textcolor{red}{a}bcbab}
+            \item<5-> $T$: \phantom{\texttt{aaaaaa}}\texttt{\textcolor{green}{aba}\textcolor{red}{b}aca}
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[plain]
+    \frametitle{Knuth--Morris--Pratt algorithm}
+    \begin{itemize}
+        \item Given $\pi$, matching only takes $O(n)$ time
+        \item $\pi$ can be computed in $O(m)$ time
+        \item Total time complexity of KMP therefore $O(n+m)$ worst case
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[plain,fragile]{Knuth--Morris--Pratt algorithm}
+    \begin{minted}[fontsize=\scriptsize]{cpp}
+vi kmppi(string &p) {
+  int m = p.size(), i = 0, j = -1; 
+  vi b(m + 1, -1);
+  while(i < m) { 
+    while(j >= 0 && p[i] != p[j]) j = b[j]; 
+    b[++i] = ++j; 
+  } 
+  return b; 
+}
+
+vi kmp(string &s, string &p) {
+  int n = s.size(), m = p.size(), i = 0, j = 0;
+  vi b = kmppi(p), a = vi(); 
+  while(i < n) {
+    while(j >= 0 && s[i] != p[j]) j = b[j];
+    ++i; ++j; 
+    if(j == m) { 
+      a.push_back(i - j);
+      j = b[j]; 
+    } 
+  } 
+  return a; }
+    \end{minted}
+\end{frame}
+
+\section*{Tries}
+
+\begin{frame}[plain]{Sets of strings}
+    \begin{itemize}
+\item We often have sets (or maps) of strings
+\item Insertions and lookups usually guarantee $O(\log n)$ comparisons
+    \vspace{10pt}
+\item But string comparisons are actually pretty expensive...
+    \vspace{10pt}
+\item There are other data structures, like tries, which do this in a more clever way
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[plain]{Tries}
+	\begin{itemize}
+        \item Tries contain strings not at every node, but as paths in a tree.
+        \item Each node only has a character and we say the trie contains the string if you can get it by walking along nodes starting at the root.
+        \item The nodes can also carry additional data, quite a lot in fact, as we will see later.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[plain]{Example}
+	\begin{tikzpicture}
+		\node[draw, circle, thick, white] (0) at (-1, 0) {};
+		\node[draw, circle, thick, inner sep = 1.0pt] (1) at (0, 0) {};
+		\node[draw, circle, thick, inner sep = 1.0pt] (2) at (1, 1) {};
+		\node[draw, circle, thick, inner sep = 1.0pt] (3) at (1, 0) {};
+		\node[draw, circle, thick, inner sep = 1.0pt] (4) at (1, -1) {};
+		\node[draw, circle, thick, inner sep = 1.0pt] (5) at (2, 0) {};
+		\node[draw, circle, thick, inner sep = 1.0pt] (6) at (3, 0) {};
+		\node[draw, circle, thick, inner sep = 1.0pt] (7) at (4, 0) {};
+		\node[draw, circle, thick, inner sep = 1.0pt] (8) at (5, 0) {};
+		\node[draw, circle, thick, inner sep = 1.0pt] (9) at (6, 0) {};
+		\node[draw, circle, thick, inner sep = 1.0pt] (10) at (2, -1) {};
+		\node[draw, circle, thick, inner sep = 1.0pt] (11) at (3, -1) {};
+		\node[draw, circle, thick, inner sep = 1.0pt] (12) at (4, -1) {};
+		\node[draw, circle, thick, inner sep = 1.0pt] (13) at (2, 1) {};
+		\node[draw, circle, thick, inner sep = 1.0pt] (14) at (3, 1) {};
+		\node[draw, circle, thick, inner sep = 1.0pt] (15) at (4, 1) {};
+		\node[draw, circle, thick, inner sep = 1.0pt] (16) at (5, 1) {};
+		\node[draw, circle, thick, inner sep = 1.0pt] (17) at (6, 1) {};
+		\node[draw, circle, thick, inner sep = 1.0pt] (18) at (5, -1) {};
+		\node[draw, circle, thick, inner sep = 1.0pt] (19) at (6, -1) {};
+		\node[draw, circle, thick, inner sep = 1.0pt] (20) at (7, -1) {};
+
+		\path[draw, thick, ->] (0) -- (1);
+		\path[draw, thick] (1) -- (2);
+		\path[draw, thick] (1) -- (3);
+		\path[draw, thick] (3) -- (5);
+		\path[draw, thick] (5) -- (6);
+		\path[draw, thick] (6) -- (7);
+		\path[draw, thick] (7) -- (8);
+		\path[draw, thick] (8) -- (9);
+		\path[draw, thick] (1) -- (4);
+		\path[draw, thick] (4) -- (10);
+		\path[draw, thick] (10) -- (11);
+		\path[draw, thick] (11) -- (12);
+		\path[draw, thick] (2) -- (13);
+		\path[draw, thick] (13) -- (14);
+		\path[draw, thick] (14) -- (15);
+		\path[draw, thick] (15) -- (16);
+		\path[draw, thick] (16) -- (17);
+		\path[draw, thick] (7) -- (18);
+		\path[draw, thick] (18) -- (19);
+		\path[draw, thick] (19) -- (20);
+
+		\node at (0.5, 0.2) {b};
+		\node at (1.5, 0.2) {e};
+		\node at (2.5, 0.2) {r};
+		\node at (3.5, 0.2) {g};
+		\node at (4.5, 0.2) {u};
+		\node at (5.5, 0.2) {r};
+		\node at (0.6, -0.4) {n};
+		\node at (1.5, -0.8) {a};
+		\node at (2.5, -0.8) {l};
+		\node at (3.5, -0.8) {a};
+		\node at (0.5, 0.8) {s};
+		\node at (1.5, 1.2) {a};
+		\node at (2.5, 1.2) {n};
+		\node at (3.5, 1.2) {d};
+		\node at (4.5, 1.2) {r};
+		\node at (5.5, 1.2) {a};
+		\node at (4.7, -0.4) {þ};
+		\node at (5.5, -0.8) {ó};
+		\node at (6.5, -0.8) {r};
+		%\only<all:2-3> { \node at (6,3) {$v$}; }
+		%\only<all:3> { \node at (5,1) {$x$}; }
+    \end{tikzpicture}
+	\begin{itemize}
+        \item Examples of strings in this trie include:
+		\begin{itemize}
+			\item<3-> ,,sandra'',
+			\item<4-> ,,nala'',
+			\item<5-> ,,bergur'',
+			\item<6-> ,,bergþór'',
+			\item<7-> ,,san'' and
+			\item<8-> ,,'' (empty string)
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[plain]{End nodes}
+	\begin{itemize}
+        \item It is common to mark some nodes as end nodes.
+        \item This is an example of extra data to put into nodes.
+        \item Then we can consider a string $s$ to be in the tree if you can walk through the tree to get the string \textbf{and} end at an end node.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[plain]{Example}
+	\begin{tikzpicture}
+		\node[draw, circle, thick, white] (0) at (-1, 0) {};
+		\node[draw, circle, thick, inner sep = 1.0pt] (1) at (0, 0) {};
+		\node[draw, circle, thick, inner sep = 1.0pt] (2) at (1, 1) {};
+		\node[draw, circle, thick, inner sep = 1.0pt] (3) at (1, 0) {};
+		\node[draw, circle, thick, fill, inner sep = 1.0pt] (4) at (1, -1) {};
+		\node[draw, circle, thick, inner sep = 1.0pt] (5) at (2, 0) {};
+		\node[draw, circle, thick, inner sep = 1.0pt] (6) at (3, 0) {};
+		\node[draw, circle, thick, inner sep = 1.0pt] (7) at (4, 0) {};
+		\node[draw, circle, thick, inner sep = 1.0pt] (8) at (5, 0) {};
+		\node[draw, circle, thick, fill, inner sep = 1.0pt] (9) at (6, 0) {};
+		\node[draw, circle, thick, inner sep = 1.0pt] (10) at (2, -1) {};
+		\node[draw, circle, thick, inner sep = 1.0pt] (11) at (3, -1) {};
+		\node[draw, circle, thick, fill, inner sep = 1.0pt] (12) at (4, -1) {};
+		\node[draw, circle, thick, inner sep = 1.0pt] (13) at (2, 1) {};
+		\node[draw, circle, thick, inner sep = 1.0pt] (14) at (3, 1) {};
+		\node[draw, circle, thick, inner sep = 1.0pt] (15) at (4, 1) {};
+		\node[draw, circle, thick, inner sep = 1.0pt] (16) at (5, 1) {};
+		\node[draw, circle, thick, fill, inner sep = 1.0pt] (17) at (6, 1) {};
+		\node[draw, circle, thick, inner sep = 1.0pt] (18) at (5, -1) {};
+		\node[draw, circle, thick, inner sep = 1.0pt] (19) at (6, -1) {};
+		\node[draw, circle, thick, fill, inner sep = 1.0pt] (20) at (7, -1) {};
+
+		\path[draw, thick, ->] (0) -- (1);
+		\path[draw, thick] (1) -- (2);
+		\path[draw, thick] (1) -- (3);
+		\path[draw, thick] (3) -- (5);
+		\path[draw, thick] (5) -- (6);
+		\path[draw, thick] (6) -- (7);
+		\path[draw, thick] (7) -- (8);
+		\path[draw, thick] (8) -- (9);
+		\path[draw, thick] (1) -- (4);
+		\path[draw, thick] (4) -- (10);
+		\path[draw, thick] (10) -- (11);
+		\path[draw, thick] (11) -- (12);
+		\path[draw, thick] (2) -- (13);
+		\path[draw, thick] (13) -- (14);
+		\path[draw, thick] (14) -- (15);
+		\path[draw, thick] (15) -- (16);
+		\path[draw, thick] (16) -- (17);
+		\path[draw, thick] (7) -- (18);
+		\path[draw, thick] (18) -- (19);
+		\path[draw, thick] (19) -- (20);
+
+		\node at (0.5, 0.2) {b};
+		\node at (1.5, 0.2) {e};
+		\node at (2.5, 0.2) {r};
+		\node at (3.5, 0.2) {g};
+		\node at (4.5, 0.2) {u};
+		\node at (5.5, 0.2) {r};
+		\node at (0.6, -0.4) {n};
+		\node at (1.5, -0.8) {a};
+		\node at (2.5, -0.8) {l};
+		\node at (3.5, -0.8) {a};
+		\node at (0.5, 0.8) {s};
+		\node at (1.5, 1.2) {a};
+		\node at (2.5, 1.2) {n};
+		\node at (3.5, 1.2) {d};
+		\node at (4.5, 1.2) {r};
+		\node at (5.5, 1.2) {a};
+		\node at (4.7, -0.4) {þ};
+		\node at (5.5, -0.8) {ó};
+		\node at (6.5, -0.8) {r};
+		%\only<all:2-3> { \node at (6,3) {$v$}; }
+		%\only<all:3> { \node at (5,1) {$x$}; }
+    \end{tikzpicture}
+	\begin{itemize}
+		\item<2-> The strings in the trie are:
+		\begin{itemize}
+			\item<3-> ,,sandra'',
+			\item<4-> ,,nala'',
+			\item<5-> ,,bergur'',
+			\item<6-> ,,bergþór'' and
+			\item<7-> ,,n''
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[plain]{Adding strings}
+    \begin{itemize}
+        \item What if we want to add a string to a trie?
+        \item We walk through it as usual, but simply add nodes when we find ourself at a dead end with letters left to walk through.
+        \item This increases the size of the tree by at most the size of the string.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[plain]{Example}
+	\begin{tikzpicture}
+		\node[draw, circle, white, thick, inner sep = 1.0pt] at (4, -2) {}; %alignment
+
+		\node[draw, circle, thick, white] (0) at (-1, 0) {};
+		\only<all:1-2, 4-8, 10-15, 17-27, 29-36, 38-46, 48-61, 63-> { \node[draw, circle, thick, inner sep = 1.0pt] (1) at (0, 0) {}; }
+		\only<all:3, 9, 16, 28, 37, 47, 62> { \node[draw, circle, blue, thick, inner sep = 1.0pt] (1) at (0, 0) {}; }
+
+		\only<all:5-9, 11-16, 18-28, 30-37, 39-47, 49-62, 64-> { \node[draw, circle, thick, inner sep = 1.0pt] (2) at (1, 0) {}; }
+		\only<all:4, 10, 17, 29, 38, 48, 63> { \node[draw, circle, blue, thick, inner sep = 1.0pt] (2) at (1, 0) {}; }
+
+		\only<all:6-10, 12-17, 19-38, 40-> { \node[draw, circle, thick, inner sep = 1.0pt] (3) at (2, 0) {}; }
+		\only<all:5, 11, 18, 39> { \node[draw, circle, blue, thick, inner sep = 1.0pt] (3) at (2, 0) {}; }
+
+		\only<all:7-> { \node[draw, circle, fill, thick, inner sep = 1.0pt] (4) at (3, 0) {}; }
+		\only<all:6> { \node[draw, circle, blue, thick, inner sep = 1.0pt] (4) at (3, 0) {}; }
+
+		\only<all:13-18, 20-39, 41-> { \node[draw, circle, thick, inner sep = 1.0pt] (5) at (3, -1) {}; }
+		\only<all:12, 19, 40> { \node[draw, circle, blue, thick, inner sep = 1.0pt] (5) at (3, -1) {}; }
+
+		\only<all:14-> { \node[draw, circle, fill, thick, inner sep = 1.0pt] (6) at (4, -1) {}; }
+		\only<all:13> { \node[draw, circle, blue, thick, inner sep = 1.0pt] (6) at (4, -1) {}; }
+
+		\only<all:21-> { \node[draw, circle, thick, inner sep = 1.0pt] (7) at (4, -2) {}; }
+		\only<all:20> { \node[draw, circle, blue, thick, inner sep = 1.0pt] (7) at (4, -2) {}; }
+
+		\only<all:22-> { \node[draw, circle, thick, inner sep = 1.0pt] (8) at (5, -2) {}; }
+		\only<all:21> { \node[draw, circle, blue, thick, inner sep = 1.0pt] (8) at (5, -2) {}; }
+
+		\only<all:23-> { \node[draw, circle, thick, inner sep = 1.0pt] (9) at (6, -2) {}; }
+		\only<all:22> { \node[draw, circle, blue, thick, inner sep = 1.0pt] (9) at (6, -2) {}; }
+
+		\only<all:24-> { \node[draw, circle, thick, inner sep = 1.0pt] (10) at (7, -2) {}; }
+		\only<all:23> { \node[draw, circle, blue, thick, inner sep = 1.0pt] (10) at (7, -2) {}; }
+
+		\only<all:25-> { \node[draw, circle, thick, inner sep = 1.0pt] (11) at (8, -2) {}; }
+		\only<all:24> { \node[draw, circle, blue, thick, inner sep = 1.0pt] (11) at (8, -2) {}; }
+
+		\only<all:26-> { \node[draw, circle, fill, thick, inner sep = 1.0pt] (12) at (9, -2) {}; }
+		\only<all:25> { \node[draw, circle, blue, thick, inner sep = 1.0pt] (12) at (9, -2) {}; }
+
+		\only<all:31-48, 50-63, 65-> { \node[draw, circle, thick, inner sep = 1.0pt] (13) at (2, 1) {}; }
+		\only<all:30, 49, 64> { \node[draw, circle, blue, thick, inner sep = 1.0pt] (13) at (2, 1) {}; }
+
+		\only<all:32-49, 51-64, 66-> { \node[draw, circle, thick, inner sep = 1.0pt] (14) at (3, 1) {}; }
+		\only<all:31, 50, 65> { \node[draw, circle, blue, thick, inner sep = 1.0pt] (14) at (3, 1) {}; }
+
+		\only<all:33-50, 52-65, 67-> { \node[draw, circle, thick, inner sep = 1.0pt] (15) at (4, 1) {}; }
+		\only<all:32, 51, 66> { \node[draw, circle, blue, thick, inner sep = 1.0pt] (15) at (4, 1) {}; }
+
+		\only<all:34-51, 53-66, 68-> { \node[draw, circle, thick, inner sep = 1.0pt] (16) at (5, 1) {}; }
+		\only<all:33, 52, 67> { \node[draw, circle, blue, thick, inner sep = 1.0pt] (16) at (5, 1) {}; }
+
+		\only<all:35-52, 54-67, 69-> { \node[draw, circle, fill, thick, inner sep = 1.0pt] (17) at (6, 1) {}; }
+		\only<all:34, 53, 68> { \node[draw, circle, blue, thick, inner sep = 1.0pt] (17) at (6, 1) {}; }
+
+		\only<all:42-> { \node[draw, circle, thick, inner sep = 1.0pt] (18) at (4, 0) {}; }
+		\only<all:41> { \node[draw, circle, blue, thick, inner sep = 1.0pt] (18) at (4, 0) {}; }
+
+		\only<all:43-> { \node[draw, circle, thick, inner sep = 1.0pt] (19) at (5, 0) {}; }
+		\only<all:42> { \node[draw, circle, blue, thick, inner sep = 1.0pt] (19) at (5, 0) {}; }
+
+		\only<all:44-> { \node[draw, circle, thick, inner sep = 1.0pt] (20) at (6, 0) {}; }
+		\only<all:43> { \node[draw, circle, blue, thick, inner sep = 1.0pt] (20) at (6, 0) {}; }
+
+		\only<all:45-> { \node[draw, circle, fill, thick, inner sep = 1.0pt] (21) at (7, 0) {}; }
+		\only<all:44> { \node[draw, circle, blue, thick, inner sep = 1.0pt] (21) at (7, 0) {}; }
+
+		\only<all:55-68, 70-> { \node[draw, circle, thick, inner sep = 1.0pt] (22) at (7, 1) {}; }
+		\only<all:54, 69> { \node[draw, circle, blue, thick, inner sep = 1.0pt] (22) at (7, 1) {}; }
+
+		\only<all:56-> { \node[draw, circle, thick, inner sep = 1.0pt] (23) at (8, 1) {}; }
+		\only<all:55> { \node[draw, circle, blue, thick, inner sep = 1.0pt] (23) at (8, 1) {}; }
+
+		\only<all:57-> { \node[draw, circle, thick, inner sep = 1.0pt] (24) at (8, 0) {}; }
+		\only<all:56> { \node[draw, circle, blue, thick, inner sep = 1.0pt] (24) at (8, 0) {}; }
+
+		\only<all:58-> { \node[draw, circle, thick, inner sep = 1.0pt] (25) at (9, 0) {}; }
+		\only<all:57> { \node[draw, circle, blue, thick, inner sep = 1.0pt] (25) at (9, 0) {}; }
+
+		\only<all:59-> { \node[draw, circle, thick, inner sep = 1.0pt] (26) at (9, 1) {}; }
+		\only<all:58> { \node[draw, circle, blue, thick, inner sep = 1.0pt] (26) at (9, 1) {}; }
+
+		\only<all:1-> { \node[draw, circle, white, thick, inner sep = 1.0pt] (27) at (10, 1) {}; } %alignment
+		\only<all:60-> { \node[draw, circle, fill, thick, inner sep = 1.0pt] (27) at (10, 1) {}; }
+		\only<all:59> { \node[draw, circle, blue, thick, inner sep = 1.0pt] (27) at (10, 1) {}; }
+
+		\only<all:71-> { \node[draw, circle, thick, inner sep = 1.0pt] (28) at (7, 2) {}; }
+		\only<all:70> { \node[draw, circle, blue, thick, inner sep = 1.0pt] (28) at (7, 2) {}; }
+
+		\only<all:72-> { \node[draw, circle, thick, inner sep = 1.0pt] (29) at (6, 2) {}; }
+		\only<all:71> { \node[draw, circle, blue, thick, inner sep = 1.0pt] (29) at (6, 2) {}; }
+
+		\only<all:73-> { \node[draw, circle, thick, inner sep = 1.0pt] (30) at (5, 2) {}; }
+		\only<all:72> { \node[draw, circle, blue, thick, inner sep = 1.0pt] (30) at (5, 2) {}; }
+
+		\only<all:74-> { \node[draw, circle, thick, inner sep = 1.0pt] (31) at (4, 2) {}; }
+		\only<all:73> { \node[draw, circle, blue, thick, inner sep = 1.0pt] (31) at (4, 2) {}; }
+
+		\only<all:75-> { \node[draw, circle, fill, thick, inner sep = 1.0pt] (32) at (3, 2) {}; }
+		\only<all:74> { \node[draw, circle, blue, thick, inner sep = 1.0pt] (32) at (3, 2) {}; }
+
+
+		\path[draw, thick, ->] (0) -- (1);
+		\only<all:4-> { \path[draw, thick] (1) -- (2); }
+		\only<all:5-> { \path[draw, thick] (2) -- (3); }
+		\only<all:6-> { \path[draw, thick] (3) -- (4); }
+		\only<all:12-> { \path[draw, thick] (3) -- (5); }
+		\only<all:13-> { \path[draw, thick] (5) -- (6); }
+		\only<all:20-> { \path[draw, thick] (5) -- (7); }
+		\only<all:21-> { \path[draw, thick] (7) -- (8); }
+		\only<all:22-> { \path[draw, thick] (8) -- (9); }
+		\only<all:23-> { \path[draw, thick] (9) -- (10); }
+		\only<all:24-> { \path[draw, thick] (10) -- (11); }
+		\only<all:25-> { \path[draw, thick] (11) -- (12); }
+		\only<all:30-> { \path[draw, thick] (2) -- (13); }
+		\only<all:31-> { \path[draw, thick] (13) -- (14); }
+		\only<all:32-> { \path[draw, thick] (14) -- (15); }
+		\only<all:33-> { \path[draw, thick] (15) -- (16); }
+		\only<all:34-> { \path[draw, thick] (16) -- (17); }
+		\only<all:41-> { \path[draw, thick] (5) -- (18); }
+		\only<all:42-> { \path[draw, thick] (18) -- (19); }
+		\only<all:43-> { \path[draw, thick] (19) -- (20); }
+		\only<all:44-> { \path[draw, thick] (20) -- (21); }
+		\only<all:54-> { \path[draw, thick] (17) -- (22); }
+		\only<all:55-> { \path[draw, thick] (22) -- (23); }
+		\only<all:56-> { \path[draw, thick] (23) -- (24); }
+		\only<all:57-> { \path[draw, thick] (24) -- (25); }
+		\only<all:58-> { \path[draw, thick] (25) -- (26); }
+		\only<all:59-> { \path[draw, thick] (26) -- (27); }
+		\only<all:70-> { \path[draw, thick] (22) -- (28); }
+		\only<all:71-> { \path[draw, thick] (28) -- (29); }
+		\only<all:72-> { \path[draw, thick] (29) -- (30); }
+		\only<all:73-> { \path[draw, thick] (30) -- (31); }
+		\only<all:74-> { \path[draw, thick] (31) -- (32); }
+
+		%\only<all:1-> { \node[white] at (3.5, -0.8) {r}; } %alignment
+		\only<all:4-> { \node at (0.5, 0.2) {a}; }
+		\only<all:5-> { \node at (1.5, 0.2) {p}; }
+		\only<all:6-> { \node at (2.5, 0.2) {i}; }
+		\only<all:12-> { \node at (2.7, -0.5) {a}; }
+		\only<all:13-> { \node at (3.5, -0.8) {r}; }
+		\only<all:20-> { \node at (3.7, -1.4) {k}; }
+		\only<all:21-> { \node at (4.5, -1.8) {ö}; }
+		\only<all:22-> { \node at (5.5, -1.8) {t}; }
+		\only<all:23-> { \node at (6.5, -1.8) {t}; }
+		\only<all:24-> { \node at (7.5, -1.8) {u}; }
+		\only<all:25-> { \node at (8.5, -1.8) {r}; }
+		\only<all:30-> { \node at (1.5, 0.8) {l}; }
+		\only<all:31-> { \node at (2.5, 1.2) {t}; }
+		\only<all:32-> { \node at (3.5, 1.2) {a}; }
+		\only<all:33-> { \node at (4.5, 1.2) {r}; }
+		\only<all:34-> { \node at (5.5, 1.2) {i}; }
+		\only<all:41-> { \node at (3.6, -0.2) {s}; }
+		\only<all:42-> { \node at (4.5, 0.2) {p}; }
+		\only<all:43-> { \node at (5.5, 0.2) {i}; }
+		\only<all:44-> { \node at (6.5, 0.2) {l}; }
+		\only<all:54-> { \node at (6.5, 1.2) {s}; }
+		\only<all:55-> { \node at (7.5, 1.2) {t}; }
+		\only<all:56-> { \node at (8.2, 0.5) {a}; }
+		\only<all:57-> { \node at (8.5, 0.2) {f}; }
+		\only<all:58-> { \node at (9.2, 0.5) {l}; }
+		\only<all:59-> { \node at (9.5, 1.2) {a}; }
+		\only<all:70-> { \node at (7.2, 1.7) {g}; }
+		\only<all:71-> { \node at (6.5, 2.2) {a}; }
+		\only<all:72-> { \node at (5.5, 2.2) {n}; }
+		\only<all:73-> { \node at (4.5, 2.2) {g}; }
+		\only<all:74-> { \node at (3.5, 2.2) {a}; }
+
+		%\node at (6.5, -0.8) {r};
+		\only<all:1-> { \node[white] at (6,3) {,,api''}; } %alignment
+		\only<all:2-3> { \node at (6,3) {,,api''}; }
+		\only<all:4> { \node at (6,3) {,,pi''}; }
+		\only<all:5> { \node at (6,3) {,,i''}; }
+		\only<all:6> { \node at (6,3) {,,''}; }
+		\only<all:8-9> { \node at (6,3) {,,apar''}; }
+		\only<all:10> { \node at (6,3) {,,par''}; }
+		\only<all:11> { \node at (6,3) {,,ar''}; }
+		\only<all:12> { \node at (6,3) {,,r''}; }
+		\only<all:13> { \node at (6,3) {,,''}; }
+		\only<all:15-16> { \node at (6,3) {,,apaköttur''}; }
+		\only<all:17> { \node at (6,3) {,,paköttur''}; }
+		\only<all:18> { \node at (6,3) {,,aköttur''}; }
+		\only<all:19> { \node at (6,3) {,,köttur''}; }
+		\only<all:20> { \node at (6,3) {,,öttur''}; }
+		\only<all:21> { \node at (6,3) {,,ttur''}; }
+		\only<all:22> { \node at (6,3) {,,tur''}; }
+		\only<all:23> { \node at (6,3) {,,ur''}; }
+		\only<all:24> { \node at (6,3) {,,r''}; }
+		\only<all:25> { \node at (6,3) {,,''}; }
+		\only<all:27-28> { \node at (6,3) {,,altari''}; }
+		\only<all:29> { \node at (6,3) {,,ltari''}; }
+		\only<all:30> { \node at (6,3) {,,tari''}; }
+		\only<all:31> { \node at (6,3) {,,ari''}; }
+		\only<all:32> { \node at (6,3) {,,ri''}; }
+		\only<all:33> { \node at (6,3) {,,i''}; }
+		\only<all:34> { \node at (6,3) {,,''}; }
+		\only<all:36-37> { \node at (6,3) {,,apaspil''}; }
+		\only<all:38> { \node at (6,3) {,,paspil''}; }
+		\only<all:39> { \node at (6,3) {,,aspil''}; }
+		\only<all:40> { \node at (6,3) {,,spil''}; }
+		\only<all:41> { \node at (6,3) {,,pil''}; }
+		\only<all:42> { \node at (6,3) {,,il''}; }
+		\only<all:43> { \node at (6,3) {,,l''}; }
+		\only<all:44> { \node at (6,3) {,,''}; }
+		\only<all:46-47> { \node at (6,3) {,,altaristafla''}; }
+		\only<all:48> { \node at (6,3) {,,ltaristafla''}; }
+		\only<all:49> { \node at (6,3) {,,taristafla''}; }
+		\only<all:50> { \node at (6,3) {,,aristafla''}; }
+		\only<all:51> { \node at (6,3) {,,ristafla''}; }
+		\only<all:52> { \node at (6,3) {,,istafla''}; }
+		\only<all:53> { \node at (6,3) {,,stafla''}; }
+		\only<all:54> { \node at (6,3) {,,tafla''}; }
+		\only<all:55> { \node at (6,3) {,,afla''}; }
+		\only<all:56> { \node at (6,3) {,,fla''}; }
+		\only<all:57> { \node at (6,3) {,,la''}; }
+		\only<all:58> { \node at (6,3) {,,a''}; }
+		\only<all:59> { \node at (6,3) {,,''}; }
+		\only<all:61-62> { \node at (6,3) {,,altarisganga''}; }
+		\only<all:63> { \node at (6,3) {,,ltarisganga''}; }
+		\only<all:64> { \node at (6,3) {,,tarisganga''}; }
+		\only<all:65> { \node at (6,3) {,,arisganga''}; }
+		\only<all:66> { \node at (6,3) {,,risganga''}; }
+		\only<all:67> { \node at (6,3) {,,isganga''}; }
+		\only<all:68> { \node at (6,3) {,,sganga''}; }
+		\only<all:69> { \node at (6,3) {,,ganga''}; }
+		\only<all:70> { \node at (6,3) {,,anga''}; }
+		\only<all:71> { \node at (6,3) {,,nga''}; }
+		\only<all:72> { \node at (6,3) {,,ga''}; }
+		\only<all:73> { \node at (6,3) {,,a''}; }
+		\only<all:74> { \node at (6,3) {,,''}; }
+    \end{tikzpicture}
+\end{frame}
+
+\begin{frame}[plain,fragile]{Tries}
+    \begin{minted}{cpp}
+struct node {
+    node* children[26];
+    bool is_end;
+
+    node() {
+        memset(children, 0, sizeof(children));
+        is_end = false;
+    }
+};
+    \end{minted}
+\end{frame}
+
+\begin{frame}[plain,fragile]{Tries}
+    \begin{minted}{cpp}
+void insert(node* nd, char *s) {
+    if (*s) {
+        if (!nd->children[*s - 'a'])
+            nd->children[*s - 'a'] = new node();
+
+        insert(nd->children[*s - 'a'], s + 1);
+    } else {
+        nd->is_end = true;
+    }
+}
+    \end{minted}
+\end{frame}
+
+\begin{frame}[plain,fragile]{Tries}
+    \begin{minted}{cpp}
+bool contains(node* nd, char *s) {
+    if (*s) {
+        if (!nd->children[*s - 'a'])
+            return false;
+
+        return contains(nd->children[*s - 'a'], s + 1);
+    } else {
+        return nd->is_end;
+    }
+}
+    \end{minted}
+\end{frame}
+
+\begin{frame}[plain,fragile]{Tries}
+    \begin{minted}{cpp}
+node *trie = new node();
+
+insert(trie, "banani");
+
+if (contains(trie, "banani")) {
+    // ...
+}
+    \end{minted}
+\end{frame}
+
+\begin{frame}[plain]{Tries}
+    \begin{itemize}
+        \item Time complexity?
+        \vspace{10pt}
+        \item Let $k$ be the length of the string we're inserting/looking for
+        \item Lookup is $\mathcal{O}(k)$ and insertion is both $\mathcal{O}(k|\Sigma|)$
+        \item The insertion takes this time because we might have to make $k$ nodes, each needing $|\Sigma|$ pointers initialized
+        \item This can be improved by using a map/dict for children instead, but that does make lookup slower, tradeoffs as usual
+    \end{itemize}
+\end{frame}
+
+\section*{String multimatching}
+
+\begin{frame}[plain]{Aho-Corasick}
+	\begin{itemize}
+        \item Let us now have some string $s$ and a list of $n$ strings $p$, where we denote the $j$-th string by $p_j$.
+        \item Let $|s|$ be the length of $s$ and $|p| = |p_1| + \dots + |p_n|$.
+        \item We want to find all substrings of $s$ that are in the list $p$.
+        \item We could run KMP $n$ times, once for each $p_j$, for a time complexity of $\mathcal{O}(n \cdot |s| + |p|)$.
+        \item The Aho-Corasick algorithm improves on this.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[plain]{The algorithm}
+	\begin{itemize}
+        \item We start by putting all strings in $p$ into a trie $T$.
+        \item We then want to turn $T$ into a finite state automata.
+        \item The nodes of the trie will be our states but the transitions from each state will correspond to a letter from $\Sigma$.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[plain]{The automata}
+	\begin{itemize}
+        \item Suppose we are in node $v$ in $T$ and want to transition according to the letter $c$ in $\Sigma$.
+        \item If there is an node corresponding to adding a $c$ after $v$ we can travel there.
+        \item If not we need to travel back to some node $w$ so the string corresponding to $w$ is a suffix of the one corresponding to $v$.
+        \item We want to drop the least amount of information, so we want $w$ to be as long as possible.
+        \item We call these transitions \emph{suffix links}. Note that they are essentially independent of $c$.
+        \item We let the suffix link of the root point back to itself for simplicity's sake.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[plain]{Suffix links}
+	\begin{itemize}
+        \item How do we find the suffix links?
+        \item We will cheat and borrow a method from the future, dynamic programming.
+        \item Let $f(w, c)$ denote the transition from node $w$ with the letter $c$ and let $g(w)$ be the suffix link of $w$.
+        \item Also let $p$ be the parent of $p$ and $f(p, a) = v$. Then $g(v) = f(g(p), a)$.
+        \item Thus we have a recursive formula we can use.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[plain]{Example}
+	\begin{tikzpicture}
+		\node[draw, circle, thick, white] (0) at (-1, 0) {};
+
+		\only<all:2, 3> { \node[draw, circle, fill, blue, thick, inner sep = 1.0pt] at (2, -1) {}; }
+		\only<all:4, 5> { \node[draw, circle, fill, blue, thick, inner sep = 1.0pt] at (3, -1) {}; }
+		\only<all:6, 7> { \node[draw, circle, fill, blue, thick, inner sep = 1.0pt] at (4, -1) {}; }
+		\only<all:8, 9> { \node[draw, circle, fill, blue, thick, inner sep = 1.0pt] at (2, 1) {}; }
+		\only<all:10, 11> { \node[draw, circle, fill, blue, thick, inner sep = 1.0pt] at (3, 1) {}; }
+		\only<all:12, 13> { \node[draw, circle, fill, blue, thick, inner sep = 1.0pt] at (4, 1) {}; }
+
+		\node[draw, circle, thick, inner sep = 1.0pt] (1) at (0, 0) {};
+		\node[draw, circle, thick, inner sep = 1.0pt] (2) at (1, 1) {};
+		\node[draw, circle, thick, inner sep = 1.0pt] (3) at (2, 1) {};
+		\node[draw, circle, thick, inner sep = 1.0pt] (4) at (3, 1) {};
+		\node[draw, circle, thick, inner sep = 1.0pt] (5) at (4, 1) {};
+		\node[draw, circle, thick, inner sep = 1.0pt] (6) at (1, -1) {};
+		\node[draw, circle, thick, inner sep = 1.0pt] (7) at (2, -1) {};
+		\node[draw, circle, thick, inner sep = 1.0pt] (8) at (3, -1) {};
+		\node[draw, circle, thick, inner sep = 1.0pt] (9) at (4, -1) {};
+
+		\path[draw, thick, ->] (0) -- (1);
+		\path[draw, thick] (1) -- (2);
+		\path[draw, thick] (2) -- (3);
+		\path[draw, thick] (3) -- (4);
+		\path[draw, thick] (4) -- (5);
+		\path[draw, thick] (1) -- (6);
+		\path[draw, thick] (6) -- (7);
+		\path[draw, thick] (7) -- (8);
+		\path[draw, thick] (8) -- (9);
+		\only<all:1-> { \path[draw, ->, very thick, white, dotted] (9) edge[bend left = 90] node {} (1); } %alignment
+		\only<all:3-> { \path[draw, ->, very thick, dark green, dotted] (7) edge[bend left = 90] node {} (1); }
+		\only<all:5-> { \path[draw, ->, very thick, dark green, dotted] (8) edge[bend left = 90] node {} (1); }
+		\only<all:7-> { \path[draw, ->, very thick, dark green, dotted] (9) edge[bend left = 90] node {} (1); }
+		\only<all:9-> { \path[draw, ->, very thick, dark green, dotted] (3) -- (6); }
+		\only<all:11-> { \path[draw, ->, very thick, dark green, dotted] (4) -- (7); }
+		\only<all:13-> { \path[draw, ->, very thick, dark green, dotted] (5) -- (8); }
+
+		\node at (0.5, 0.8) {a};
+		\node at (1.5, 1.2) {b};
+		\node at (2.5, 1.2) {c};
+		\node at (3.5, 1.2) {d};
+		\node at (0.6, -0.4) {b};
+		\node at (1.5, -0.8) {c};
+		\node at (2.5, -0.8) {d};
+		\node at (3.5, -0.8) {e};
+    \end{tikzpicture}
+\end{frame}
+
+\begin{frame}[plain]{End nodes}
+	\begin{itemize}
+        \item We also have to mark end nodes in $T$.
+        \item We then walk through $s$ and move around the state machine according to the letters encountered.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[plain]{Example}
+	\begin{tikzpicture}
+		\node[draw, circle, thick, white] (0) at (-1, 0) {};
+
+		\only<all:1-2> { \node at (3, 2) {,,abcdcdeaaabcdeabcxab''}; }
+		\only<all:3> { \node at (3, 2)    {,,bcdcdeaaabcdeabcxab''}; }
+		\only<all:4> { \node at (3, 2)     {,,cdcdeaaabcdeabcxab''}; }
+		\only<all:5> { \node at (3, 2)      {,,dcdeaaabcdeabcxab''}; }
+		\only<all:6-8> { \node at (3, 2)     {,,cdeaaabcdeabcxab''}; }
+		\only<all:9> { \node at (3, 2)        {,,deaaabcdeabcxab''}; }
+		\only<all:10> { \node at (3, 2)        {,,eaaabcdeabcxab''}; }
+		\only<all:11> { \node at (3, 2)         {,,aaabcdeabcxab''}; }
+		\only<all:12-13> { \node at (3, 2)       {,,aabcdeabcxab''}; }
+		\only<all:14-15> { \node at (3, 2)        {,,abcdeabcxab''}; }
+		\only<all:16> { \node at (3, 2)            {,,bcdeabcxab''}; }
+		\only<all:17> { \node at (3, 2)             {,,cdeabcxab''}; }
+		\only<all:18> { \node at (3, 2)              {,,deabcxab''}; }
+		\only<all:19-20> { \node at (3, 2)            {,,eabcxab''}; }
+		\only<all:21-22> { \node at (3, 2)             {,,abcxab''}; }
+		\only<all:23> { \node at (3, 2)                 {,,bcxab''}; }
+		\only<all:24> { \node at (3, 2)                  {,,cxab''}; }
+		\only<all:25-26> { \node at (3, 2)                {,,xab''}; }
+		\only<all:27> { \node at (3, 2)                    {,,ab''}; }
+		\only<all:28> { \node at (3, 2)                     {,,b''}; }
+		\only<all:29-30> { \node at (3, 2)                   {,,''}; }
+
+		\only<all:2> { \node[draw, circle, fill, blue, thick, inner sep = 1.0pt] at (0, 0) {}; }
+		\only<all:3> { \node[draw, circle, fill, blue, thick, inner sep = 1.0pt] at (1, 1) {}; }
+		\only<all:4> { \node[draw, circle, fill, blue, thick, inner sep = 1.0pt] at (2, 1) {}; }
+		\only<all:5> { \node[draw, circle, fill, blue, thick, inner sep = 1.0pt] at (3, 1) {}; }
+		\only<all:6> { \node[draw, circle, fill, blue, thick, inner sep = 1.0pt] at (4, 1) {}; }
+		\only<all:7> { \node[draw, circle, fill, blue, thick, inner sep = 1.0pt] at (3, -1) {}; }
+		\only<all:8-11, 13, 15> { \node[draw, circle, fill, blue, thick, inner sep = 1.0pt] at (0, 0) {}; }
+		\only<all:12, 14, 16> { \node[draw, circle, fill, blue, thick, inner sep = 1.0pt] at (1, 1) {}; }
+		\only<all:17> { \node[draw, circle, fill, blue, thick, inner sep = 1.0pt] at (2, 1) {}; }
+		\only<all:18> { \node[draw, circle, fill, blue, thick, inner sep = 1.0pt] at (3, 1) {}; }
+		\only<all:19> { \node[draw, circle, fill, blue, thick, inner sep = 1.0pt] at (4, 1) {}; }
+		\only<all:20> { \node[draw, circle, fill, blue, thick, inner sep = 1.0pt] at (3, -1) {}; }
+		\only<all:21> { \node[draw, circle, fill, blue, thick, inner sep = 1.0pt] at (4, -1) {}; }
+		\only<all:22> { \node[draw, circle, fill, blue, thick, inner sep = 1.0pt] at (0, 0) {}; }
+		\only<all:23> { \node[draw, circle, fill, blue, thick, inner sep = 1.0pt] at (1, 1) {}; }
+		\only<all:24> { \node[draw, circle, fill, blue, thick, inner sep = 1.0pt] at (2, 1) {}; }
+		\only<all:25> { \node[draw, circle, fill, blue, thick, inner sep = 1.0pt] at (3, 1) {}; }
+		\only<all:26-27> { \node[draw, circle, fill, blue, thick, inner sep = 1.0pt] at (0, 0) {}; }
+		\only<all:28> { \node[draw, circle, fill, blue, thick, inner sep = 1.0pt] at (1, 1) {}; }
+		\only<all:29> { \node[draw, circle, fill, blue, thick, inner sep = 1.0pt] at (2, 1) {}; }
+
+		\node[draw, circle, thick, inner sep = 1.0pt] (1) at (0, 0) {};
+		\node[draw, circle, thick, inner sep = 1.0pt] (2) at (1, 1) {};
+		\node[draw, circle, thick, inner sep = 1.0pt] (3) at (2, 1) {};
+		\node[draw, circle, thick, inner sep = 1.0pt] (4) at (3, 1) {};
+		\node[draw, circle, thick, inner sep = 1.0pt] (5) at (4, 1) {};
+		\node[draw, circle, thick, inner sep = 1.0pt] (6) at (1, -1) {};
+		\node[draw, circle, thick, inner sep = 1.0pt] (7) at (2, -1) {};
+		\node[draw, circle, thick, inner sep = 1.0pt] (8) at (3, -1) {};
+		\node[draw, circle, thick, inner sep = 1.0pt] (9) at (4, -1) {};
+
+		\path[draw, thick, ->] (0) -- (1);
+		\path[draw, thick] (1) -- (2);
+		\path[draw, thick] (2) -- (3);
+		\path[draw, thick] (3) -- (4);
+		\path[draw, thick] (4) -- (5);
+		\path[draw, thick] (1) -- (6);
+		\path[draw, thick] (6) -- (7);
+		\path[draw, thick] (7) -- (8);
+		\path[draw, thick] (8) -- (9);
+		\path[draw, thick, green, dotted] (2) edge[bend left = 40] node {} (1);
+		\path[draw, thick, green, dotted] (3) -- (6);
+		\path[draw, thick, green, dotted] (4) -- (7);
+		\path[draw, thick, green, dotted] (5) -- (8);
+		\path[draw, thick, green, dotted] (6) edge[bend left = 40] node {} (1);
+		\path[draw, thick, green, dotted] (7) edge[bend left = 90] node {} (1);
+		\path[draw, thick, green, dotted] (8) edge[bend left = 90] node {} (1);
+		\path[draw, thick, green, dotted] (9) edge[bend left = 90] node {} (1);
+
+		\node at (0.5, 0.8) {a};
+		\node at (1.5, 1.2) {b};
+		\node at (2.5, 1.2) {c};
+		\node at (3.5, 1.2) {d};
+		\node at (0.6, -0.4) {b};
+		\node at (1.5, -0.8) {c};
+		\node at (2.5, -0.8) {d};
+		\node at (3.5, -0.8) {e};
+    \end{tikzpicture}
+\end{frame}
+
+\begin{frame}[plain]{End nodes}
+	\begin{itemize}
+        \item<2-> Thus every time we are at an end node we have a substring in $s$ that is in $p$. Are these the only ones?
+        \item<3-> No, we also need to consider if we can get to end nodes by traveling along suffix links.
+		\item<4->[]
+		\begin{tikzpicture}
+			\node[draw, circle, thick, white] (0) at (-1, 0) {};
+			\onslide<all:6, 7> { \node at (3, 2) {,,bcb''}; }
+			\onslide<all:8> { \node at (3, 2)     {,,cb''}; }
+			\onslide<all:9> { \node at (3, 2)      {,,b''}; }
+			\onslide<all:10-11> { \node at (3, 2)   {,,''}; }
+
+			\onslide<all:7> { \node[draw, circle, fill, blue, thick, inner sep = 1.0pt] at (0, 0) {}; }
+			\onslide<all:8> { \node[draw, circle, fill, blue, thick, inner sep = 1.0pt] at (1, 1) {}; }
+			\onslide<all:9> { \node[draw, circle, fill, blue, thick, inner sep = 1.0pt] at (2, 1) {}; }
+			\onslide<all:10> { \node[draw, circle, fill, blue, thick, inner sep = 1.0pt] at (3, 1) {}; }
+
+			\node[draw, circle, thick, inner sep = 1.0pt] (1) at (0, 0) {};
+			\node[draw, circle, thick, inner sep = 1.0pt] (2) at (1, 1) {};
+			\node[draw, circle, thick, inner sep = 1.0pt] (3) at (2, 1) {};
+			\node[draw, circle, thick, inner sep = 1.0pt] (4) at (3, 1) {};
+			\node[draw, circle, thick, inner sep = 1.0pt] (5) at (1, -1) {};
+
+			\path[draw, thick, ->] (0) -- (1);
+			\path[draw, thick] (1) -- (2);
+			\path[draw, thick] (2) -- (3);
+			\path[draw, thick] (3) -- (4);
+			\path[draw, thick] (1) -- (5);
+			\path[draw, thick, green, dotted] (2) edge[bend left = 40] node {} (1);
+			\path[draw, thick, green, dotted] (3) -- (5);
+			%\path[draw, thick, green, dotted] (4) -- (6);
+			\path[draw, thick, green, dotted] (4) edge[bend right = 90] node {} (1);
+			\path[draw, thick, green, dotted] (5) edge[bend left = 40] node {} (1);
+
+			\node at (0.5, 0.8) {b};
+			\node at (1.5, 1.2) {c};
+			\node at (2.5, 1.2) {b};
+			\node at (0.6, -0.4) {c};
+        \end{tikzpicture}
+        \item<12-> To keep the complexity in check we again use dynamic programming.
+        \item<13-> We add the concatenated links into the tree, calling them \emph{exit links}.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[plain]{Speed}
+	\begin{itemize}
+        \item Let us assume the strings in $p$ appear $k$ times in $s$.
+        \item Then the time complexity is $\mathcal{O}(|s| + |\Sigma| \cdot |p| + k)$
+        \item If we only want the number of matches, the implementation can be modified accordingly and then the complexity is $\mathcal{O}(|s| + |\Sigma| \cdot |p|)$.
+        \item Note that for a bounded alphabet, this second complexity is linear.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[plain]{Implementation explanation}
+	\begin{itemize}
+        \item The implementation contains three helper functions.
+        \item The first is \texttt{trie\_step(...)} which is used to move around the state machine.
+        \item The second is \texttt{trie\_suffix(...)} which is used to find suffix links.
+        \item The third is \texttt{trie\_exit(...)} which is used to find exit links.
+        \item All these functions are recursive and memoized.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[plain,fragile]{Aho nodes}
+    \scriptsize
+    \begin{minted}{cpp}
+#define ALPHABET 128
+// Helper function to get index of letter
+int val(char c) { return c; }
+struct listnode {
+    // n is index of next node, v is value of this node
+    int v, n;
+    listnode(int _v, int _n) : v(_v), n(_n) { }
+};
+struct trienode {
+    // l is the index of the pattern that ends here or -1 if none
+    // e is the exit link index, d is the suffix link index
+    // p is the parent index
+    // c is the character of the incoming edge
+    // t is the transition table of the trie node
+    int t[ALPHABET], l, e, p, c, d;
+    trienode(int _p, int _c) :
+        l(-1), e(-1), p(_p), c(_c), d(-1) {
+        memset(t, -1, sizeof(t));
+    }
+};
+    \end{minted}
+\end{frame}
+
+\begin{frame}[plain,fragile]{Aho trie}
+    \tiny
+    \begin{multicols}{2}
+    \begin{minted}{cpp}
+struct trie { 
+    // r is the index of the root
+    int r;
+    vector<trienode> m;
+    vector<listnode> w;
+
+    trie() {
+        m = vector<trienode>();
+        w = vector<listnode>();
+        r = trie_node(-1, -1);
+    }
+
+    int list_node(int v, int n) {
+        w.push_back(listnode(v, n));
+        return w.size() - 1;
+    }
+    int trie_node(int p, int c) {
+        m.push_back(trienode(p, c));
+        return m.size() - 1;
+    }
+
+    void trie_insert(string &s, int x) {
+        int h, i = 0;
+        for(h = r; i < s.size(); h = m[h].t[val(s[i])], i++)
+            if(m[h].t[val(s[i])] == -1)
+                m[h].t[val(s[i])] = trie_node(h, val(s[i]));
+        m[h].l = list_node(x, m[h].l);
+    }
+    \end{minted}
+    \columnbreak
+    \begin{minted}{cpp}
+    int trie_suffix(int h) {
+        if(m[h].d != -1) return m[h].d;
+        if(h == r || m[h].p == r) return m[h].d = r;
+        return m[h].d = 
+            trie_step(trie_suffix(m[h].p), m[h].c);
+    }
+
+    int trie_step(int h, int c) {
+        if(m[h].t[c] != -1) return m[h].t[c];
+        return m[h].t[c] = h == r ? r :
+            trie_step(trie_suffix(h), c);
+    }
+
+    int trie_exit(int h) {
+        if(m[h].e != -1) return m[h].e;
+        if(h == 0 || m[h].l != -1) return m[h].e = h;
+        return m[h].e = trie_exit(trie_suffix(h));
+    }
+};
+    \end{minted}
+    \end{multicols}
+\end{frame}
+
+\begin{frame}[plain,fragile]{Aho implementation}
+    \vspace{-25pt}
+    \scriptsize
+    \begin{minted}{cpp}
+int aho_corasick(string &s, vector<string> &p) {
+    trie t; int h, i, j, k, w, m = p.size(), l[m];
+    for(i = 0; i < m; i++) l[i] = p[i].size();
+    for(i = 0; i < m; i++) t.trie_insert(p[i], i);
+    s.push_back('\0');
+    for(i = 0, j = 0, h = t.r; j < s.size(); j++) {
+        k = t.trie_exit(h);
+        while(t.m[k].l != -1) {
+            for(w = t.m[k].l; w != -1; w = t.w[w].n) {
+                cout << p[t.w[w].v] << " found at index " << 
+                    j - l[t.w[w].v] << '\n';
+            }
+            k = t.trie_exit(t.trie_suffix(k));
+        }
+        h = t.trie_step(h, val(s[j]));
+    }
+    return i;
+}
+    \end{minted}
+\end{frame}
+
+\end{document}
+
