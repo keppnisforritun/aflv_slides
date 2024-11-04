@@ -536,7 +536,7 @@ using point = complex<double>;
 
 \begin{frame}[plain]{Using complex in C++}
     \begin{itemize}
-        \item Usually we do \texttt{typedef complex<double> point}
+        \item Usually we do \texttt{using point = complex<double>;}
         \item Then we can initialize a point with \texttt{point z(x, y)}
         \begin{itemize}
             \item \texttt{real(z)} returns the $x$-coordinate
@@ -576,7 +576,7 @@ using point = complex<double>;
     \begin{minted}{cpp}
 #include<bits/stdc++.h>
 using namespace std;
-typedef complex<double> point;
+using point = complex<double>;
 int main() {
     int n; cin >> n;
     double x, r = 0.0;
