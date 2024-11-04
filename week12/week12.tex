@@ -2762,7 +2762,7 @@ if (contains(trie, "banani")) {
 \begin{frame}[plain]{Suffix links}
 	\begin{itemize}
         \item How do we find the suffix links?
-        \item We will cheat and borrow a method from the future, dynamic programming.
+        \item We will cheat and borrow a method from a past week, dynamic programming.
         \item Let $f(w, c)$ denote the transition from node $w$ with the letter $c$ and let $g(w)$ be the suffix link of $w$.
         \item Also let $p$ be the parent of $p$ and $f(p, a) = v$. Then $g(v) = f(g(p), a)$.
         \item Thus we have a recursive formula we can use.
