@@ -74,7 +74,7 @@
 \definecolor{hilight}{RGB}{235,129,27}
 \definecolor{vhilight}{HTML}{14B03D}
 
-\def\hepta{\draw[foreground](A) -- (B) -- (C) -- (D) -- (E) -- (F) -- (G) -- cycle;}
+\def\hepta{\draw[foreground](A) -- (B) -- (C) -- (D) -- (E) -- (F) -- (G) -- cycle}
 
 \newcommand{\slice}[1]{%
     \hepta
@@ -479,7 +479,7 @@ struct point {
   \vspace{20pt}
   \ldots or we could use the \texttt{complex<double>} class. 
   \begin{minted}{cpp}
-typedef complex<double> point;
+using point = complex<double>;
   \end{minted}
   \onslide<2->
   \vspace{10pt}
@@ -936,7 +936,7 @@ point closest_point(L(a, b), P(c), bool segment = false) {
           \coordinate (D) at (60:2.7cm);
           \coordinate (C) at ($ (B) + (D) $);
 
-          \tkzDrawPolygon[color=foreground](A,B,C,D);
+          \tkzDrawPolygon[color=foreground](A,B,C,D)
           \draw[fill=title!50] (0,0) -- (60:.75cm) arc (60:0:.75cm);
           \draw[->,thick,hilight] (0,0) -- node[near end, below] {$\vec u$} (B);
           \draw[->,thick,vhilight] (0,0) -- node[near end, left=4pt] {$\vec v$} (D);
@@ -944,7 +944,7 @@ point closest_point(L(a, b), P(c), bool segment = false) {
 
           \visible<2->{
             %\draw[title,thick,->] (0,0) -- node[below] {$\vec{v}_{\vec{u}}$} (0:2.45134221cm);
-            \tkzDrawPolygon[fill=title,opacity=0.4](A,B,D);
+            \tkzDrawPolygon[fill=title,opacity=0.4](A,B,D)
             \draw (20:1.6cm) node {\color{background}$\frac{1}{2}\lvert \vec{u} \times \vec{v} \rvert$};
             \draw[->,thick,hilight] (0,0) -- node[near end, below] {$\vec u$} (B);
             \draw[->,thick,vhilight] (0,0) -- node[near end, left=4pt] {$\vec v$} (D);
@@ -1002,13 +1002,13 @@ point closest_point(L(a, b), P(c), bool segment = false) {
           }
 
           \visible<2>{
-            \tkzDrawPolygon[fill=title,opacity=0.3](A,B,C);
+            \tkzDrawPolygon[fill=title,opacity=0.3](A,B,C)
             \draw (B) node[left=20pt] {\Large$+$};
             \draw[outer color=title,fill=title,opacity=0.5] (B) -- ++(135:.35cm) arc (135:225:.35cm);
           }
 
           \visible<3>{
-            \tkzDrawPolygon[fill=vhilight,opacity=0.2](A,B,C);
+            \tkzDrawPolygon[fill=vhilight,opacity=0.2](A,B,C)
             \draw (B) node[left=20pt] {\Large$-$};
             \draw[thick,hilight,->] (B) -- node[above right] {$\vec u$} (C);
             \draw[thick,hilight,->] (B) -- node[below right] {$\vec v$} (A) ;
@@ -1221,38 +1221,38 @@ bool collinear(P(a), P(b), P(c)) {
           \coordinate(F) at (1,1.5);
           \coordinate(G) at (-1,2);
 
-          \tkzDrawPolygon[color=foreground](A,B,C,D,E,F,G);
+          \tkzDrawPolygon[color=foreground](A,B,C,D,E,F,G)
 
           \visible<3->{
             \draw[fill,hilight] (B) circle[radius=2pt];
           }
 
           \visible<4>{
-            \tkzDrawPolygon[color=foreground,fill=title,opacity=0.3,thin](A,B,G);
+              \tkzDrawPolygon[color=foreground,fill=title,opacity=0.3,thin](A,B,G)
           }
 
           \visible<5>{
-            \tkzDrawPolygon[color=foreground,fill=title,opacity=0.3,thin](B,G,F);
+            \tkzDrawPolygon[color=foreground,fill=title,opacity=0.3,thin](B,G,F)
           }
 
           \visible<6>{
-            \tkzDrawPolygon[color=foreground,fill=title,opacity=0.3,thin](B,F,E);
+            \tkzDrawPolygon[color=foreground,fill=title,opacity=0.3,thin](B,F,E)
           }
 
           \visible<7>{
-            \tkzDrawPolygon[color=foreground,fill=title,opacity=0.3,thin](B,E,D);
+            \tkzDrawPolygon[color=foreground,fill=title,opacity=0.3,thin](B,E,D)
           }
 
           \visible<8>{
-            \tkzDrawPolygon[color=foreground,fill=vhilight,opacity=0.2,thin](B,D,C);
+            \tkzDrawPolygon[color=foreground,fill=vhilight,opacity=0.2,thin](B,D,C)
           }
 
           \visible<9>{
-            \tkzDrawPolygon[color=foreground,fill=title,opacity=0.3,thin](A,B,G);
-            \tkzDrawPolygon[color=foreground,fill=title,opacity=0.3,thin](B,G,F);
-            \tkzDrawPolygon[color=foreground,fill=title,opacity=0.3,thin](B,F,E);
-            \tkzDrawPolygon[color=foreground,fill=title,opacity=0.3,thin](B,E,D);
-            \tkzDrawPolygon[color=foreground,fill=vhilight,opacity=0.2,thin](B,D,C);
+            \tkzDrawPolygon[color=foreground,fill=title,opacity=0.3,thin](A,B,G)
+            \tkzDrawPolygon[color=foreground,fill=title,opacity=0.3,thin](B,G,F)
+            \tkzDrawPolygon[color=foreground,fill=title,opacity=0.3,thin](B,F,E)
+            \tkzDrawPolygon[color=foreground,fill=title,opacity=0.3,thin](B,E,D)
+            \tkzDrawPolygon[color=foreground,fill=vhilight,opacity=0.2,thin](B,D,C)
           }
         \end{tikzpicture}
       \end{figure}
@@ -1631,50 +1631,50 @@ int convex_hull(vector<point> p) {
 
           \draw[title,thick] (A) -- (B) -- (C) -- (D) -- (E) -- (F) -- (G) -- cycle;
           \visible<2>{
-            \tkzDrawPolygon[color=title,fill=title,opacity=0.4,ultra thin](A,B,C,D,E,F,G);
+            \tkzDrawPolygon[color=title,fill=title,opacity=0.4,ultra thin](A,B,C,D,E,F,G)
           }
           \visible<3-10>{
-            \tkzDrawPolygon[color=title,fill=title,opacity=0.4,ultra thin](A,B,P);
+            \tkzDrawPolygon[color=title,fill=title,opacity=0.4,ultra thin](A,B,P)
           }
           \visible<4-10>{
-            \tkzDrawPolygon[color=title,fill=title,opacity=0.4,ultra thin](B,C,P);
+            \tkzDrawPolygon[color=title,fill=title,opacity=0.4,ultra thin](B,C,P)
           }
           \visible<5-10>{
-            \tkzDrawPolygon[color=title,fill=title,opacity=0.4,ultra thin](C,D,P);
+            \tkzDrawPolygon[color=title,fill=title,opacity=0.4,ultra thin](C,D,P)
           }
           \visible<6-10>{
-            \tkzDrawPolygon[color=title,fill=title,opacity=0.4,ultra thin](D,E,P);
+            \tkzDrawPolygon[color=title,fill=title,opacity=0.4,ultra thin](D,E,P)
           }
           \visible<7-10>{
-            \tkzDrawPolygon[color=title,fill=title,opacity=0.4,ultra thin](E,F,P);
+            \tkzDrawPolygon[color=title,fill=title,opacity=0.4,ultra thin](E,F,P)
           }
           \visible<8-10>{
-            \tkzDrawPolygon[color=title,fill=title,opacity=0.4,ultra thin](F,G,P);
+            \tkzDrawPolygon[color=title,fill=title,opacity=0.4,ultra thin](F,G,P)
           }
           \visible<9-10>{
-            \tkzDrawPolygon[color=title,fill=title,opacity=0.4,ultra thin](G,A,P);
+            \tkzDrawPolygon[color=title,fill=title,opacity=0.4,ultra thin](G,A,P)
           }
 
           \visible<11->{
-            \tkzDrawPolygon[color=title,fill=title,opacity=0.4,ultra thin](A,B,Q);
+            \tkzDrawPolygon[color=title,fill=title,opacity=0.4,ultra thin](A,B,Q)
           }
           \visible<12->{
-            \tkzDrawPolygon[color=title,fill=title,opacity=0.4,ultra thin](B,C,Q);
+            \tkzDrawPolygon[color=title,fill=title,opacity=0.4,ultra thin](B,C,Q)
           }
           \visible<13->{
-            \tkzDrawPolygon[color=title,fill=title,opacity=0.4,ultra thin](C,D,Q);
+            \tkzDrawPolygon[color=title,fill=title,opacity=0.4,ultra thin](C,D,Q)
           }
           \visible<14->{
-            \tkzDrawPolygon[color=title,fill=title,opacity=0.4,ultra thin](D,E,Q);
+            \tkzDrawPolygon[color=title,fill=title,opacity=0.4,ultra thin](D,E,Q)
           }
           \visible<15->{
-            \tkzDrawPolygon[color=title,fill=title,opacity=0.4,ultra thin](E,F,Q);
+            \tkzDrawPolygon[color=title,fill=title,opacity=0.4,ultra thin](E,F,Q)
           }
           \visible<16->{
-            \tkzDrawPolygon[color=title,fill=title,opacity=0.4,ultra thin](F,G,Q);
+            \tkzDrawPolygon[color=title,fill=title,opacity=0.4,ultra thin](F,G,Q)
           }
           \visible<17->{
-            \tkzDrawPolygon[color=title,fill=title,opacity=0.4,ultra thin](G,A,Q);
+            \tkzDrawPolygon[color=title,fill=title,opacity=0.4,ultra thin](G,A,Q)
           }
 
         \end{tikzpicture}
@@ -1735,26 +1735,26 @@ int convex_hull(vector<point> p) {
               \draw[fill,hilight] (O) circle[radius=2pt];
             }
 
-            \tkzInterLL(B,D)(P,Q) \tkzGetPoint{LL1};
-            \tkzInterLL(D,E)(P,Q) \tkzGetPoint{LL2};
-            \tkzInterLL(E,F)(P,Q) \tkzGetPoint{LL3};
-            \tkzInterLL(F,G)(P,Q) \tkzGetPoint{LL4};
-            \tkzInterLL(G,H)(P,Q) \tkzGetPoint{LL5};
-            \tkzInterLL(H,A)(P,Q) \tkzGetPoint{LL6};
+            \tkzInterLL(B,D)(P,Q) \tkzGetPoint{LL1}
+            \tkzInterLL(D,E)(P,Q) \tkzGetPoint{LL2}
+            \tkzInterLL(E,F)(P,Q) \tkzGetPoint{LL3}
+            \tkzInterLL(F,G)(P,Q) \tkzGetPoint{LL4}
+            \tkzInterLL(G,H)(P,Q) \tkzGetPoint{LL5}
+            \tkzInterLL(H,A)(P,Q) \tkzGetPoint{LL6}
 
-            \tkzInterLL(D,E)(R,O) \tkzGetPoint{LL7};
-            \tkzInterLL(E,F)(R,O) \tkzGetPoint{LL8};
-            \tkzInterLL(F,G)(R,O) \tkzGetPoint{LL9};
+            \tkzInterLL(D,E)(R,O) \tkzGetPoint{LL7}
+            \tkzInterLL(E,F)(R,O) \tkzGetPoint{LL8}
+            \tkzInterLL(F,G)(R,O) \tkzGetPoint{LL9}
 
-            \tkzInterLL(B,D)(S,Q) \tkzGetPoint{LL10};
-            \tkzInterLL(D,E)(S,Q) \tkzGetPoint{LL11};
-            \tkzInterLL(E,F)(S,Q) \tkzGetPoint{LL12};
-            \tkzInterLL(F,G)(S,Q) \tkzGetPoint{LL13};
+            \tkzInterLL(B,D)(S,Q) \tkzGetPoint{LL10}
+            \tkzInterLL(D,E)(S,Q) \tkzGetPoint{LL11}
+            \tkzInterLL(E,F)(S,Q) \tkzGetPoint{LL12}
+            \tkzInterLL(F,G)(S,Q) \tkzGetPoint{LL13}
 
-            \tkzDrawPolygon[color=foreground,opacity=0.85](A,B,D,E,F,G,H);
+            \tkzDrawPolygon[color=foreground,opacity=0.85](A,B,D,E,F,G,H)
 
             \onslide<2-4>{
-              %\tkzDrawPolygon[color=foreground,opacity=0.7](A,B,D,E,F,G,H);
+              %\tkzDrawPolygon[color=foreground,opacity=0.7](A,B,D,E,F,G,H)
               \draw[vhilight,title] (P) -- (O);
               \draw[fill,hilight] (O) circle[radius=2pt];
             }
@@ -1779,7 +1779,7 @@ int convex_hull(vector<point> p) {
             }
 
             \onslide<7-8>{
-              %\tkzDrawPolygon[color=foreground,opacity=0.7](A,B,D,E,F,G,H);
+              %\tkzDrawPolygon[color=foreground,opacity=0.7](A,B,D,E,F,G,H)
               \draw[vhilight,title] (Q) -- (S);
               \draw[fill,hilight] (S) circle[radius=2pt];
             }
@@ -2977,9 +2977,9 @@ if (contains(trie, "banani")) {
 \begin{frame}[plain,fragile]{Aho nodes}
     \scriptsize
     \begin{minted}{cpp}
-#define ALPHABET 128
+constexpr int ALPHABET{ 128 };
 // Helper function to get index of letter
-int val(char c) { return c; }
+constexpr int val(char c) { return c; }
 struct listnode {
     // n is index of next node, v is value of this node
     int v, n;
