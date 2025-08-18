@@ -45,7 +45,7 @@
 \graphicspath{{myndir/}}
 
 \title{Complexity and standard libraries}
-\author{Atli FF}
+\author{Atli FF \& Arnar Bjarni Arnarson}
 \institute{\href{http://ru.is/td}{School of Computer Science} \\[2pt] \href{http://ru.is}{Reykjavík University}}
 \titlegraphic{\hfill\includegraphics[height=0.6cm]{kattis}}
 
@@ -333,10 +333,45 @@
     \end{center}
 \end{frame}
 
+\begin{frame}[plain]{Vector}
+    \begin{itemize}
+        \item Capacity is the number of slots allocated for items
+        \item Size is the number of slots in use
+        \item Has some fixed capacity upon initialization
+        \item Can append items until size reaches capacity
+        \item Can remove from the back
+        \item How to insert / erase at other positions?
+        \item How to append when size equals capacity?
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[plain]{Vector - insert/erase}
+    \begin{itemize}
+        \item Want to insert $x$ and index $i$.
+        \item Before that we must move item at index $i$ to index $i+1$.
+        \item Before that we must move item at index $i+1$ to index $i+2$.
+        \item \textellipsis
+        \item So the first step is moving item at index $n$ to index $n+1$.
+        \item Erasing works similarly, but in reverse.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[plain]{Vector - resizing}
+    \begin{itemize}
+        \item Need to allocate a new larger block of memory
+        \item Then copy from old to new
+        \item Finally free up the old block of memory
+        \item Now you can finish the append/insert operation
+        \item Can also shrink the vector if size is much lower than capacity.
+        \item Manual calls to resize / reserve allow for optimizations
+    \end{itemize}
+\end{frame}
+
 \begin{frame}[plain]{Applications of Linked lists}
     \begin{itemize}
         \item Very rarely used
         \item Mostly used when concatenation of arrays or insertion outside of endpoints needs to be fast
+        \item Nodes can be allocated in a batch to improve memory layout
     \end{itemize}
     \vspace*{1cm}
     \begin{center}
@@ -349,6 +384,8 @@
     \end{tabular}
     \end{center}
 \end{frame}
+
+
 
 \begin{frame}[plain]{Applications of Stacks}
     \begin{itemize}
