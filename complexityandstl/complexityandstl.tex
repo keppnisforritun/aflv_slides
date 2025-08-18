@@ -1050,7 +1050,7 @@ vector<size_t> nge(const vector<T>& v) {
         \item As an example of a data structure in the standard library but that sometimes requires a more powerful version, let us consider heaps.
         \item Heaps are implemented in most standard libraries in the forms of priority queues.
         \item A heap is nothing but a binary tree satisfying \textit{the heap condition}.
-        \item The heap condition (for a min heap) says that the value of any given node is not greater than that of its chilren.
+        \item The heap condition (for a min heap) says that the value of any given node is not greater than that of its children.
     \end{itemize}
 \end{frame}
 
@@ -1076,15 +1076,15 @@ vector<size_t> nge(const vector<T>& v) {
     \node[minimum size=1cm, draw, circle] (H) at (-2*\spa, -3*\spa) {$10$};
     \node[minimum size=1cm, draw, circle] (I) at (-\spa, -3*\spa) {$2$};
     
-    \node (Ai) [above right=0.1cm of A] {\texttt{0}};
-    \node (Bi) [above left=0.1cm of B] {\texttt{1}};
-    \node (Ci) [above right=0.1cm of C] {\texttt{2}};
-    \node (Di) [above left=0.1cm of D] {\texttt{3}};
-    \node (Ei) [above=0.1cm of E] {\texttt{4}};
-    \node (Fi) [above=0.1cm of F] {\texttt{5}};
-    \node (Gi) [above right=0.1cm of G] {\texttt{6}};
-    \node (Hi) [above left=0.1cm of H] {\texttt{7}};
-    \node (Ii) [above right=0.1cm of I] {\texttt{8}};
+    \node (Ai) [above right=0.1cm of A] {\texttt{1}};
+    \node (Bi) [above left=0.1cm of B] {\texttt{2}};
+    \node (Ci) [above right=0.1cm of C] {\texttt{3}};
+    \node (Di) [above left=0.1cm of D] {\texttt{4}};
+    \node (Ei) [above=0.1cm of E] {\texttt{5}};
+    \node (Fi) [above=0.1cm of F] {\texttt{6}};
+    \node (Gi) [above right=0.1cm of G] {\texttt{7}};
+    \node (Hi) [above left=0.1cm of H] {\texttt{8}};
+    \node (Ii) [above right=0.1cm of I] {\texttt{9}};
     
     \draw[->, thick] (A) -- (B);
     \draw[->, thick] (A) -- (C);
@@ -1139,7 +1139,6 @@ template<typename T> struct Heap {
 \begin{frame}[plain]{Heaps}
     \begin{itemize}
         \item We note that peek and size run in $\mathcal{O}(1)$ while all other operations run in $\mathcal{O}(log(n))$.
-        \item This can be used to, for example, solve the Bastard's Peace problem listed earlier.
         \item This implementation isn't any better than the standard library one in C++.
         \item But let us consider a harder problem where the standard heap (and this one) aren't good enough.
         \item This particular implementation won't be needed for problems in the course, it is merely an example.
