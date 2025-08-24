@@ -7,4 +7,9 @@
 
 ## Week 2
 
-- Coming soon
+- [Ad-Hoc](adhoc/adhoc.pdf)
+- [Complete Search](completesearch/completesearch.pdf)
+
+## Week 3
+
+Coming Soon
