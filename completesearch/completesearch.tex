@@ -130,11 +130,76 @@ do {
     \end{itemize}
 \end{frame}
 
+\begin{frame}[plain]
+	\frametitle{Iterating over a variable number of loops}
+	\begin{itemize}
+		 \item A common somewhat harder thing is iterating over a sequence of integers, with variable bounds
+		 \item Say we want to test every vector of $n$ integers where each value can be from $0$ to $m - 1$.
+		 \item We could do this usually with $n$ for loops, but if $n$ is an input this does not work
+		 \item In python we can use itertools, C++ needs something handmade
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[plain, fragile]
+	\frametitle{All vectors}
+	\begin{minted}{cpp}
+int n, m; cin >> n >> m;
+vector<int> counter(n, 0);
+while(true) {
+  process_solution(counter); // whatever the problem needs
+  bool done = true;
+  for(int i = 0; i < n; ++i) {
+    counter[i]++;
+    if(counter[i] == m) counter[i] = 0;
+    else {
+      done = false;
+      break;
+    }
+  }
+  if(done) { break; }
+}
+	\end{minted}
+\end{frame}
+
+\begin{frame}[plain]
+	\frametitle{Iterating over subsets}
+	\begin{itemize}
+		 \item For subsets we could do the same where we have a \texttt{vector<bool>} and index $i$ denotes whether we include the $i$-th element or not
+		 \item But for this specific case we can do something much faster
+		 \item \texttt{int}s consist of bits, so we can instead just have a number and let the $i$-th bit denote whether we include the $i$-th element or not
+		 \item This means the subsets will just be the numbers from $0$ to $2^n - 1$ for $n$ elements, which can be iterated over with a simple for loop
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[plain]
+	\frametitle{Bit masks}
+	\begin{itemize}
+		 \item These things are usually called bit masks
+		 \item If $A = \{1, 2, 3, 4, 5, 6\}$ and $B = \{1, 3, 5, 6\}$ then the corresponding numbers in binary would be $111111$ and $110101$ since the first bit is the one we write last. In decimal these are 63 and 53.
+		 \item This also gives us a whole load of useful operations that work on masks
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[plain]
+	\frametitle{Bit operations}
+	\begin{tabular}{|l|l|}
+	\hline
+	Code & Meaning \\
+	\hline
+	\texttt{0} & The empty set \\
+	\texttt{(1 <{}< n) - 1} & The set of the first $n$ elements \\
+	\texttt{1 <{}< k} & The set containing only the $k$-th element \\
+	\texttt{A | B} & The union of $A$ and $B$ \\
+	\texttt{A \& B} & The intersection of $A$ and $B$ \\
+	\texttt{A \string^ B} & The symmetric difference of $A$ and $B$ \\
+	\texttt{\string~ A} & The complement of $A$ \\
+	\hline
+	\end{tabular}
+\end{frame}
+
 \begin{frame}[plain,fragile]{Iterating through subsets}
     \begin{itemize}
-        \item Remember the bit representation of subsets?
-        \item Each integer from $0$ to $2^n - 1$ represents a different subset of the set $\{1,2,\ldots,n\}$
-        \item Just iterate through the integers
+        \item Now just iterate through the integers
     \end{itemize}
 
             \begin{minted}{cpp}
