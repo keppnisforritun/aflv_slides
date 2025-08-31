@@ -12,4 +12,8 @@
 
 ## Week 3
 
+- [Greedy](greedy/greedy.pdf)
+- [Reduce and Conquer](reduceandconquer/reduceandconquer.pdf)
+
+## Week 4
 Coming Soon
