@@ -727,10 +727,24 @@ int lcs(int i, int j) {
 
 \begin{frame}[plain]{Narrow Art Gallery}
     \begin{itemize}
-        \item https://open.kattis.com/problems/narrowartgallery
+        \item We have a narrow art gallery, $N$ rows long and $2$ columns wide.
+        \item Each cell has an exhibition of some value.
+        \item Must close exactly $K$ exhibitions, still allowing people to pass through
+        \item Goal is to maximize total value of open exhibitions
+        \item What is our state?
+        \item What information do we need to know our options?
     \end{itemize}
 \end{frame}
 
+\begin{frame}[plain]{Narrow Art Gallery}
+    \begin{itemize}
+        \item<1-> What is our state?
+        \item<1-> What information do we need to know our options?
+        \item<2-> Which row we are in
+        \item<3-> How many we need to close
+        \item<4-> What decision we made last time
+    \end{itemize}
+\end{frame}
 
 \begin{frame}[plain]{Top-down vs. bottom-up}
     \begin{itemize}
