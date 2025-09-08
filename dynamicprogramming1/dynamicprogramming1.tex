@@ -52,8 +52,6 @@
 \begin{document}
 \maketitle
 
-\section*{Dynamic Programming}
-
 \begin{frame}[plain]{What is dynamic programming?}
     \begin{itemize}
         \item A problem solving paradigm
@@ -529,12 +527,12 @@ int opt(int i, int x) {
 \begin{frame}[plain]{Longest increasing subsequence}
     \begin{itemize}
 \item Given an array $a[0]$, $a[1]$, \ldots, $a[n-1]$ of integers, what is the length of the longest increasing subsequence?
-    \vspace{5pt}
+    \vspace{2pt}
 \item First, what is a subsequence?
 \item If we delete zero or more elements from $a$, then we have a subsequence of $a$
-    \vspace{5pt}
+    \vspace{2pt}
 \item Example: $a = [5,1,8,1,9,2]$
-    \vspace{5pt}
+    \vspace{2pt}
 \item $[5,8,9]$ is a subsequence
 \item $[1,1]$ is a subsequence
 \item $[5,1,8,1,9,2]$ is a subsequence
@@ -547,16 +545,16 @@ int opt(int i, int x) {
 \begin{frame}[plain]{Longest increasing subsequence}
     \begin{itemize}
 \item Given an array $a[0]$, $a[1]$, \ldots, $a[n-1]$ of integers, what is the length of the longest increasing subsequence?
-    \vspace{5pt}
+    \vspace{2pt}
 \item An increasing subsequence of $a$ is a subsequence of $a$ such that the elements are in (strictly) increasing order
-    \vspace{5pt}
+    \vspace{2pt}
 \item $[5,8,9]$ and $[1,8,9]$ are the longest increasing subsequences of $a = [5,1,8,1,9,2]$
 
-    \vspace{5pt}
+    \vspace{2pt}
 \item How do we compute the length of the longest increasing subsequence?
 \item There are $2^n$ subsequences, so we can go through all of them
 \item That would result in an $O(n2^n)$ algorithm, which can only handle $n\leq 23$
-    \vspace{5pt}
+    \vspace{2pt}
 \item What about dynamic programming?
 
     \end{itemize}
@@ -718,7 +716,7 @@ int lcs(int i, int j) {
         \item<1-> Take turns picking a coin from either end.
         \item<1-> Want to maximize total value at the end.
         \item<2-> Formulation: $\mathrm{dp}(i, j, p)$, solution is $\mathrm{dp}(0, n-1, 1)$.
-        \item<2-> Base case when $i < j$: $\mathrm{dp}(i, j, p) = 0$
+        \item<2-> Base case when $i > j$: $\mathrm{dp}(i, j, p) = 0$
         \item<2-> Recursive step: \[
                 \scriptstyle{\mathrm{dp}(i, j, p) = \mathrm{max}\left(p \cdot A_i + \mathrm{dp}(i+1, j, 1-p), p \cdot A_j + \mathrm{dp}(i, j-1, 1-p)\right)}
             \]
@@ -755,8 +753,8 @@ int lcs(int i, int j) {
         \item<3-> $\mathrm{dp}(i, k, c) = \mathrm{max} \left\{
 	\begin{array}{ll}
         A[i-1][0] + A[i-1][1] + \mathrm{dp}(i - 1, k, 0) & \\
-        A[i-1][0] + \mathrm{dp}(i - 1, k - 1, 1) & \textrm{if } c \neq 2 \\
-        A[i-1][1] + \mathrm{dp}(i - 1, k - 1, 2) & \textrm{if } c \neq 1 \\
+        A[i-1][1] + \mathrm{dp}(i - 1, k - 1, 1) & \textrm{if } c \neq 2 \\
+        A[i-1][0] + \mathrm{dp}(i - 1, k - 1, 2) & \textrm{if } c \neq 1 \\
 	\end{array}
             \right\}.$
     \end{itemize}
