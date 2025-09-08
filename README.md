@@ -16,4 +16,5 @@
 - [Reduce and Conquer](reduceandconquer/reduceandconquer.pdf)
 
 ## Week 4
-Coming Soon
+
+- [Divide and Conquer](divideandconquer/divideandconquer.pdf)
