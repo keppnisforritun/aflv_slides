@@ -720,7 +720,7 @@ int lcs(int i, int j) {
         \item<2-> Formulation: $\mathrm{dp}(i, j, p)$, solution is $\mathrm{dp}(0, n-1, 1)$.
         \item<2-> Base case when $i < j$: $\mathrm{dp}(i, j, p) = 0$
         \item<2-> Recursive step: \[
-                \mathrm{dp}(i, j, p) = \mathrm{max}\left(p \cdot A_i + \mathrm{dp}(i+1, j, 1-p), p \cdot A_j + \mathrm{dp}(i, j-1, 1-p)\right)
+                \scriptstyle{\mathrm{dp}(i, j, p) = \mathrm{max}\left(p \cdot A_i + \mathrm{dp}(i+1, j, 1-p), p \cdot A_j + \mathrm{dp}(i, j-1, 1-p)\right)}
             \]
     \end{itemize}
 \end{frame}
