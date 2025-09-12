@@ -1,4 +1,4 @@
-# aflv_slides
+# Glærur
 
 ## Week 1
 
