@@ -19,3 +19,7 @@
 
 - [Divide and Conquer](divideandconquer/divideandconquer.pdf)
 - [Dynamic Programming Part 1](dynamicprogramming1/dynamicprogramming1.pdf)
+
+## Week 5
+
+- [Dynamic Programming Part 2](dynamicprogramming2/dynamicprogramming2.pdf)
