@@ -1,0 +1,119 @@
+\documentclass{beamer}
+\usefonttheme[onlymath]{serif}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{gensymb}
+\usepackage{parskip}
+\usepackage{mathtools}
+\usepackage{listings}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{color}
+\usepackage{enumerate}
+\usepackage{tikz}
+\usetikzlibrary{calc}
+\usetikzlibrary{positioning}
+\usetikzlibrary{angles}
+\usetikzlibrary{shapes}
+\usetikzlibrary{arrows}
+\usepackage{verbatim}
+\usepackage{multicol}
+\usepackage{array}
+\usepackage{minted}
+\parskip 0pt
+
+
+\DeclareMathOperator{\lcm}{lcm}
+\newcommand\floor[1]{\left\lfloor#1\right\rfloor}
+\newcommand\ceil[1]{\left\lceil#1\right\rceil}
+\newcommand\abs[1]{\left|#1\right|}
+\newcommand\p[1]{\left(#1\right)}
+\newcommand\sqp[1]{\left[#1\right]}
+\newcommand\cp[1]{\left\{#1\right\}}
+\newcommand\norm[1]{\left\lVert#1\right\rVert}
+\renewcommand\Im{\operatorname{Im}}
+\renewcommand\Re{\operatorname{Re}}
+
+\usetheme{metropolis}
+\definecolor{dark yellow}{rgb} {0.6,0.6,0.0}
+\definecolor{dark green}{rgb} {0.0,0.6,0.0}
+
+\graphicspath{{myndir/}}
+
+\title{Square Root Decomposition}
+\author{Arnar Bjarni Arnarson}
+\institute{\href{http://ru.is/td}{School of Computer Science} \\[2pt] \href{http://ru.is}{Reykjavík University}}
+\titlegraphic{\hfill\includegraphics[height=0.6cm]{kattis}}
+
+\begin{document}
+\maketitle
+
+\begin{frame}[plain]{Range queries}
+    \vspace{30pt}
+    \begin{itemize}
+        \item<1-> We have an array $A$ of size $n$.
+        \item<2-> Given $i,j$, we want to answer:
+            \begin{itemize}
+                \item<3-> $\mathrm{max}(A[i],A[i+1],\ldots,A[j-1],A[j])$
+                \item<4-> $\mathrm{min}(A[i],A[i+1],\ldots,A[j-1],A[j])$
+                \item<5-> $\mathrm{sum}(A[i],A[i+1],\ldots,A[j-1],A[j])$
+            \end{itemize}
+        \item<6-> We want to answer these queries efficiently, or in other words, without looking through all elements.
+        \item<7-> Sometimes we also want to update elements.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[plain]{Bucketing}
+    \begin{itemize}
+        \item<1-> Group values into buckets of size $k$ and store result of each bucket
+        \item<2-> Updating is easy:
+        \begin{itemize}
+            \item<3-> change the array element
+            \item<4-> recompute corresponding bucket
+        \end{itemize}
+        \item<5-> Time complexity: $O(k)$
+        \item<6-> Again we want to query over a range
+        \begin{itemize}
+            \item<7-> When a bucket is contained in the range, use the stored sum for the bucket
+            \item<8-> This (sometimes) allows us to ``jump'' over intervals of size $k$
+            \item<9-> Only have to go inside at most two buckets (each end)
+            \item<10-> Have to consider at most $n/k$ buckets and 2 buckets of size $k$
+        \end{itemize}
+        \item<11-> Time complexity: $O(n/k + k)$
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[plain]{Choosing number of buckets}
+    \begin{itemize}
+        \item<1-> Now we have a data structure that supports:
+            \begin{itemize}
+                \item<2-> Updating in $O(k)$
+                \item Querying in $O(n/k + k)$
+            \end{itemize}
+        \item<3-> What $k$ to pick?
+        \item<4-> Time complexity is minimized for $k=\sqrt{n}$:
+            \begin{itemize}
+                \item<5-> Updating in $O(\sqrt{n})$
+                \item<6-> Querying in $O(n/\sqrt{n} + \sqrt{n}) = O(\sqrt{n})$
+            \end{itemize}
+        \item<7-> Also known as square root decomposition, and is a very
+            powerful technique
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[plain]{Example problem: Supercomputer}
+    \begin{itemize}
+        \item https://open.kattis.com/problems/supercomputer
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[plain]{Mo's Algorithm}
+
+
+\end{frame}
+
+\end{document}

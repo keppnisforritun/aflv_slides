@@ -1,0 +1,164 @@
+\documentclass{beamer}
+\usefonttheme[onlymath]{serif}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{gensymb}
+\usepackage{parskip}
+\usepackage{mathtools}
+\usepackage{listings}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{color}
+\usepackage{enumerate}
+\usepackage{tikz}
+\usetikzlibrary{calc}
+\usetikzlibrary{positioning}
+\usetikzlibrary{angles}
+\usetikzlibrary{shapes}
+\usetikzlibrary{arrows}
+\usepackage{verbatim}
+\usepackage{multicol}
+\usepackage{array}
+\usepackage{minted}
+\parskip 0pt
+
+
+\DeclareMathOperator{\lcm}{lcm}
+\newcommand\floor[1]{\left\lfloor#1\right\rfloor}
+\newcommand\ceil[1]{\left\lceil#1\right\rceil}
+\newcommand\abs[1]{\left|#1\right|}
+\newcommand\p[1]{\left(#1\right)}
+\newcommand\sqp[1]{\left[#1\right]}
+\newcommand\cp[1]{\left\{#1\right\}}
+\newcommand\norm[1]{\left\lVert#1\right\rVert}
+\renewcommand\Im{\operatorname{Im}}
+\renewcommand\Re{\operatorname{Re}}
+
+\usetheme{metropolis}
+\definecolor{dark yellow}{rgb} {0.6,0.6,0.0}
+\definecolor{dark green}{rgb} {0.0,0.6,0.0}
+
+\graphicspath{{myndir/}}
+
+\title{Union-Find}
+\author{Arnar Bjarni Arnarson}
+\institute{\href{http://ru.is/td}{School of Computer Science} \\[2pt] \href{http://ru.is}{Reykjavík University}}
+\titlegraphic{\hfill\includegraphics[height=0.6cm]{kattis}}
+
+\begin{document}
+\maketitle
+
+\begin{frame}[plain]{Union-Find}
+    \begin{itemize}
+        \item<1-> We have $n$ items
+        \item<1-> Maintains a collection of disjoint sets (or equivalently, an equivalence relation)
+        \item<1-> Each of the $n$ items is in exactly one set
+        \item<2-> We represent each set with one of its members, a representative element
+        \item<2-> Supports two operations efficiently: \texttt{find(x)} and \texttt{union(x,y)}.
+        \item<3-> Operation \texttt{find(x)} finds the representative of the set $x$ is in
+        \item<4-> Operation \texttt{union(x, y)} unions the sets of which $x$ and $y$ are members.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[plain]{Union-Find}
+    \begin{itemize}
+        \item<1-> It is generally initialized with all items being in their own set.
+        \item<1-> So for $n = 5$ we start out with $\{\{1\},\{2\},\{3\},\{4\},\{5\}\}$.
+        \item<2-> \texttt{union(1, 3)} then changes this to $\{\{1, 3\}, \{2\}, \{4\}, \{5\}\}$.
+		\item<2-> \texttt{union(2, 5)} then results in $\{\{1, 3\}, \{2, 5\}, \{4\}\}$.
+		\item<2-> \texttt{union(2, 4)} then results in $\{\{1, 3\}, \{2, 4, 5\}\}$.
+		\item<2-> \texttt{union(1, 4)} finally results in $\{\{1, 2, 3, 4, 5\}\}$.
+        \item<3-> At any given point $\texttt{find(x)}$ returns some value in the same set as $x$.
+        \item<3-> The important bit is that \texttt{find(x)} returns the same value for all elements of the same set, the representative.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[plain]{Union-Find}
+    \begin{itemize}
+        \item<1-> We can do this by maintaining an array of parents, letting the $i$-th value be the index of the parent of the $i$-th item.
+        \item<1-> If a value has no parent, we can denote this somehow, make it its own parent, give it the value $-1$, exactly what we do is not important.
+        \item<2-> To get the representative of $x$ we go to the parent of our current item (starting at $x$) until the item has no parent.
+        \item<2-> Then to unite $x, y$ we simply make the representative of $x$ the parent of the representative of $y$.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[plain,fragile]{Naïve Union-Find implementation}
+    \begin{minted}{cpp}
+struct union_find {
+    vector<int> parent;
+    union_find(int n) {
+        parent = vector<int>(n);
+        for(int i = 0; i < n; i++) {
+            parent[i] = i;
+        }
+    }
+    int find(int x) {
+        return parent[x] == x ? x : find(parent[x]);
+    }
+    void unite(int x, int y) {
+        parent[find(x)] = find(y);
+    }
+};
+    \end{minted}
+\end{frame}
+
+\begin{frame}[plain]{Union-Find}
+    \begin{itemize}
+        \item<1-> The problem here is that for specific queries, the parent chains may end up being of length $\mathcal{O}(n)$, making each query linear.
+        \item<1-> The key to making this more efficient is making those chains shorter.
+        \item<2-> One method is to use what is known as small-to-large merging, where the smaller group's leader is made to point to the larger group's leader.
+        \item<2-> This ensures the height increases by $1$ as a group's size doubles, resulting in $\mathcal{O}(\log n)$ complexity.
+        \item<3-> We can also do this by flattening the chain each time we query \texttt{find}, so the amortized complexity becomes good.
+        \item<3-> Here the worst case is still $\mathcal{O}(n)$ but the amortized complexity is $\mathcal{O}(\alpha(n))$ which may as well be a constant, as it is $<5$ for $n$ equal to the number of atoms in the observable universe.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[plain,fragile]{Path compressed Union-Find implementation}
+    \begin{minted}{cpp}
+struct union_find {
+    vector<int> parent;
+    union_find(int n) {
+        parent = vector<int>(n);
+        for (int i = 0; i < n; i++) {
+            parent[i] = i;
+        }
+    }
+    int find(int x) {
+        if(parent[x] == x) return x;
+        return parent[x] = find(parent[x]);
+    }
+    void unite(int x, int y) {
+        parent[find(x)] = find(y);
+    }
+};
+    \end{minted}
+\end{frame}
+
+\begin{frame}[plain]{Union-Find applications}
+    \vspace{30pt}
+    \begin{itemize}
+        \item<1-> Union-Find maintains a collection of disjoint sets
+        \item<1-> When are we dealing with such collections?
+        \item<2-> Usually when we want to work with equivalence relations like graph connectivity
+        \item<2-> By modifying the data structure it can also contain more queryable data
+        \begin{itemize}
+            \item<2-> Number of different sets currently
+            \item<2-> Current size of the set containing $x$
+            \item<2-> An iterable list of all elements of the set containing $x$
+        \end{itemize}
+        \item<3-> When tracking size you can use it to always perform small-to-large merges for $\mathcal{O}(\log n)$ time complexity.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[plain]{Example problem: Skolavslutningen}
+    \begin{itemize}
+        \item https://open.kattis.com/problems/skolavslutningen
+    \end{itemize}
+\end{frame}
+
+
+\end{document}

@@ -23,3 +23,13 @@
 ## Week 5
 
 - [Dynamic Programming Part 2](dynamicprogramming2/dynamicprogramming2.pdf)
+
+## Week 6
+
+- [Sliding Window](datastructures/slidingwindow.pdf)
+- [Heap](datastructures/heap.pdf)
+- [Union-Find](datastructures/unionfind.pdf)
+- [Prefix Sum](datastructures/prefixsum.pdf)
+- [Square Root Decomposition](datastructures/sqrtdecomposition.pdf)
+- [Segment Tree](datastructures/segmenttree.pdf)
+- [Sparse Table](datastructures/sparsetable.pdf)

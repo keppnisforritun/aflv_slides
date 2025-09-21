@@ -1,0 +1,393 @@
+\documentclass{beamer}
+\usefonttheme[onlymath]{serif}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{gensymb}
+\usepackage{parskip}
+\usepackage{mathtools}
+\usepackage{listings}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{color}
+\usepackage{enumerate}
+\usepackage{tikz}
+\usetikzlibrary{calc}
+\usetikzlibrary{positioning}
+\usetikzlibrary{angles}
+\usetikzlibrary{shapes}
+\usetikzlibrary{arrows}
+\usepackage{verbatim}
+\usepackage{multicol}
+\usepackage{array}
+\usepackage{minted}
+\parskip 0pt
+
+
+\DeclareMathOperator{\lcm}{lcm}
+\newcommand\floor[1]{\left\lfloor#1\right\rfloor}
+\newcommand\ceil[1]{\left\lceil#1\right\rceil}
+\newcommand\abs[1]{\left|#1\right|}
+\newcommand\p[1]{\left(#1\right)}
+\newcommand\sqp[1]{\left[#1\right]}
+\newcommand\cp[1]{\left\{#1\right\}}
+\newcommand\norm[1]{\left\lVert#1\right\rVert}
+\renewcommand\Im{\operatorname{Im}}
+\renewcommand\Re{\operatorname{Re}}
+
+\usetheme{metropolis}
+\definecolor{dark yellow}{rgb} {0.6,0.6,0.0}
+\definecolor{dark green}{rgb} {0.0,0.6,0.0}
+
+\graphicspath{{myndir/}}
+
+\title{Sliding Window}
+\author{Arnar Bjarni Arnarson}
+\institute{\href{http://ru.is/td}{School of Computer Science} \\[2pt] \href{http://ru.is}{Reykjavík University}}
+\titlegraphic{\hfill\includegraphics[height=0.6cm]{kattis}}
+
+\begin{document}
+\maketitle
+
+\begin{frame}[plain]
+	\frametitle{A Sum Problem}
+	\begin{block}{Problem description}
+    	    Write a program that, given an integer array of size $N$, finds the
+            contiguous subarray of size $K$ with the highest sum.
+    \end{block}
+
+    \vspace{10pt}
+    
+    \begin{block}{Input description}
+            Input consist of two lines.
+            The first line contains two space separated integers $N$, the size of the array, where $1 \leq N \leq 10^6$,
+    and $K$, the size of the subarrays to consider, where $1 \leq K \leq N$.
+            Then second line contains $N$ space separated integers, the values of the array.
+            Each value in the array is between $-10^9$  and $10^9$.
+    \end{block}
+
+    \vspace{10pt}
+    
+    \begin{block}{Output description}
+            Output one line, the sum of the highest valued contiguous subarray of size $K$.
+    \end{block}
+\end{frame}
+
+\begin{frame}[plain]
+	\frametitle{A Sum Problem}
+	\begin{center}
+		\begin{tabular}{|l|l|}
+            \hline
+            {\footnotesize Sample input} & {\footnotesize Sample output} \\
+            \hline
+            \ttfamily
+            10 4 & 39 \\
+            17 20 0 1 5 24 8 2 4 1 &  \\
+            \hline
+        \end{tabular}
+    \end{center}
+\end{frame}
+
+\begin{frame}[plain, fragile]
+    \frametitle{Straightforward Solution}
+	\begin{scriptsize}
+        \begin{minted}{python}
+n, k = map(int, input().split())
+arr = list(map(int, input().split()))
+highest = float('-inf')
+for start in range(n-k+1):
+    end = start + k
+    total = 0
+    for i in range(start, end):
+        total += arr[i]
+    highest = max((highest, total))
+print(highest)
+        \end{minted}
+    \end{scriptsize}
+    \begin{itemize}
+        \item<2-> This solution constructs all size $K$ contiguous subarrays.
+        \item<3-> What is the time complexity?
+        \item<4-> There are $N$ starting points, each construction takes $K$ steps, so $\mathcal{O}(NK)$.
+        \item<5-> Too slow!
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[plain, fragile]
+    \frametitle{Wasted Operations}
+    \begin{itemize}
+        \item<1-> The subarray starting at index $i$ has the sum $a_i + a_{i+1} + \dots + a_{i+k-1}$.
+        \item<2-> The subarray starting at index $i+1$ has the sum $a_{i+1} + a_{i+2} + \dots + a_{i+k}$.
+        \item<3-> We iterate over the indices $i+1, i+2, \dotsc, i+k-1$ twice.
+        \item<4-> What changes between starting at $i$ vs. starting at $i+1$?
+        \item<5-> We subtract $a_i$.
+        \item<6-> We add $a_{i+k}$.
+        \item<7-> A shift from the subarray starting at $i$ to the subarray starting at $i+1$ takes $\mathcal{O}(1)$ time.
+        \item<8-> This is known as the sliding window technique, in this case with a fixed window size.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[plain, fragile]
+    \frametitle{Sliding Window Solution}
+	\begin{scriptsize}
+        \begin{minted}{python}
+n, k = map(int, input().split())
+arr = list(map(int, input().split()))
+total = 0
+for i in range(k):
+    total += arr[i]
+highest = total
+for i in range(n - k):
+    total -= arr[i]
+    total += arr[i+k]
+    highest = max((highest, total))
+print(highest)
+        \end{minted}
+    \end{scriptsize}
+    \begin{itemize}
+        \item<2-> What is the time complexity?
+        \item<3-> This solution constructs the first size $K$ contiguous subarray.
+        \item<4-> Then, $N-K$ times, an element is removed and another added.
+        \item<5-> Subtracting and adding numbers is constant time so $\mathcal{O}(N)$.
+        \item<6-> Fast enough!
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[plain]
+	\frametitle{A Substring Problem}
+	\begin{block}{Problem description}
+    	    Write a program that, give a string of size $N$, finds the
+            longest substring with $K$ distinct elements.
+    \end{block}
+
+    \vspace{10pt}
+    
+    \begin{block}{Input description}
+            Input consist of two lines.
+            The first line contains two space separated integers $N$, the size of the string, where $1 \leq N \leq 10^6$,
+    and $K$, the number of distinct elements the substring must have, where $1 \leq K \leq 26$.
+            Then second line contains a string of length $N$ consisting of English lowercase characters.
+    \end{block}
+
+    \vspace{10pt}
+    
+    \begin{block}{Output description}
+            Output one line, the longest substring with $K$ distinct elements.
+            If no such string exists, output ``\texttt{DOES NOT EXIST}'', without quotations.
+    \end{block}
+\end{frame}
+
+\begin{frame}[plain]
+	\frametitle{A Substring Problem}
+	\begin{center}
+		\begin{tabular}{|l|l|}
+            \hline
+            {\footnotesize Sample input} & {\footnotesize Sample output} \\
+            \hline
+            \ttfamily
+            14 3 & cdcbcbcb \\
+            bacdcbcbcbabdb & \\
+            \hline
+        \end{tabular}
+    \end{center}
+\end{frame}
+
+\begin{frame}[plain, fragile]
+    \frametitle{General Framework}
+    \begin{scriptsize}
+        \begin{minted}{python}
+from string import ascii_lowercase
+n, k = map(int, input().split())
+s = input()
+
+best_ind, best_len = distinct_k(n, k, s)
+
+if best_len == -1:
+  print("DOES NOT EXIST")
+else:
+  print(s[best_ind:best_ind + best_len])
+        \end{minted}
+    \end{scriptsize}
+\end{frame}
+
+\begin{frame}[plain, fragile]
+    \frametitle{Straightforward Solution}
+	\begin{tiny}
+        \begin{minted}{python}
+def distinct_k(n, k, s):
+  best_ind, best_len = -1, -1
+  for start in range(n):
+    for end in range(start, n+1):
+      substring = s[start:end]
+      distinct = 0
+      for symbol in ascii_lowercase:
+        if symbol in substring:
+          distinct += 1
+      cur_len = len(substring)
+      if distinct == k and cur_len > best_len:
+        best_ind = start
+        best_len = cur_len
+  return best_ind, best_len
+        \end{minted}
+    \end{tiny}
+    \begin{itemize}
+        \item<2-> What is the time complexity?
+        \item<3-> There are $\mathcal{O}(N^2)$ substrings of the string
+        \item<4-> Checking each one takes us $\mathcal{O}(N)$ time, so $\mathcal{O}(N^3)$ in total.
+        \item<5-> Way too slow!
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[plain, fragile]
+    \frametitle{Constant optimization}
+	\begin{tiny}
+        \begin{minted}{python}
+def distinct_k(n, k, s):
+  best_ind, best_len = -1, -1
+  for start in range(n):
+    for end in range(start, n+1):
+      substring = s[start:end]
+      present = [False for _ in range(26)]
+      for symbol in substring:
+        present[ord(symbol) - ord('a')] = True
+      distinct = sum(present)
+      cur_len = len(substring)
+      if distinct == k and cur_len > best_len:
+        best_ind = start
+        best_len = cur_len
+  return best_ind, best_len
+        \end{minted}
+    \end{tiny}
+    \begin{itemize}
+        \item<2-> This is a little faster, by a factor of $26$ approximately.
+        \item<3-> Time complexity is the same.
+        \item<4-> Note that \texttt{present} barely differs between adjacent values of \texttt{end}
+        \item<5-> Build it as the substring grows.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[plain, fragile]
+    \frametitle{Incremental}
+	\begin{tiny}
+        \begin{minted}{python}
+def distinct_k(n, k, s):
+  best_ind, best_len = -1, -1
+  for start in range(n):
+    present = [False for _ in range(26)]
+    for end in range(start, n):
+      present[ord(s[end]) - ord('a')] = True
+      distinct = sum(present)
+      cur_len = end - start + 1
+      if distinct == k and cur_len > best_len:
+        best_ind = start
+        best_len = cur_len
+  return best_ind, best_len
+        \end{minted}
+    \end{tiny}
+    \begin{itemize}
+        \item<1-> Now each substring is processed in constant time.
+        \item<2-> Time complexity is $\mathcal{O}(N^2)$
+        \item<3-> For a given value of \texttt{ind}, adjacent \texttt{start} values have similar values of \texttt{present}.
+        \item<4-> Note that adding characters will never decrease \texttt{distinct}.
+        \item<4-> However, removing elements from the front may reduce \texttt{distinct}.
+    \end{itemize}
+\end{frame}
+
+
+\begin{frame}[plain, fragile]
+    \frametitle{Sliding Window}
+	\begin{tiny}
+        \begin{minted}{python}
+def distinct_k(n, k, s):
+  best_ind, best_len = -1, -1
+  start, end, distinct = 0, 0, 0
+  count = [0 for _ in range(26)]
+  while start < n:
+    while end < n:
+      c = ord(s[end]) - ord('a')
+      if distinct == k and count[c] == 0:
+        break
+      count[c] += 1
+      end += 1
+      distinct = sum(x > 0 for x in count)
+    cur_len = end - start
+    if distinct == k and cur_len > best_len:
+      best_ind = start
+      best_len = cur_len
+    count[ord(s[start]) - ord('a')] -= 1
+    start += 1
+    distinct = sum(x > 0 for x in count)
+  return best_ind, best_len
+        \end{minted}
+    \end{tiny}
+    \vspace*{-0.3cm}
+    \begin{itemize}
+        \item<1-> What is the time complexity? \only<2-> { It may seem quadratic at first}
+        \item<3-> Each element gets added and removed once, so $\mathcal{O}(N)$.
+        \item<4-> Lets introduce $C$, the number of different symbols possible.
+        \item<4-> The time complexity is actually $\mathcal{O}(NC)$, but we can do better!
+    \end{itemize}
+\end{frame}
+
+
+\begin{frame}[plain, fragile]
+    \frametitle{Sliding Window Improved}
+	\begin{tiny}
+        \begin{minted}{python}
+def distinct_k(n, k, s):
+  best_ind, best_len = -1, -1
+  start, end, distinct = 0, 0, 0
+  count = [0 for _ in range(26)]
+  while start < n:
+    while end < n:
+      c = ord(s[end]) - ord('a')
+      if distinct == k and count[c] == 0:
+        break
+      if count[c] == 0:
+        distinct += 1
+      count[c] += 1
+      end += 1
+    cur_len = end - start
+    if distinct == k and cur_len > best_len:
+      best_ind = start
+      best_len = cur_len
+    c = ord(s[start]) - ord('a')
+    count[c] -= 1
+    if count[c] == 0:
+      distinct -= 1
+    start += 1
+    distinct = sum(x > 0 for x in count)
+  return best_ind, best_len
+        \end{minted}
+    \end{tiny}
+    \begin{itemize}
+        \item<2-> Now adding/removing an element is $\mathcal{O}(1)$.
+        \item<2-> The time complexity is now $\mathcal{O}(N + C)$.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \frametitle{General Method}
+    \begin{itemize}
+        \item<1->  This method is applicable when working with substrings or subarrays.
+        \item<1->  The data has to be contiguous, or in other words, no gaps between selected elements.
+        \item<1->  Usually you want the maximal or the minimal window fulfilling a certain condition.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \frametitle{General Method}
+    \begin{itemize}
+        \item<1->  Suppose that your current window is $[i, j)$ which are both initialized as $0$.
+        \item<2->  Define an operation \texttt{add} which adds $a_j$ to your subarray, finally increasing $j$ by $1$.
+        \item<2->  Define an operation \texttt{remove} which removes $a_i$ from your subarray, finally increasing $i$ by $1$.
+        \item<3->  Step 1: If performing \texttt{add} does not break your condition, perform it and repeat step 1. Otherwise go to step 2.
+        \item<3->  Step 2: Check if the current window is a better answer and possibly update. Then go to step 3.
+        \item<3->  Step 3: Perform \texttt{remove} and go to step 1.
+        \item<4->  Time complexity is $\mathcal{O}(N \cdot (X + Y))$ where $X$ and $Y$ are the cost of \texttt{add} and \texttt{remove}, respectively.
+    \end{itemize}
+\end{frame}
+
+\end{document}
