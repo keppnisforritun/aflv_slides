@@ -1,0 +1,129 @@
+\documentclass{beamer}
+\usefonttheme[onlymath]{serif}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{gensymb}
+\usepackage{parskip}
+\usepackage{mathtools}
+\usepackage{listings}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{color}
+\usepackage{enumerate}
+\usepackage{tikz}
+\usetikzlibrary{calc}
+\usetikzlibrary{positioning}
+\usetikzlibrary{angles}
+\usetikzlibrary{shapes}
+\usetikzlibrary{arrows}
+\usepackage{verbatim}
+\usepackage{multicol}
+\usepackage{array}
+\usepackage{minted}
+\parskip 0pt
+
+
+\DeclareMathOperator{\lcm}{lcm}
+\newcommand\floor[1]{\left\lfloor#1\right\rfloor}
+\newcommand\ceil[1]{\left\lceil#1\right\rceil}
+\newcommand\abs[1]{\left|#1\right|}
+\newcommand\p[1]{\left(#1\right)}
+\newcommand\sqp[1]{\left[#1\right]}
+\newcommand\cp[1]{\left\{#1\right\}}
+\newcommand\norm[1]{\left\lVert#1\right\rVert}
+\renewcommand\Im{\operatorname{Im}}
+\renewcommand\Re{\operatorname{Re}}
+
+\usetheme{metropolis}
+\definecolor{dark yellow}{rgb} {0.6,0.6,0.0}
+\definecolor{dark green}{rgb} {0.0,0.6,0.0}
+
+\graphicspath{{myndir/}}
+
+\title{Partition Refinement}
+\author{Atli Fannar Franklín}
+\institute{\href{http://ru.is/td}{School of Computer Science} \\[2pt] \href{http://ru.is}{Reykjavík University}}
+\titlegraphic{\hfill\includegraphics[height=0.6cm]{kattis}}
+
+\begin{document}
+	\maketitle
+	
+	\begin{frame}[plain]{Opposite Union-Find}
+		\vspace{30pt}
+		\begin{itemize}
+			\item In Union-Find we want to group things together more and more over time, keeping track of which items have been joined together.
+			\item In certain situations we want quite the opposite, starting with everything in one group and breaking it up over time.
+			\item This won't be the exact opposite behaviour, but close to it.
+			\item This may seem rather specific, but it has quite a few uses and provides a good case study for us on a more niche data structure.
+			\item It is useful for DFA minimisation, parallel scheduling and certain types of graph searches.
+		\end{itemize}
+	\end{frame}
+	
+	\begin{frame}[plain]{Split operation}
+		\begin{itemize}
+			\item At the start our data structure should contain just a single group $S$ of every element $1, 2, \dots, n$.
+			\item Then it should have a split operation. Split should take a set $X$ as input and then split every group $S$ in the data structure into $S \cap X$ and $S \setminus X$.
+			\item For example if we start with $\{1, 2, 3, 4, 5\}$ and do \texttt{split(1, 2)} we should end up with $\{1, 2\}, \{3, 4, 5\}$.
+			\item Next if we do \texttt{split(1, 4)} we get $\{1\}, \{2\}, \{3, 5\}, \{4\}$.
+			\item Crucially we want this to be linear time in the number of input elements.
+		\end{itemize}
+	\end{frame}
+	
+	\begin{frame}[plain]{Group iteration}
+		\begin{itemize}
+			\item The only other thing the data structure has to support is \texttt{group(x)}.
+			\item This should return a list/vector/iterator over all the elements of the group $x$ is in.
+			\item Again this should take linear time in the number of elements returned.
+			\item Together these operations define the partition refinement data structure.
+		\end{itemize}
+	\end{frame}
+	
+	\begin{frame}[plain]{Needed data}
+		\begin{itemize}
+			\item So what info does our data structure need? 
+			\begin{itemize}
+				\item<2-> We need an array that stores what group each element is in.
+				\item<3-> Then we need a data structure to store each group. These need to support constant time deletion from anywhere, so we use linked lists.
+				\item<4-> We still have to be able to find elements quickly, so we store a pointer to each element's linked list node in an array.
+			\end{itemize}
+			\item<5-> Call the first \texttt{group\_index}, the second \texttt{groups} and the last \texttt{locations}.
+		\end{itemize}
+	\end{frame}
+	
+	\begin{frame}[plain]{Group iteration}
+		\begin{itemize}
+			\item With this data we can easily iterate over a group.
+			\item Given an item $x$ we find its group $i$ as \texttt{group\_index[x]}.
+			\item Then we just find the group at \texttt{groups[i]} and iterate through that linked list.
+		\end{itemize}
+	\end{frame}
+	
+	\begin{frame}[plain]{Split operation}
+		\begin{itemize}
+			\item The split operation is trickier. It's a bit easier if we allow ourselves a linearithmic time complexity, but it can be done in linear time.
+			\item First we have to collect together elements in the input that are currently in the same group. We can do this by making a hash table that maps group indices to lists, then adding the elements in the input one by one (or by sorting).
+			\item Then each of these lists should be a new group and we need to delete them from their current groups.
+		\end{itemize}
+	\end{frame}
+	
+	\begin{frame}[plain]{Split operation}
+		\begin{itemize}
+			\item We then process these new groups one by one. Each time we add a new group with some new index $j$.
+			\item For each element $x$ we find their location in their linked list using \texttt{locations[x]} and delete that node.
+			\item Then we add $x$ to \texttt{groups[j]} and update \texttt{locations} to point there.
+			\item Finally we set \texttt{group\_index[x]} to $j$.
+		\end{itemize}
+	\end{frame}
+	
+	\begin{frame}[plain]{Bonus challenge}
+		\begin{itemize}
+			\item This gives us a linear time complexity as desired.
+			\item But linked lists are slow! They'll be fast enough for the homework, but as an added challenge one can try to implement all of this in the same time complexity using only vectors/arrays.
+		\end{itemize}
+	\end{frame}
+	
+\end{document}
