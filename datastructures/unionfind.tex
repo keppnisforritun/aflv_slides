@@ -91,8 +91,7 @@
     \begin{minted}{cpp}
 struct union_find {
     vector<int> parent;
-    union_find(int n) {
-        parent = vector<int>(n);
+    union_find(int n) : parent(n) {
         for(int i = 0; i < n; i++) {
             parent[i] = i;
         }
@@ -125,8 +124,7 @@ struct union_find {
     \begin{minted}{cpp}
 struct union_find {
     vector<int> parent;
-    union_find(int n) {
-        parent = vector<int>(n);
+    union_find(int n) : parent(n) {
         for(int i = 0; i < n; i++) {
             parent[i] = i;
         }
@@ -186,8 +184,7 @@ struct union_find {
     \begin{minted}{cpp}
 struct union_find {
     vector<int> parent;
-    union_find(int n) {
-        parent = vector<int>(n);
+    union_find(int n) : parent(n) {
         for (int i = 0; i < n; i++) {
             parent[i] = i;
         }
