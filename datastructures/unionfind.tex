@@ -86,7 +86,41 @@
     \end{itemize}
 \end{frame}
 
-\begin{frame}[plain,fragile]{Naïve Union-Find implementation}
+\begin{frame}[plain,fragile]{Quick-Find}
+    \begin{small}
+    \begin{minted}{cpp}
+struct union_find {
+    vector<int> parent;
+    union_find(int n) {
+        parent = vector<int>(n);
+        for(int i = 0; i < n; i++) {
+            parent[i] = i;
+        }
+    }
+    int find(int x) {
+        return parent[x];
+    }
+    void unite(int x, int y) {
+        for (int i = 0; i < n; i++) {
+            if (find(i) == find(x)) {
+                parent[i] = find(y);
+            }
+        }
+    }
+};
+    \end{minted}
+    \end{small}
+\end{frame}
+
+\begin{frame}
+    \begin{itemize}
+        \item The time complexity of the find operation is $\mathcal{O}(1)$.
+        \item The time complexity of the unite operation is $\mathcal{O}(n)$.
+        \item This is not good enough, so lets try a different approach.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[plain,fragile]{Quick-Union}
     \begin{minted}{cpp}
 struct union_find {
     vector<int> parent;
@@ -117,7 +151,36 @@ struct union_find {
     \end{itemize}
 \end{frame}
 
-\begin{frame}[plain,fragile]{Path compressed Union-Find implementation}
+\begin{frame}[plain,fragile]{Weighted Quick-Union}
+    \begin{tiny}
+    \begin{minted}{cpp}
+struct union_find {
+    vector<int> parent, sizes;
+    union_find(int n) : parent(n), sizes(n) {
+        for (int i = 0; i < n; i++) {
+            parent[i] = i;
+            sizes[i] = 1;
+        }
+    }
+    int find(int x) {
+        if(parent[x] == x) return x;
+        return find(parent[x]);
+    }
+    void unite(int x, int y) {
+        int xp = find(x);
+        int yp = find(y);
+        if (xp == yp) return;
+        if (sizes[xp] > sizes[yp]) swap(xp, yp);
+        parent[xp] = parent[yp];
+        sizes[yp] += sizes[xp];
+    }
+};
+    \end{minted}
+    \end{tiny}
+\end{frame}
+
+\begin{frame}[plain,fragile]{Quick-Union with path compression}
+    \begin{small}
     \begin{minted}{cpp}
 struct union_find {
     vector<int> parent;
@@ -136,6 +199,7 @@ struct union_find {
     }
 };
     \end{minted}
+    \end{small}
 \end{frame}
 
 \begin{frame}[plain]{Union-Find applications}
