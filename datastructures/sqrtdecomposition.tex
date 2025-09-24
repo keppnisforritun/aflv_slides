@@ -111,9 +111,67 @@
     \end{itemize}
 \end{frame}
 
-\begin{frame}[plain]{Mo's Algorithm}
-
-
+\begin{frame}[plain]{Offline and online}
+    \begin{itemize}
+        \item Usually we get all queries in a batch.
+        \item This means we can compute the answers for all of them collectively. This is known as an offline algorithm.
+        \item Conversely, an online algorithm is interactive and answers each query as it is received.
+        \item The order in which we compute the answer may differ from the input order.
+        \item After computing, we make sure to output them in the correct order.
+        \item We will draw inspiration from the sliding window method.
+    \end{itemize}
 \end{frame}
 
+\begin{frame}[plain]{Another sliding window method}
+    \begin{itemize}
+        \item Recall that when we move the right endpoint of a range, very little changes.
+        \item Idea: sort the ranges by $(l, r)$.
+        \item Then use the same methodology as sliding window.
+        \item Define operations $\mathrm{add_R}, \mathrm{add_L}, \mathrm{del_R}, \mathrm{del_L}$ that shift the active range.
+        \item Now we expand and contract as needed using these operations.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[plain]{One slight problem}
+    \begin{itemize}
+        \item<1-> What is the worst case for this method?
+        \item<2-> Consider ranges $(0, N-1), (1, 1), (2, N-1), (3, 3), (4, N-1), \dots$
+        \item<3-> With $Q$ queries, each taking $N$ time, we get $\mathcal{O}(NQ)$.
+        \item<3-> Bucketing by singular left endpoints is too rigid.
+        \item<3-> We need more wiggle room.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[plain]{Mo's algorithm}
+    \begin{itemize}
+        \item Lets pick a value $k$ which is the size of a bucket.
+        \item Now sort by $(\left\lceil\frac{l}{k}\right\rceil, r)$.
+        \item This puts ranges with similar values of $l$ close to each other.
+        \item Then internally orders by $r$ in ascending order so we can build incrementally.
+        \item Lets analyze the worst case here.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[plain]{Analysis}
+    \begin{itemize}
+        \item<1-> If everything is in the same bucket, then we need one linear pass.
+        \item<1-> Even distribution requires more linear passes for right endpoint.
+        \item<2-> For the left endpoint, worst case is to wiggle maximally.
+        \item<2-> We have $b = \frac{N}{k}$ buckets.
+        \item<3-> Within each bucket, right endpoint will move by $N$ steps to the right and $N$ steps back when switching buckets.
+        \item<4-> Even distribution gives $\frac{Q}{b}$ queries per bucket, each query moving left endpoint by $k$ steps.
+        \item<5-> Time complexity is $\mathcal{O}\left(\frac{N}{k} \cdot (k \cdot \frac{Q}{b} + N)\right)$.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[plain]{Choosing $k$}
+    \begin{itemize}
+        \item<1-> Optimal choice depends on $N$ and $Q$, but consider the common case of $Q \approx N$.
+        \item<1-> Then all we need to do is find when $k^2 = N$.
+        \item<1-> We saw this earlier, this is $k = \sqrt{N}$
+        \item<2-> Then our total operations would be $2 \cdot N\sqrt{N}$ for the right endpoint and $\sqrt{N}^3$ for the left endpoint.
+        \item<2-> Total is $3 \cdot N \sqrt{N}$.
+        \item<2-> But this can be reduced to $2 \cdot N \sqrt{N}$ by reducing how much we move the right endpoint.
+    \end{itemize}
+\end{frame}
 \end{document}
