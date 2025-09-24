@@ -29,6 +29,7 @@
 - [Sliding Window](datastructures/slidingwindow.pdf)
 - [Heap](datastructures/heap.pdf)
 - [Union-Find](datastructures/unionfind.pdf)
+- [Partition Refinment](datastructures/partitionrefinement.pdf)
 - [Prefix Sum](datastructures/prefixsum.pdf)
 - [Square Root Decomposition](datastructures/sqrtdecomposition.pdf)
 - [Segment Tree](datastructures/segmenttree.pdf)
