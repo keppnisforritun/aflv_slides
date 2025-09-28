@@ -1,0 +1,318 @@
+\documentclass{beamer}
+\usefonttheme[onlymath]{serif}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{gensymb}
+\usepackage{parskip}
+\usepackage{mathtools}
+\usepackage{listings}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{color}
+\usepackage{enumerate}
+\usepackage{verbatim}
+\usepackage{minted}
+\parskip 0pt
+
+
+\DeclareMathOperator{\lcm}{lcm}
+\newcommand\floor[1]{\left\lfloor#1\right\rfloor}
+\newcommand\ceil[1]{\left\lceil#1\right\rceil}
+\newcommand\abs[1]{\left|#1\right|}
+\newcommand\p[1]{\left(#1\right)}
+\newcommand\sqp[1]{\left[#1\right]}
+\newcommand\cp[1]{\left\{#1\right\}}
+\newcommand\norm[1]{\left\lVert#1\right\rVert}
+\renewcommand\Im{\operatorname{Im}}
+\renewcommand\Re{\operatorname{Re}}
+
+\usetheme{metropolis}
+\graphicspath{{myndir/}}
+
+\definecolor{dark yellow}{rgb} {0.6,0.6,0.0}
+\definecolor{dark green}{rgb} {0.0,0.6,0.0}
+
+\title{Mathematical Introduction}
+\author{Atli Fannar Franklín, Arnar Bjarni Arnarson}
+\institute{\href{http://ru.is/td}{School of Computer Science} \\[2pt] \href{http://ru.is}{Reykjavík University}}
+\titlegraphic{\hfill\includegraphics[height=0.6cm]{kattis}}
+\date{\textbf{Árangursrík forritun og lausn verkefna}}
+
+\begin{document}
+
+\begin{frame}[plain]
+    \titlepage
+\end{frame}
+
+\begin{frame}[plain]{Important point}
+    \begin{center}
+        Computer Science $\subset$ Mathematics
+    \end{center}
+    \vspace{10pt}
+    \begin{itemize}
+        \item Problems often require mathematical analysis to be solved efficiently.
+        \item Using a bit of math before coding can also shorten and simplify code.
+        \item We will now go over various bits and pieces from mathematics that are useful to know.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[plain]{Pattern finding}
+    \vspace{20pt}
+    \begin{itemize}
+        \item Some problems have solutions that form a pattern.
+        \onslide<2-> \item By finding the pattern, we solve the problem.
+        \item Could be classified as mathematical ad-hoc problem.
+        \item Requires mathematical intuition.
+        \onslide<3->{
+            \item Useful tricks:
+            \begin{itemize}
+                \item Solve some small instances by hand.
+                \item See if the solutions form a pattern.
+            \end{itemize}
+        } \onslide<4-> {
+            \item Does the pattern involve some overlapping subproblem? \\
+        } \onslide<5-> {
+            We might need to use {\color{blue}DP}.
+        } \onslide<6-> {
+            \item Knowing reoccurring identities and sequences can be helpful.
+        }
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[plain]{Arithmetic progression}
+  \vspace{30pt}
+  \begin{itemize}
+    \item Often we see a pattern like
+      \[
+        2 , 5 , 8 , 11 , 14, 17, 20, \ldots
+      \]
+    \onslide<2->
+    \item This is called an arithmetic progression.
+      \[
+        a_n = a_{n-1} + c
+      \]
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[plain]{Arithmetic progression}
+  \vspace{30pt}
+  \begin{itemize}
+    \item Depending on the situation we may want to get the $n$-th element
+      \[
+        a_n = a_1 + (n-1) c
+      \]
+    \item Or the sum over a finite portion of the progression
+      \[
+        S_n = \frac{n(a_1 + a_n)}{2}
+      \]
+    \onslide<2->
+    \item Remember this one?
+      \[
+        1 + 2 + 3 + 4 + 5 + \ldots + n = \frac{n(n+1)}{2}
+      \]
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[plain]{Geometric progression}
+  \vspace{30pt}
+  \begin{itemize}
+    \item Other types of pattern we often see are geometric progressions
+      \[
+        1,\, 2,\, 4,\, 8,\, 16,\, 32,\, 64,\, 128,\, \ldots
+      \]
+    \onslide<2->{
+      \item More generally
+        \[
+          s,\, sr,\, sr^2,\, sr^3,\, sr^4,\, sr^5,\, sr^6,\, \ldots
+        \]
+        \[
+          a_n  = s r^{n-1}
+        \]
+      }
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[plain]{Geometric progression}
+  \vspace{30pt}
+  \begin{itemize}
+    \item Sum over a finite portion
+      \[
+        \sum_{i = 0}^n sr^i =  \frac{s(1-r^n)}{(1-r)}
+      \]
+    \onslide<2->{
+      \item Or from the $m$-th element to the $n$-th
+        \[
+          \sum_{i = m}^n sr^i =  \frac{s(r^{m}-r^{n+1})}{(1-r)}
+        \]
+    }
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[plain,fragile]{Quick note on logarithms}
+  \vspace{30pt}
+  \begin{itemize}
+    \item Sometimes doing computation in logarithm can be an efficient alternative.
+
+    \onslide<2->
+  \item In both C++(\texttt{<cmath>}) and
+    Java(\texttt{java.lang.Math}) we have the natural logarithm
+      \begin{minted}{cpp}
+    double log(double x);
+      \end{minted}
+
+    \onslide<3->
+      and logarithm in base $10$
+      \begin{minted}{cpp}
+    double log10(double x);
+      \end{minted}
+    \onslide<4->
+  \item And also the exponential
+    \begin{minted}{cpp}
+    double exp(double x);
+    \end{minted}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[plain,fragile]{Example}
+  \vspace{20pt}
+  \begin{itemize}
+    \item For example, what is the first power of $17$ that has $k$ digits in base $b$?
+    \onslide<2->
+    \item Naive solution: Iterate over powers of $17$ and count the number of digits.
+    \onslide<3->
+    \item But the powers of $17$ grow exponentially!
+      \[17^{16} > 2^{64}\]
+    \item What if $k = 500$ ($\sim1.7 \cdot 10^{615}$), or something larger?
+    \onslide<4->
+    \item Impossible to work with the numbers in a normal fashion.
+    \item Why not $\log$?
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[plain,fragile]{Example}
+  \vspace{40pt}
+  \begin{itemize}
+    \item Remember, we can calculate the length of a number $n$ in base $b$
+      with $\lfloor \log_b(n) \rfloor + 1$.
+    \onslide<2->
+    \item But how do we do this with only $\ln$ or $\log_{10}$?
+    \onslide<3->
+    \item Change base!
+      \[
+        \log_b(a) = \frac{\log_d(a)}{\log_d(b)} = \frac{\ln(a)}{\ln(b)}
+      \]
+    \item Now we can at least count the length without converting bases
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[plain]{Example}
+  \vspace{20pt}
+  \begin{itemize}
+    \item We still have to iterate over the powers of $17$, but we can do that in log
+      \[
+        \ln(17^{x-1} \cdot 17) = \ln(17^{x-1}) + \ln(17)
+      \]
+    \onslide<2->
+    \item More generally
+      \[
+        \log_b(xy) = \log_b(x) + \log_b(y)
+      \]
+    \item For division
+      \[
+        \log_b\p{\frac{x}{y}} = \log_b(x) - \log_b(y)
+      \]
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[plain]{Example}
+  \vspace{20pt}
+  \begin{itemize}
+    \item We can simplify this even more.
+    \item The solution to our problem is in mathematical terms, finding the $x$ for
+      \[
+        \log_b(17^x) = k - 1
+      \]
+    \onslide<2->
+    \item One more handy identity
+      \[
+        \log_b(a^c) = c \cdot \log_b(a)
+      \]
+    \onslide<3->
+    \item Using this identity and the ones we've covered, we get
+      \[
+        x = \left\lceil (k-1) \cdot \frac{\ln(10)}{\ln(17)} \right\rceil
+      \]
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[plain,fragile]
+  \frametitle{Base conversion}
+  \begin{itemize}
+    \item Speaking of bases.
+    \onslide<2->
+    \item What if we actually need to use base conversion?
+    \onslide<3->
+    \item Simple algorithm
+      \begin{minted}{cpp}
+template <typename T>
+vector<T> toBase(T base, T val) {
+    vector<T> res;
+    while(val) {
+        res.push_back(val % base);
+        val /= base;
+    }
+    return res;
+}
+      \end{minted}
+    \item Starts from the $0$-th digit, and calculates the multiple of each power.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[plain,fragile]
+  \frametitle{Working with doubles}
+  \vspace{30pt}
+  \begin{itemize}
+    \item Comparing doubles, sounds like a bad idea.
+  \onslide<2->
+    \item What else can we do if we are working with real numbers?
+  \onslide<3->
+    \item We compare them to a certain degree of precision like in binary search.
+  \onslide<4->
+    \item Two numbers are deemed equal if their difference is less than some small epsilon.
+  \end{itemize}
+
+    \begin{minted}{cpp}
+    const double EPS = 1e-9;
+
+    if(abs(a - b) < EPS) {
+    ...
+    }
+    \end{minted}
+\end{frame}
+
+\begin{frame}[plain,fragile]
+  \frametitle{Working with doubles}
+  \vspace{30pt}
+  \begin{itemize}
+    \item Less than operator:
+      \begin{minted}{cpp}
+    if(a < b - EPS) {
+    ...
+    }
+      \end{minted}
+    \item Less than or equal:
+      \begin{minted}{cpp}
+    if(a  < b + EPS) {
+    ...
+    }
+    \end{minted}
+    \item The rest of the operators follow.
+  \end{itemize}
+\end{frame}
+
+\end{document}
+

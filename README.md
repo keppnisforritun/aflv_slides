@@ -34,3 +34,7 @@
 - [Square Root Decomposition](datastructures/sqrtdecomposition.pdf)
 - [Segment Tree](datastructures/segmenttree.pdf)
 - [Sparse Table](datastructures/sparsetable.pdf)
+
+## Week 7
+- [Math Intro](numbertheory/mathintro.pdf)
+- [Number Theory](numbertheory/numbertheory.pdf)
