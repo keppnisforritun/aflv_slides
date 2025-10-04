@@ -38,3 +38,6 @@
 ## Week 7
 - [Math Intro](numbertheory/mathintro.pdf)
 - [Number Theory](numbertheory/numbertheory.pdf)
+
+## Week 8
+- [Unweighted Graphs](unweightedgraphs/unweightedgraphs.pdf)
