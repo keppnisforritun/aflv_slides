@@ -41,3 +41,8 @@
 
 ## Week 8
 - [Unweighted Graphs](unweightedgraphs/unweightedgraphs.pdf)
+
+## Bonus
+
+- [Convex Hull Trick](convexhulltrick/convexhulltrick.pdf)
+- [Divide and Conquer DP](divideandconquerdp/divideandconquerdp.pdf)
