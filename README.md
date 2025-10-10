@@ -42,6 +42,9 @@
 ## Week 8
 - [Unweighted Graphs](unweightedgraphs/unweightedgraphs.pdf)
 
+## Week 9
+- [Weighted Graphs](weightedgraphs/weightedgraphs.pdf)
+
 ## Bonus
 
 - [Convex Hull Trick](convexhulltrick/convexhulltrick.pdf)
