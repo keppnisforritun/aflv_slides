@@ -1,0 +1,769 @@
+\documentclass{beamer}
+\usefonttheme[onlymath]{serif}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{gensymb}
+\usepackage{parskip}
+\usepackage{mathtools}
+\usepackage{listings}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{color}
+\usepackage{enumerate}
+\usepackage{tikz}
+\usetikzlibrary{calc}
+\usetikzlibrary{positioning}
+\usetikzlibrary{angles}
+\usetikzlibrary{shapes}
+\usetikzlibrary{arrows}
+\usepackage{verbatim}
+\usepackage{multicol}
+\usepackage{array}
+\usepackage{minted}
+\parskip 0pt
+
+\usepackage{colortbl}
+\usepackage{pgf}
+\usepackage{pgfkeys}
+\usetikzlibrary{fpu}
+\usepackage{tkz-euclide}
+
+\DeclareMathOperator{\lcm}{lcm}
+\newcommand\floor[1]{\left\lfloor#1\right\rfloor}
+\newcommand\ceil[1]{\left\lceil#1\right\rceil}
+\newcommand\abs[1]{\left|#1\right|}
+\newcommand\p[1]{\left(#1\right)}
+\newcommand\sqp[1]{\left[#1\right]}
+\newcommand\cp[1]{\left\{#1\right\}}
+\newcommand\norm[1]{\left\lVert#1\right\rVert}
+\renewcommand\Im{\operatorname{Im}}
+\renewcommand\Re{\operatorname{Re}}
+
+\usetheme{metropolis}
+\definecolor{dark yellow}{rgb} {0.6,0.6,0.0}
+\definecolor{dark green}{rgb} {0.0,0.6,0.0}
+
+\graphicspath{{myndir/}}
+
+\tikzstyle{vertex}=[circle,fill=black!50,minimum size=15pt,inner sep=0pt, font=\small]
+\tikzstyle{selected vertex} = [vertex, fill=red!24]
+\tikzstyle{edge} = [draw,thick,-]
+\tikzstyle{dedge} = [draw,thick,->]
+\tikzstyle{weight} = [font=\scriptsize,pos=0.5]
+\tikzstyle{selected edge} = [draw,line width=2pt,-,red!50]
+\tikzstyle{selected2 vertex} = [vertex, fill=hilight!50, text=black]
+\tikzstyle{ignored edge} = [draw,line width=5pt,-,black!20]
+\tikzstyle{vertex1} = [vertex, fill=red]
+\tikzstyle{vertex2} = [vertex, fill=blue]
+\tikzstyle{vertex3} = [vertex, fill=green, text=black]
+\tikzstyle{vertex4} = [vertex, fill=yellow, text=black]
+\tikzstyle{vertex5} = [vertex, fill=pink, text=black]
+\tikzstyle{vertex6} = [vertex, fill=purple]
+
+\tikzset{
+	treenode/.style = {align=center, inner sep=0pt, text centered,
+		font=\sffamily},
+	vertex/.style = {treenode, circle, black, font=\sffamily\bfseries\tiny, draw=black, text width=1.8em},% arbre rouge noir, noeud noir
+	rvertex/.style = {treenode, circle, black, font=\sffamily\bfseries\tiny, draw=red, text width=1.8em},% arbre rouge noir, noeud noir
+}
+
+\definecolor{offwhite}{RGB}{249,242,215}
+\definecolor{foreground}{HTML}{23373b}
+\definecolor{background}{RGB}{24,24,24}
+\definecolor{title}{RGB}{107,174,214}
+\definecolor{gray}{RGB}{155,155,155}
+\definecolor{subtitle}{RGB}{102,255,204}
+\definecolor{lolight}{RGB}{155,155,155}
+\definecolor{green}{RGB}{125,250,125}
+
+\definecolor{hilight}{RGB}{235,129,27}
+\definecolor{vhilight}{HTML}{14B03D}
+
+\def\hepta{\draw[foreground](A) -- (B) -- (C) -- (D) -- (E) -- (F) -- (G) -- cycle;}
+
+\newcommand{\slice}[1]{%
+	\hepta
+	\draw[foreground] \foreach \x/\y in {#1} {(\x)--(\y)};
+}
+
+\title{Graphs Part 3}
+\author{Atli Fannar Franklín}
+\institute{\href{http://ru.is/td}{School of Computer Science} \\[2pt] \href{http://ru.is}{Reykjavík University}}
+\titlegraphic{\hfill\includegraphics[height=0.6cm]{kattis}}
+
+\begin{document}
+	\maketitle
+	
+	\begin{frame}[plain]{Today we're going to cover}
+		\begin{itemize}
+			\item Maximum flow
+			\begin{itemize}
+				\item Ford-Fulkerson
+				\item Edmond-Karp
+				\item Dinic's
+				\item MCMF
+			\end{itemize}
+		\end{itemize}
+	\end{frame}
+	
+	\begin{frame}[plain]{Flow problems}
+		\begin{itemize}
+			\item What is maximum flow?
+			\item We imagine each edge in a (directed) graph is a pipe, and the weight says how many units of liquid can pass through it per second.
+			\item Then vertices are joints, and the amount of liquid going in and out must be the same.
+			\item Except for one vertex where we let water flow in from the outside, the source, and one where we let it flow out, the sink.
+			\item Then the maximum flow problem is the problem of determining the maximum amount of liquid that can flow per second from the source to the sink.
+		\end{itemize}
+	\end{frame}
+	
+	\begin{frame}[plain]{Formal definition}
+		\begin{itemize}
+			\item For a graph $G = (V, E)$ we say that $f : E \rightarrow \mathbb{R}$ is a flow from $s \in V$ to $t \in V$ if $0 \leq f(e) \leq c_e$ where $c_e$ is the capacity for $e$ and for all $v \in V \setminus{s, t}$ we have
+			\[\sum_{e \in \text{out}(v)} f(e) = \sum_{e \in \text{in}(v)} f(e)\]
+			\item The value of a flow $f$ is the amount of liquid flowing out at the source (or in at the sink, equivalently), more formally given as
+			\[\sum_{e \in \text{out}(s)} f(e) = \sum_{e \in \text{in}(t)} f(e)\]
+			\item The maximum flow problem is then to find the flow with the maximum value for a given graph.
+		\end{itemize}
+	\end{frame}
+	
+	\begin{frame}[plain]{First solution ideas}
+		\begin{itemize}
+			\item How do we solve this?
+			\item Brute force trying every combination will be massively slow.
+			\item So we just try something greedy.
+			\item<2-> How about we just find some path from $s$ to $t$ where we can fit more flow, and fit more flow there?
+			\item<2-> Rinse and repeat, until we get stuck.
+		\end{itemize}
+	\end{frame}
+	
+	\begin{frame}[plain]{Example}
+		\begin{center}
+			\begin{tikzpicture}[scale=1.2]
+				\node[circle, draw, very thick] (0) at (0,0) {$s$};
+				\node[circle, draw, very thick] (1) at (2,-2) {};
+				\node[circle, draw, very thick] (2) at (2,0) {};
+				\node[circle, draw, very thick] (3) at (2,2) {};
+				\node[circle, draw, very thick] (4) at (5,-2) {};
+				\node[circle, draw, very thick] (5) at (5,0) {};
+				\node[circle, draw, very thick] (6) at (5,2) {};
+				\node[circle, draw, very thick] (7) at (7,0) {$t$};
+				
+				\draw[very thick, ->]  (0) -- (1) node[midway,below left] () {$0/15$};
+				\draw[very thick, ->]  (0) -- (2) node[midway,below] () {$0/8$};
+				\draw[very thick, ->]  (0) -- (3) node[midway,above left] () {$0/5$};
+				\draw[very thick, ->]  (1) -- (4) node[midway,above] () {$0/16$};
+				\draw[very thick, ->]  (2) -- (5) node[midway,above] () {$0/8$};
+				\draw[very thick, ->]  (3) -- (6) node[midway,above] () {$0/9$};
+				\draw[very thick, ->]  (3) -- (5) node[midway,above right] () {$0/15$};
+				\draw[very thick, ->]  (4) -- (2) node[midway,above right] () {$0/6$};
+				\draw[very thick, ->]  (4) -- (7) node[midway,below right] () {$0/10$};
+				\draw[very thick, ->]  (5) -- (7) node[midway,above] () {$0/5$};
+				\draw[very thick, ->]  (6) -- (7) node[midway,above right] () {$0/10$};
+			\end{tikzpicture}
+		\end{center}
+	\end{frame}
+	
+	\begin{frame}[plain]{Example}
+		\begin{center}
+			\begin{tikzpicture}[scale=1.2]
+				\node[circle, draw, very thick] (0) at (0,0) {$s$};
+				\node[circle, draw, very thick] (1) at (2,-2) {};
+				\node[circle, draw, very thick] (2) at (2,0) {};
+				\node[circle, draw, very thick] (3) at (2,2) {};
+				\node[circle, draw, very thick] (4) at (5,-2) {};
+				\node[circle, draw, very thick] (5) at (5,0) {};
+				\node[circle, draw, very thick] (6) at (5,2) {};
+				\node[circle, draw, very thick] (7) at (7,0) {$t$};
+				
+				\draw[very thick, ->]  (0) -- (1) node[midway,below left] () {$0/15$};
+				\draw[very thick, ->]  (0) -- (2) node[midway,below] () {$0/8$};
+				\draw[very thick, ->]  (0) -- (3) node[midway,above left] () {$0/5$};
+				\draw[very thick, ->]  (1) -- (4) node[midway,above] () {$0/16$};
+				\draw[very thick, ->]  (2) -- (5) node[midway,above] () {$0/8$};
+				\draw[very thick, ->]  (3) -- (6) node[midway,above] () {$0/9$};
+				\draw[very thick, ->]  (3) -- (5) node[midway,above right] () {$0/15$};
+				\draw[very thick, ->]  (4) -- (2) node[midway,above right] () {$0/6$};
+				\draw[very thick, ->]  (4) -- (7) node[midway,below right] () {$0/10$};
+				\draw[very thick, ->]  (5) -- (7) node[midway,above] () {$0/5$};
+				\draw[very thick, ->]  (6) -- (7) node[midway,above right] () {$0/10$};
+				
+				\draw[very thick, blue!80!black, ->] (0) to [bend left=15] (1);
+				\draw[very thick, blue!80!black, ->] (1) to [bend right=15] (4);
+				\draw[very thick, blue!80!black, ->] (4) to [bend left=15] (7);
+			\end{tikzpicture}
+		\end{center}
+	\end{frame}
+	
+	\begin{frame}[plain]{Example}
+		\begin{center}
+			\begin{tikzpicture}[scale=1.2]
+				\node[circle, draw, very thick] (0) at (0,0) {$s$};
+				\node[circle, draw, very thick] (1) at (2,-2) {};
+				\node[circle, draw, very thick] (2) at (2,0) {};
+				\node[circle, draw, very thick] (3) at (2,2) {};
+				\node[circle, draw, very thick] (4) at (5,-2) {};
+				\node[circle, draw, very thick] (5) at (5,0) {};
+				\node[circle, draw, very thick] (6) at (5,2) {};
+				\node[circle, draw, very thick] (7) at (7,0) {$t$};
+				
+				\draw[very thick, ->]  (0) -- (1) node[midway,below left] () {$10/15$};
+				\draw[very thick, ->]  (0) -- (2) node[midway,below] () {$0/8$};
+				\draw[very thick, ->]  (0) -- (3) node[midway,above left] () {$0/5$};
+				\draw[very thick, ->]  (1) -- (4) node[midway,above] () {$10/16$};
+				\draw[very thick, ->]  (2) -- (5) node[midway,above] () {$0/8$};
+				\draw[very thick, ->]  (3) -- (6) node[midway,above] () {$0/9$};
+				\draw[very thick, ->]  (3) -- (5) node[midway,above right] () {$0/15$};
+				\draw[very thick, ->]  (4) -- (2) node[midway,above right] () {$0/6$};
+				\draw[very thick, ->]  (4) -- (7) node[midway,below right] () {$10/10$};
+				\draw[very thick, ->]  (5) -- (7) node[midway,above] () {$0/5$};
+				\draw[very thick, ->]  (6) -- (7) node[midway,above right] () {$0/10$};
+			\end{tikzpicture}
+		\end{center}
+	\end{frame}
+	
+	\begin{frame}[plain]{Example}
+		\begin{center}
+			\begin{tikzpicture}[scale=1.2]
+				\node[circle, draw, very thick] (0) at (0,0) {$s$};
+				\node[circle, draw, very thick] (1) at (2,-2) {};
+				\node[circle, draw, very thick] (2) at (2,0) {};
+				\node[circle, draw, very thick] (3) at (2,2) {};
+				\node[circle, draw, very thick] (4) at (5,-2) {};
+				\node[circle, draw, very thick] (5) at (5,0) {};
+				\node[circle, draw, very thick] (6) at (5,2) {};
+				\node[circle, draw, very thick] (7) at (7,0) {$t$};
+				
+				\draw[very thick, ->]  (0) -- (1) node[midway,below left] () {$10/15$};
+				\draw[very thick, ->]  (0) -- (2) node[midway,below] () {$0/8$};
+				\draw[very thick, ->]  (0) -- (3) node[midway,above left] () {$0/5$};
+				\draw[very thick, ->]  (1) -- (4) node[midway,above] () {$10/16$};
+				\draw[very thick, ->]  (2) -- (5) node[midway,above] () {$0/8$};
+				\draw[very thick, ->]  (3) -- (6) node[midway,above] () {$0/9$};
+				\draw[very thick, ->]  (3) -- (5) node[midway,above right] () {$0/15$};
+				\draw[very thick, ->]  (4) -- (2) node[midway,above right] () {$0/6$};
+				\draw[very thick, ->]  (4) -- (7) node[midway,below right] () {$10/10$};
+				\draw[very thick, ->]  (5) -- (7) node[midway,above] () {$0/5$};
+				\draw[very thick, ->]  (6) -- (7) node[midway,above right] () {$0/10$};
+				
+				\draw[very thick, blue!80!black, ->] (0) to [bend left=15] (2);
+				\draw[very thick, blue!80!black, ->] (2) to [bend right=15] (5);
+				\draw[very thick, blue!80!black, ->] (5) to [bend right=15] (7);
+			\end{tikzpicture}
+		\end{center}
+	\end{frame}
+	
+	\begin{frame}[plain]{Example}
+		\begin{center}
+			\begin{tikzpicture}[scale=1.2]
+				\node[circle, draw, very thick] (0) at (0,0) {$s$};
+				\node[circle, draw, very thick] (1) at (2,-2) {};
+				\node[circle, draw, very thick] (2) at (2,0) {};
+				\node[circle, draw, very thick] (3) at (2,2) {};
+				\node[circle, draw, very thick] (4) at (5,-2) {};
+				\node[circle, draw, very thick] (5) at (5,0) {};
+				\node[circle, draw, very thick] (6) at (5,2) {};
+				\node[circle, draw, very thick] (7) at (7,0) {$t$};
+				
+				\draw[very thick, ->]  (0) -- (1) node[midway,below left] () {$10/15$};
+				\draw[very thick, ->]  (0) -- (2) node[midway,below] () {$5/8$};
+				\draw[very thick, ->]  (0) -- (3) node[midway,above left] () {$0/5$};
+				\draw[very thick, ->]  (1) -- (4) node[midway,above] () {$10/16$};
+				\draw[very thick, ->]  (2) -- (5) node[midway,above] () {$5/8$};
+				\draw[very thick, ->]  (3) -- (6) node[midway,above] () {$0/9$};
+				\draw[very thick, ->]  (3) -- (5) node[midway,above right] () {$0/15$};
+				\draw[very thick, ->]  (4) -- (2) node[midway,above right] () {$0/6$};
+				\draw[very thick, ->]  (4) -- (7) node[midway,below right] () {$10/10$};
+				\draw[very thick, ->]  (5) -- (7) node[midway,above] () {$5/5$};
+				\draw[very thick, ->]  (6) -- (7) node[midway,above right] () {$0/10$};
+			\end{tikzpicture}
+		\end{center}
+	\end{frame}
+	
+	\begin{frame}[plain]{Example}
+		\begin{center}
+			\begin{tikzpicture}[scale=1.2]
+				\node[circle, draw, very thick] (0) at (0,0) {$s$};
+				\node[circle, draw, very thick] (1) at (2,-2) {};
+				\node[circle, draw, very thick] (2) at (2,0) {};
+				\node[circle, draw, very thick] (3) at (2,2) {};
+				\node[circle, draw, very thick] (4) at (5,-2) {};
+				\node[circle, draw, very thick] (5) at (5,0) {};
+				\node[circle, draw, very thick] (6) at (5,2) {};
+				\node[circle, draw, very thick] (7) at (7,0) {$t$};
+				
+				\draw[very thick, ->]  (0) -- (1) node[midway,below left] () {$10/15$};
+				\draw[very thick, ->]  (0) -- (2) node[midway,below] () {$5/8$};
+				\draw[very thick, ->]  (0) -- (3) node[midway,above left] () {$0/5$};
+				\draw[very thick, ->]  (1) -- (4) node[midway,above] () {$10/16$};
+				\draw[very thick, ->]  (2) -- (5) node[midway,above] () {$5/8$};
+				\draw[very thick, ->]  (3) -- (6) node[midway,above] () {$0/9$};
+				\draw[very thick, ->]  (3) -- (5) node[midway,above right] () {$0/15$};
+				\draw[very thick, ->]  (4) -- (2) node[midway,above right] () {$0/6$};
+				\draw[very thick, ->]  (4) -- (7) node[midway,below right] () {$10/10$};
+				\draw[very thick, ->]  (5) -- (7) node[midway,above] () {$5/5$};
+				\draw[very thick, ->]  (6) -- (7) node[midway,above right] () {$0/10$};
+				
+				\draw[very thick, blue!80!black, ->] (0) to [bend right=15] (3);
+				\draw[very thick, blue!80!black, ->] (3) to [bend right=15] (6);
+				\draw[very thick, blue!80!black, ->] (6) to [bend right=15] (7);
+			\end{tikzpicture}
+		\end{center}
+	\end{frame}
+	
+	\begin{frame}[plain]{Example}
+		\begin{center}
+			\begin{tikzpicture}[scale=1.2]
+				\node[circle, draw, very thick] (0) at (0,0) {$s$};
+				\node[circle, draw, very thick] (1) at (2,-2) {};
+				\node[circle, draw, very thick] (2) at (2,0) {};
+				\node[circle, draw, very thick] (3) at (2,2) {};
+				\node[circle, draw, very thick] (4) at (5,-2) {};
+				\node[circle, draw, very thick] (5) at (5,0) {};
+				\node[circle, draw, very thick] (6) at (5,2) {};
+				\node[circle, draw, very thick] (7) at (7,0) {$t$};
+				
+				\draw[very thick, ->]  (0) -- (1) node[midway,below left] () {$10/15$};
+				\draw[very thick, ->]  (0) -- (2) node[midway,below] () {$5/8$};
+				\draw[very thick, ->]  (0) -- (3) node[midway,above left] () {$5/5$};
+				\draw[very thick, ->]  (1) -- (4) node[midway,above] () {$10/16$};
+				\draw[very thick, ->]  (2) -- (5) node[midway,above] () {$5/8$};
+				\draw[very thick, ->]  (3) -- (6) node[midway,above] () {$5/9$};
+				\draw[very thick, ->]  (3) -- (5) node[midway,above right] () {$0/15$};
+				\draw[very thick, ->]  (4) -- (2) node[midway,above right] () {$0/6$};
+				\draw[very thick, ->]  (4) -- (7) node[midway,below right] () {$10/10$};
+				\draw[very thick, ->]  (5) -- (7) node[midway,above] () {$5/5$};
+				\draw[very thick, ->]  (6) -- (7) node[midway,above right] () {$5/10$};
+			\end{tikzpicture}
+		\end{center}
+	\end{frame}
+	
+	\begin{frame}[plain]{Example}
+		\begin{center}
+			\begin{tikzpicture}[scale=1.2]
+				\node[circle, draw, very thick] (0) at (0,0) {$s$};
+				\node[circle, draw, very thick] (1) at (2,-2) {};
+				\node[circle, draw, very thick] (2) at (2,0) {};
+				\node[circle, draw, very thick] (3) at (2,2) {};
+				\node[circle, draw, very thick] (4) at (5,-2) {};
+				\node[circle, draw, very thick] (5) at (5,0) {};
+				\node[circle, draw, very thick] (6) at (5,2) {};
+				\node[circle, draw, very thick] (7) at (7,0) {$t$};
+				
+				\draw[very thick, ->]  (0) -- (1) node[midway,below left] () {$10/15$};
+				\draw[very thick, ->]  (0) -- (2) node[midway,below] () {$5/8$};
+				\draw[very thick, ->]  (0) -- (3) node[midway,above left] () {$5/5$};
+				\draw[very thick, ->]  (1) -- (4) node[midway,above] () {$10/16$};
+				\draw[very thick, ->]  (2) -- (5) node[midway,above] () {$5/8$};
+				\draw[very thick, ->]  (3) -- (6) node[midway,above] () {$5/9$};
+				\draw[very thick, ->]  (3) -- (5) node[midway,above right] () {$0/15$};
+				\draw[very thick, ->]  (4) -- (2) node[midway,above right] () {$0/6$};
+				\draw[very thick, ->]  (4) -- (7) node[midway,below right] () {$10/10$};
+				\draw[very thick, ->]  (5) -- (7) node[midway,above] () {$5/5$};
+				\draw[very thick, ->]  (6) -- (7) node[midway,above right] () {$5/10$};
+				
+				\draw[very thick, blue!80!black, ->] (0) to [bend left=15] (1);
+				\draw[very thick, blue!80!black, ->] (1) to [bend right=15] (4);
+				\draw[very thick, blue!80!black, ->] (4) to [bend left=15] (2);
+				\draw[very thick, blue!80!black, ->] (2) to [bend right=15] (5);
+				\draw[very thick, blue!80!black, ->] (5) to [bend left=15] (3);
+				\draw[very thick, blue!80!black, ->] (3) to [bend right=15] (6);
+				\draw[very thick, blue!80!black, ->] (6) to [bend right=15] (7);
+			\end{tikzpicture}
+		\end{center}
+	\end{frame}
+	
+	\begin{frame}[plain]{Example}
+		\begin{center}
+			\begin{tikzpicture}[scale=1.2]
+				\node[circle, draw, very thick] (0) at (0,0) {$s$};
+				\node[circle, draw, very thick] (1) at (2,-2) {};
+				\node[circle, draw, very thick] (2) at (2,0) {};
+				\node[circle, draw, very thick] (3) at (2,2) {};
+				\node[circle, draw, very thick] (4) at (5,-2) {};
+				\node[circle, draw, very thick] (5) at (5,0) {};
+				\node[circle, draw, very thick] (6) at (5,2) {};
+				\node[circle, draw, very thick] (7) at (7,0) {$t$};
+				
+				\draw[very thick, ->]  (0) -- (1) node[midway,below left] () {$13/15$};
+				\draw[very thick, ->]  (0) -- (2) node[midway,below] () {$5/8$};
+				\draw[very thick, ->]  (0) -- (3) node[midway,above left] () {$5/5$};
+				\draw[very thick, ->]  (1) -- (4) node[midway,above] () {$13/16$};
+				\draw[very thick, ->]  (2) -- (5) node[midway,above] () {$8/8$};
+				\draw[very thick, ->]  (3) -- (6) node[midway,above] () {$8/9$};
+				\draw[very thick, ->]  (3) -- (5) node[midway,above right] () {$3/15$};
+				\draw[very thick, ->]  (4) -- (2) node[midway,above right] () {$3/6$};
+				\draw[very thick, ->]  (4) -- (7) node[midway,below right] () {$10/10$};
+				\draw[very thick, ->]  (5) -- (7) node[midway,above] () {$5/5$};
+				\draw[very thick, ->]  (6) -- (7) node[midway,above right] () {$8/10$};
+			\end{tikzpicture}
+		\end{center}
+	\end{frame}
+	
+	\begin{frame}[plain]{Min-cut}
+		\begin{itemize}
+			\item We see that the value of the flow above is 23, but how do we know that's the maximum?
+			\item The crux of showing that you can't do better is to look at the min-cut.
+			\item This is a dual problem, asking what's the cheapest (minimum total capacity) set of vertices you need to cut to disconnect $s$ from $t$?
+		\end{itemize}
+	\end{frame}
+	
+	\begin{frame}[plain]{Example}
+		\begin{center}
+			\begin{tikzpicture}[scale=1.2]
+				\node[circle, draw, very thick] (0) at (0,0) {$s$};
+				\node[circle, draw, very thick] (1) at (2,-2) {};
+				\node[circle, draw, very thick] (2) at (2,0) {};
+				\node[circle, draw, very thick] (3) at (2,2) {};
+				\node[circle, draw, very thick] (4) at (5,-2) {};
+				\node[circle, draw, very thick] (5) at (5,0) {};
+				\node[circle, draw, very thick] (6) at (5,2) {};
+				\node[circle, draw, very thick] (7) at (7,0) {$t$};
+				
+				\draw[very thick, ->]  (0) -- (1) node[midway,below left] () {$13/15$};
+				\draw[very thick, ->]  (0) -- (2) node[midway,below] () {$5/8$};
+				\draw[very thick, ->, red]  (0) -- (3) node[midway,above left] () {$5/5$};
+				\draw[very thick, ->]  (1) -- (4) node[midway,above] () {$13/16$};
+				\draw[very thick, ->, red]  (2) -- (5) node[midway,above] () {$8/8$};
+				\draw[very thick, ->]  (3) -- (6) node[midway,above] () {$8/9$};
+				\draw[very thick, ->]  (3) -- (5) node[midway,above right] () {$3/15$};
+				\draw[very thick, ->]  (4) -- (2) node[midway,above right] () {$3/6$};
+				\draw[very thick, ->, red]  (4) -- (7) node[midway,below right] () {$10/10$};
+				\draw[very thick, ->]  (5) -- (7) node[midway,above] () {$5/5$};
+				\draw[very thick, ->]  (6) -- (7) node[midway,above right] () {$8/10$};
+			\end{tikzpicture}
+		\end{center}
+	\end{frame}
+	
+	\begin{frame}[plain]{Max-flow Min-cut}
+		\begin{itemize}
+			\item The fact that the min cut has value $23$ as well is no coincidence.
+			\item It is not too hard to see that a max flow can never exceed a cut, as the flow has to pass from one side to the other of the cut using only the edges in the cut.
+			\item So all cuts have costs greater or equal to the values of all flows.
+			\item So if we find a flow that has value equal to the cost of a cut, that flow must be maximal and that cut minimal.
+			\item The fact is, this is always the case. The maximum flow value is always equal to the cost of the minimum cut, proved by Ford and Fulkerson in 1962.
+		\end{itemize}
+	\end{frame}
+	
+	\begin{frame}[plain]{Max-flow Min-cut}
+		\begin{itemize}
+			\item The proof is not so hard, it is just a proof by looking at the greedy algorithm above and showing that if the flow is not yet equal to the cost of a minimum cut there must be some path that gets us closer.
+			\item The proof also gives us that our greedy method always gets us closer to the answer in each step.
+			\item Note that since our algorithm always increases the flow as much as it can along the path we choose, this means our flow will always have integer flow values if our capacities have integer values.
+			\item If we do not have integer values, the greedy algorithm might not terminate!
+		\end{itemize}
+	\end{frame}
+	
+	\begin{frame}[plain]{Ford Fulkerson}
+		\begin{itemize}
+			\item This is known as the Ford-Fulkerson algorithm. So how fast is it if we have integer capacities?
+			\item We have to find an augmenting path, we can do this using some standard graph search.
+			\item<2-> So we have $\mathcal{O}(V + E)$ but the flow might just increase by one each time.
+			\item<2-> Therefore the complexity is $\mathcal{O}(F(V + E))$ where $F$ is the maximum flow.
+		\end{itemize}
+	\end{frame}
+	
+	\begin{frame}[plain]{Edmond Karp}
+		\begin{itemize}
+			\item The problem is that if the capacities are very large, this is quite slow (in the worst case).
+			\item There are ways around this, we just have to be more specific about how we find our augmenting paths.
+			\item We essentially have two options, DFS and BFS:
+			\item If you try both, you will see that BFS gives better worst-case behaviour.
+		\end{itemize}
+	\end{frame}
+	
+	\begin{frame}[plain]{Edmond Karp}
+		\begin{itemize}
+			\item Ford-Fulkerson with BFS is known as Edmond-Karp.
+			\item The key feature one can prove is that if you saturate an edge several in the process, it must always be further away from the source along the augmenting path than last time. (Proof by contradiction, bit tricky, but not terrible)
+			\item Then each edge can be saturated at most $V$ times, so we do at most $VE$ augmentations.
+			\item Thus the time complexity is $\mathcal{O}(VE^2)$ at most (still also at most $\mathcal{O}(FE)$)
+		\end{itemize}
+	\end{frame}
+	
+	\begin{frame}[plain, fragile]{Implementation, part 1}
+		\begin{scriptsize}
+\begin{minted}{python}
+# We use this as the queue module is not what we want
+# It is meant for asynchronous tasks, not this
+from collections import deque
+from math import inf
+# We define a class that takes in a graph
+# and provides a max flow method
+class FlowNetwork:
+\end{minted}
+\end{scriptsize}
+\end{frame}
+\begin{frame}[plain, fragile]{Implementation, part 2}
+\begin{scriptsize}
+\begin{minted}{python}
+    def __init__(self, graph):
+        # We construct the residual graph
+        self.residual = [[] for _ in range(len(graph))]
+        self.edges = []
+        for vertex in range(len(graph)):
+            for cap, neighbour in graph[vertex]:
+                # Each edge is doubled and always adjacent
+                # This means we can get the reverse edge with
+                # ^1, since 0 and 1 map to each other, 2 and 3
+                # and so on (just flips last bit in number)
+                # Before adding the edge the length of the list
+                # gives the index the new edge will be at
+                self.residual[vertex].append(len(self.edges))
+                # Initially we have a budget of up to 'cap'
+                e1 = [vertex, neighbour, cap]
+                self.edges.append(e1)
+                self.residual[neighbour].append(len(self.edges))
+                # But the reverse edge has no initial budget
+                e2 = [neighbour, vertex, 0]
+                self.edges.append(e2)
+\end{minted}
+\end{scriptsize}
+\end{frame}
+\begin{frame}[plain, fragile]{Implementation, part 3}
+\begin{scriptsize}
+\begin{minted}{python}
+    def bfs(self, s, t, parent): # s is the source, t the sink
+        # Keep an array of the flow found, augmenting path pushes to vertex
+        flow = [0 for i in range(len(self.residual))]
+        # Initialize BFS
+        queue = deque()
+        queue.append(s)
+        flow[s] = inf
+        while queue:
+            cur = queue.popleft()
+            for index in self.residual[cur]:
+                edge = self.edges[index]
+                # edge[1] is endpoint of edge, edge[2] is cap
+                # So if we've already looked at endpoint or
+                # the edge is saturated we skip
+                if flow[edge[1]] > 0 or edge[2] == 0:
+                    continue
+                # Otherwise update and continue
+                queue.append(edge[1])
+                flow[edge[1]] = min(flow[cur], edge[2])
+                parent[edge[1]] = index
+        # flow[t] contains how much we can push to sink
+        return flow[t]
+\end{minted}
+\end{scriptsize}
+\end{frame}
+\begin{frame}[plain, fragile]{Implementation, part 4}
+\begin{scriptsize}
+\begin{minted}{python}
+    def max_flow(self, s, t):
+        parent = [-1 for _ in range(len(self.residual))]
+        max_flow = 0
+        # This will set path_flow to the result of bfs
+        # and only loop if that is > 0
+        while path_flow := self.bfs(s, t, parent):
+            # Add it to max flow
+            max_flow += path_flow
+            # Now we need to walk along the path
+            # and update the residual capacities
+            position = t
+            while position != s:
+                index = parent[position]
+                # Decrease residual capacity
+                self.edges[index][2] -= path_flow
+                # The reverse edge is adjacent, ^1 trick
+                self.edges[index ^ 1][2] += path_flow
+                position = self.edges[index][0]
+         # And we're done!
+        return max_flow
+\end{minted}
+		\end{scriptsize}
+	\end{frame}
+	
+	\begin{frame}[plain]{But then what?}
+		\begin{itemize}
+			\item What do we do with this then?
+			\item In fact very many things can be modeled as maximum flow.
+			\item Probably one of the most practical algorithms in this course. But to show some examples, first we have to look at a general construction that allows us to have multiple sources and multiple sinks.
+			\item Any suggestions how?
+		\end{itemize}
+	\end{frame}
+	
+	\begin{frame}[plain]{Multi source/sink}
+	\begin{center}
+		\begin{tikzpicture}[scale=1.2]
+			\node[circle, draw, very thick] (0) at (0,0) {$S$};
+			\node[circle, draw, very thick] (1) at (2,-2) {$s_1$};
+			\node[circle, draw, very thick] (2) at (2,-0.5) {$s_2$};
+			\node (3) at (2,0.75) {\Huge $\vdots$};
+			\node[circle, draw, very thick] (4) at (2,2) {$s_k$};
+			\node[align=center] (5) at (3.5,0) {Rest of \\ the graph};
+			\node[circle, draw, very thick] (6) at (5,-2) {$t_1$};
+			\node[circle, draw, very thick] (7) at (5,-0.5) {$t_2$};
+			\node (8) at (5,0.75) {\Huge $\vdots$};
+			\node[circle, draw, very thick] (9) at (5,2) {$t_k$};
+			\node[circle, draw, very thick] (A) at (7,0) {$T$};
+			
+			
+			\draw[very thick, ->]  (0) -- (1) node[midway,below left] () {$\infty$};
+			\draw[very thick, ->]  (0) -- (2) node[midway,above] () {$\infty$};
+			\draw[very thick, ->]  (0) -- (4) node[midway,above left] () {$\infty$};
+			
+			\draw[very thick, ->]  (6) -- (A) node[midway,below right] () {$\infty$};
+			\draw[very thick, ->]  (7) -- (A) node[midway,above] () {$\infty$};
+			\draw[very thick, ->]  (9) -- (A) node[midway,above right] () {$\infty$};
+			
+			\draw[very thick, ->] (5) -- ++(0,0.75);
+			\draw[very thick, ->] (5) -- ++(0.6,0.6);
+			\draw[very thick, ->] (5) -- ++(0.9,0);
+			\draw[very thick, ->] (5) -- ++(0.6,-0.6);
+			\draw[very thick, ->] (5) -- ++(0,-0.75);
+			\draw[very thick, ->] (5) -- ++(-0.6,-0.6);
+			\draw[very thick, ->] (5) -- ++(-0.9,0);
+			\draw[very thick, ->] (5) -- ++(-0.6,0.6);
+		\end{tikzpicture}
+	\end{center}
+	\end{frame}
+	
+	\begin{frame}[plain]{Bipartite matching}
+		\begin{itemize}
+			\item There are many practical situations where we want to pair up some set of objects with another, but not every pair is acceptable, and each objects can only be in one pair.
+			\item As an example my team solved a problem for a contest of practical problems hosted by Google (Hash Code) about pairing employees to tasks they can handle using a variant of this method.
+			\item We can use maximum flow just by making the graph on the last slide (except with 1 instead of $\infty$ so each vertex can only be in ine pair) and putting an edge with capacity $1$ between any two vertices we are allowed to pair together.
+		\end{itemize}
+	\end{frame}
+	
+	\begin{frame}[plain]{Bipartite matching}
+		\begin{center}
+			\begin{tikzpicture}[scale=1]
+				\node[circle, draw, very thick] (0) at (0,0) {$s$};
+				\node[circle, draw, very thick] (1) at (2,-4) {};
+				\node[circle, draw, very thick] (2) at (2,-2) {};
+				\node[circle, draw, very thick] (3) at (2,0) {};
+				\node[circle, draw, very thick] (4) at (2,2) {};
+				\node[circle, draw, very thick] (5) at (2,4) {};
+				\node[circle, draw, very thick] (6) at (6,-4) {};
+				\node[circle, draw, very thick] (7) at (6,-2) {};
+				\node[circle, draw, very thick] (8) at (6,0) {};
+				\node[circle, draw, very thick] (9) at (6,2) {};
+				\node[circle, draw, very thick] (A) at (6,4) {};
+				\node[circle, draw, very thick] (B) at (8,0) {$t$};
+				
+				\def\pp{0.1} 
+				
+				\draw[very thick, ->] (1) -- (6) node[pos=\pp,above] () {$1$};
+				\draw[very thick, ->, red!80!black] (1) -- (7) node[pos=\pp,above] () {\color{black} $1$};
+				\draw[very thick, ->] (2) -- (6) node[pos=\pp,above] () {$1$};
+				\draw[very thick, ->, red!80!black] (2) -- (A) node[pos=\pp,above] () {\color{black} $1$};
+				\draw[very thick, ->, red!80!black] (3) -- (8) node[pos=\pp,above] () {\color{black}$1$};
+				\draw[very thick, ->] (3) -- (9) node[pos=\pp,above] () {$1$};
+				\draw[very thick, ->, red!80!black] (4) -- (6) node[pos=\pp,above] () {\color{black} $1$};
+				\draw[very thick, ->] (4) -- (A) node[pos=\pp,above] () {$1$};
+				\draw[very thick, ->] (5) -- (6) node[pos=\pp,above] () {$1$};
+				\draw[very thick, ->, red!80!black] (5) -- (9) node[pos=\pp,above] () {\color{black} $1$};
+				
+				\draw[very thick, ->]  (0) -- (1) node[midway,below left] () {$1$};
+				\draw[very thick, ->]  (0) -- (2) node[midway,above right] () {$1$};
+				\draw[very thick, ->]  (0) -- (3) node[midway,above] () {$1$};
+				\draw[very thick, ->]  (0) -- (4) node[midway,below right] () {$1$};
+				\draw[very thick, ->]  (0) -- (5) node[midway,above left] () {$1$};
+				
+				\draw[very thick, ->]  (B) -- (6) node[midway,below right] () {$1$};
+				\draw[very thick, ->]  (B) -- (7) node[midway,above left] () {$1$};
+				\draw[very thick, ->]  (B) -- (8) node[midway,above] () {$1$};
+				\draw[very thick, ->]  (B) -- (9) node[midway,below left] () {$1$};
+				\draw[very thick, ->]  (B) -- (A) node[midway,above right] () {$1$};
+			\end{tikzpicture}
+		\end{center}
+	\end{frame}
+	
+	\begin{frame}[plain]{Bipartite matching}
+		\begin{itemize}
+			\item Here actually the "bad" bound of $\mathcal{O}(FE)$ is better than $\mathcal{O}(VE^2)$ as $FE$ simplifies to $VE$ in this graph.
+			\item Though we will see later a way to do it in $\mathcal{O}(E\sqrt{V})$.
+			\item We will also later consider the case where each pairing has different weights, like the cost of hiring an employee to do a particular task, where we want to minimise total cost as well.
+			\item Let's first take two other examples of problems solvable with max flow.
+		\end{itemize}
+	\end{frame}
+	
+	\begin{frame}[plain]{Baseball league}
+		\begin{itemize}
+			\item TODO
+		\end{itemize}
+	\end{frame}
+	
+	\begin{frame}[plain]{Project selection}
+		\begin{itemize}
+			\item TODO
+		\end{itemize}
+	\end{frame}
+	
+	\begin{frame}[plain]{Theorems}
+		\begin{itemize}
+			\item Some theorems also give us use cases for maximum flow. König's theorem for example gives us the solution to the minimum vertex cover (fewest vertices needed to touch every edge) problem in bipartite graphs in terms of the maximum matching. 
+			\item Menger's theorem tells us that the number of disjoint paths between $s$ and $t$ in a graph is equal to the maximum flow from $s$ to $t$ if every edge has unit capacity. This way we can find whether a graph is $k$-edge-connected. (There is also a version of Menger's theorem for vertex connectivity)
+		\end{itemize}
+	\end{frame}
+	
+	\begin{frame}[plain]{Tricks}
+		\begin{itemize}
+			\item Aside from there being many theorems that show that max flow or problems solved solved by max flow are equivalent to something else, there are also many constructions that allow us to solve more general problems.
+			\item We already saw how to have multiple sources and sinks, but let's look at some other examples of this.
+			\item We'll look at vertex capacities and flows with demands as two examples.
+		\end{itemize}
+	\end{frame}
+	
+	\begin{frame}[plain]{Vertex split}
+		\begin{itemize}
+			\item Say we have a flow problem, but we want to limit the amount of flow that goes through each vertex as well
+			\item We can split the vertex, and make it have an internal edge with a capacity
+			\item So each edge pointing to $v$ goes to a new vertex $v_{\text{in}}$, each pointing out goes from a new vertex $v_{\text{out}}$, and then we put an edge from $v_{\text{in}}$ to $v_{\text{out}}$ with our desired capacity
+		\end{itemize}
+	\end{frame}
+	
+	\begin{frame}[plain]{Vertex split}
+		\begin{itemize}
+			\item Say we have a flow problem, but we want to limit the amount of flow that goes through each vertex as well
+			\item We can split the vertex, and make it have an internal edge with a capacity
+			\item So each edge pointing to $v$ goes to a new vertex $v_{\text{in}}$, each pointing out goes from a new vertex $v_{\text{out}}$, and then we put an edge from $v_{\text{in}}$ to $v_{\text{out}}$ with our desired capacity
+		\end{itemize}
+	\end{frame}
+	
+	\begin{frame}[plain]{With demands}
+		\begin{itemize}
+			\item What if we want each edge $e$ to have a minimum flow $d_e$? We can ask for any flow or even the minimum flow
+			\item We can actually augment the graph to solve this with maximum flow as well
+			\item This won't be in the homework, but is a good exercise for those wanting to try it
+		\end{itemize}
+	\end{frame}
+	
+	\begin{frame}[plain]{Capacity scaling}
+		\begin{itemize}
+			\item Another trick one can use to do max flow is to start with only capacities 0/1 and solve that in $\mathcal{O}(FE) = \mathcal{O}(E)$
+			\item Then we double all the capacities and flows that should be $\geq 2$ and solve again, each edge needs to be incremented at most once,
+			 so this takes $\mathcal{O}(E^2)$
+			 \item Then we double, and repeat
+			 \item This trick is known as capacity scaling, which solves max flow in $\mathcal{O}(E^2 \log(F))$
+		\end{itemize}
+	\end{frame}
+	
+	\begin{frame}[plain]{Dinic's}
+		\begin{itemize}
+			\item TODO
+		\end{itemize}
+	\end{frame}
+	
+	\begin{frame}[plain]{MCMF}
+		\begin{itemize}
+			\item TODO
+		\end{itemize}
+	\end{frame}
+	
+	\begin{frame}[plain]{Hungarian}
+		\begin{itemize}
+			\item In the case of bipartite matchings where we want maximum/minimum weight, then MCMF will solve it, but there is a better solution
+			\item We won't cover it in detail here, but it's known as the Hungarian algorithm or Kuhn-Munkres algorithm
+			\item Interested students can also look into the push-relabel algorithm which is even faster than Dinic's
+		\end{itemize}
+	\end{frame}
+\end{document}
+
+
