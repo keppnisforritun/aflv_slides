@@ -45,6 +45,9 @@
 ## Week 9
 - [Weighted Graphs](weightedgraphs/weightedgraphs.pdf)
 
+## Week 10
+- [Maximum Flow](maximumflow/maximumflow.pdf)
+
 ## Bonus
 
 - [Convex Hull Trick](convexhulltrick/convexhulltrick.pdf)

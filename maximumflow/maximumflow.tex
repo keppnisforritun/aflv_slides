@@ -452,6 +452,213 @@
 		\begin{itemize}
 			\item The proof is not so hard, it is just a proof by looking at the greedy algorithm above and showing that if the flow is not yet equal to the cost of a minimum cut there must be some path that gets us closer.
 			\item The proof also gives us that our greedy method always gets us closer to the answer in each step.
+			\item But our algorithm is missing something to get all the way there!
+		\end{itemize}
+	\end{frame}
+	
+	\begin{frame}[plain]{Example}
+		\begin{center}
+			\begin{tikzpicture}
+				\node[circle, draw, very thick] (A) at (0,0) {$s$};
+				\node[circle, draw, very thick] (B) at (0,-4) {$1$};
+				\node[circle, draw, very thick] (C) at (3,-2) {$2$};
+				\node[circle, draw, very thick] (D) at (6,0) {$3$};
+				\node[circle, draw, very thick] (E) at (6,-4) {$4$};
+				\node[circle, draw, very thick] (F) at (9,0) {$5$};
+				\node[circle, draw, very thick] (G) at (9,-4) {$t$};
+				
+				\draw[very thick, ->]  (A) -- (B) node[midway,left] () {$0/3$};
+				\draw[very thick, ->]  (A) -- (D) node[midway,above] () {$0/3$};
+				\draw[very thick, ->]  (B) -- (C) node[midway,below right] () {$0/4$};
+				\draw[very thick, ->]  (C) -- (A) node[midway,above right] () {$0/3$};
+				\draw[very thick, ->]  (C) -- (D) node[midway,above left] () {$0/1$};
+				\draw[very thick, ->]  (C) -- (E) node[midway,below left] () {$0/2$};
+				\draw[very thick, ->]  (D) -- (E) node[midway,right] () {$0/2$};
+				\draw[very thick, ->]  (D) -- (F) node[midway,above] () {$0/6$};
+				\draw[very thick, ->]  (E) -- (B) node[midway,below] () {$0/1$};
+				\draw[very thick, ->]  (E) -- (G) node[midway,below] () {$0/1$};
+				\draw[very thick, ->]  (F) -- (G) node[midway,left] () {$0/9$};
+			\end{tikzpicture}
+		\end{center}
+	\end{frame}
+	
+	\begin{frame}[plain]{Example}
+		\begin{center}
+			\begin{tikzpicture}
+				\node[circle, draw, very thick] (A) at (0,0) {$s$};
+				\node[circle, draw, very thick] (B) at (0,-4) {$1$};
+				\node[circle, draw, very thick] (C) at (3,-2) {$2$};
+				\node[circle, draw, very thick] (D) at (6,0) {$3$};
+				\node[circle, draw, very thick] (E) at (6,-4) {$4$};
+				\node[circle, draw, very thick] (F) at (9,0) {$5$};
+				\node[circle, draw, very thick] (G) at (9,-4) {$t$};
+				
+				\draw[very thick, ->]  (A) -- (B) node[midway,left] () {$0/3$};
+				\draw[very thick, ->, blue]  (A) -- (D) node[midway,above] () {$1/3$};
+				\draw[very thick, ->]  (B) -- (C) node[midway,below right] () {$0/4$};
+				\draw[very thick, ->]  (C) -- (A) node[midway,above right] () {$0/3$};
+				\draw[very thick, ->]  (C) -- (D) node[midway,above left] () {$0/1$};
+				\draw[very thick, ->]  (C) -- (E) node[midway,below left] () {$0/2$};
+				\draw[very thick, ->, blue]  (D) -- (E) node[midway,right] () {$1/2$};
+				\draw[very thick, ->]  (D) -- (F) node[midway,above] () {$0/6$};
+				\draw[very thick, ->]  (E) -- (B) node[midway,below] () {$0/1$};
+				\draw[very thick, ->, blue]  (E) -- (G) node[midway,below] () {$1/1$};
+				\draw[very thick, ->]  (F) -- (G) node[midway,left] () {$0/9$};
+			\end{tikzpicture}
+		\end{center}
+	\end{frame}
+	
+	\begin{frame}[plain]{Example}
+		\begin{center}
+			\begin{tikzpicture}
+				\node[circle, draw, very thick] (A) at (0,0) {$s$};
+				\node[circle, draw, very thick] (B) at (0,-4) {$1$};
+				\node[circle, draw, very thick] (C) at (3,-2) {$2$};
+				\node[circle, draw, very thick] (D) at (6,0) {$3$};
+				\node[circle, draw, very thick] (E) at (6,-4) {$4$};
+				\node[circle, draw, very thick] (F) at (9,0) {$5$};
+				\node[circle, draw, very thick] (G) at (9,-4) {$t$};
+				
+				\draw[very thick, ->]  (A) -- (B) node[midway,left] () {$0/3$};
+				\draw[very thick, ->, blue]  (A) -- (D) node[midway,above] () {$3/3$};
+				\draw[very thick, ->]  (B) -- (C) node[midway,below right] () {$0/4$};
+				\draw[very thick, ->]  (C) -- (A) node[midway,above right] () {$0/3$};
+				\draw[very thick, ->]  (C) -- (D) node[midway,above left] () {$0/1$};
+				\draw[very thick, ->]  (C) -- (E) node[midway,below left] () {$0/2$};
+				\draw[very thick, ->]  (D) -- (E) node[midway,right] () {$1/2$};
+				\draw[very thick, ->, blue]  (D) -- (F) node[midway,above] () {$2/6$};
+				\draw[very thick, ->]  (E) -- (B) node[midway,below] () {$0/1$};
+				\draw[very thick, ->]  (E) -- (G) node[midway,below] () {$1/1$};
+				\draw[very thick, ->, blue]  (F) -- (G) node[midway,left] () {$2/9$};
+			\end{tikzpicture}
+		\end{center}
+	\end{frame}
+	
+	\begin{frame}[plain]{Example}
+		\begin{center}
+			\begin{tikzpicture}
+				\node[circle, draw, very thick] (A) at (0,0) {$s$};
+				\node[circle, draw, very thick] (B) at (0,-4) {$1$};
+				\node[circle, draw, very thick] (C) at (3,-2) {$2$};
+				\node[circle, draw, very thick] (D) at (6,0) {$3$};
+				\node[circle, draw, very thick] (E) at (6,-4) {$4$};
+				\node[circle, draw, very thick] (F) at (9,0) {$5$};
+				\node[circle, draw, very thick] (G) at (9,-4) {$t$};
+				
+				\draw[very thick, ->, blue]  (A) -- (B) node[midway,left] () {$1/3$};
+				\draw[very thick, ->]  (A) -- (D) node[midway,above] () {$3/3$};
+				\draw[very thick, ->, blue]  (B) -- (C) node[midway,below right] () {$1/4$};
+				\draw[very thick, ->]  (C) -- (A) node[midway,above right] () {$0/3$};
+				\draw[very thick, ->, blue]  (C) -- (D) node[midway,above left] () {$1/1$};
+				\draw[very thick, ->]  (C) -- (E) node[midway,below left] () {$0/2$};
+				\draw[very thick, ->]  (D) -- (E) node[midway,right] () {$1/2$};
+				\draw[very thick, ->, blue]  (D) -- (F) node[midway,above] () {$3/6$};
+				\draw[very thick, ->]  (E) -- (B) node[midway,below] () {$0/1$};
+				\draw[very thick, ->]  (E) -- (G) node[midway,below] () {$1/1$};
+				\draw[very thick, ->, blue]  (F) -- (G) node[midway,left] () {$3/9$};
+			\end{tikzpicture}
+		\end{center}
+	\end{frame}
+	
+	\begin{frame}[plain]{Example}
+		\begin{center}
+			\begin{tikzpicture}
+				\node[circle, draw, very thick] (A) at (0,0) {$s$};
+				\node[circle, draw, very thick] (B) at (0,-4) {$1$};
+				\node[circle, draw, very thick] (C) at (3,-2) {$2$};
+				\node[circle, draw, very thick] (D) at (6,0) {$3$};
+				\node[circle, draw, very thick] (E) at (6,-4) {$4$};
+				\node[circle, draw, very thick] (F) at (9,0) {$5$};
+				\node[circle, draw, very thick] (G) at (9,-4) {$t$};
+				
+				\draw[very thick, ->]  (A) -- (B) node[midway,left] () {$1/3$};
+				\draw[very thick, ->]  (A) -- (D) node[midway,above] () {$3/3$};
+				\draw[very thick, ->]  (B) -- (C) node[midway,below right] () {$1/4$};
+				\draw[very thick, ->]  (C) -- (A) node[midway,above right] () {$0/3$};
+				\draw[very thick, ->]  (C) -- (D) node[midway,above left] () {$1/1$};
+				\draw[very thick, ->]  (C) -- (E) node[midway,below left] () {$0/2$};
+				\draw[very thick, ->]  (D) -- (E) node[midway,right] () {$1/2$};
+				\draw[very thick, ->]  (D) -- (F) node[midway,above] () {$3/6$};
+				\draw[very thick, ->]  (E) -- (B) node[midway,below] () {$0/1$};
+				\draw[very thick, ->]  (E) -- (G) node[midway,below] () {$1/1$};
+				\draw[very thick, ->]  (F) -- (G) node[midway,left] () {$3/9$};
+			\end{tikzpicture}
+		\end{center}
+	\end{frame}
+	
+	\begin{frame}[plain]{Now what?}
+		\begin{itemize}
+			\item We're stuck! The max flow is not $4$, and there is no max cut.
+			\item But there is no way from $s$ to $t$ without using a full edge!
+			\item What to do?
+			\item<2-> What if we can "borrow" flow that's already been assigned?
+			\item<2-> Then we can assign some more.
+		\end{itemize}
+	\end{frame}
+	
+	\begin{frame}[plain]{Example}
+		\begin{center}
+			\begin{tikzpicture}
+				\node[circle, draw, very thick] (A) at (0,0) {$s$};
+				\node[circle, draw, very thick] (B) at (0,-4) {$1$};
+				\node[circle, draw, very thick] (C) at (3,-2) {$2$};
+				\node[circle, draw, very thick] (D) at (6,0) {$3$};
+				\node[circle, draw, very thick] (E) at (6,-4) {$4$};
+				\node[circle, draw, very thick] (F) at (9,0) {$5$};
+				\node[circle, draw, very thick] (G) at (9,-4) {$t$};
+				
+				\draw[very thick, ->]  (A) -- (B) node[midway,left] () {$1/3$};
+				\draw[very thick, ->]  (A) -- (D) node[midway,above] () {$3/3$};
+				\draw[very thick, ->]  (B) -- (C) node[midway,below right] () {$1/4$};
+				\draw[very thick, ->]  (C) -- (A) node[midway,above right] () {$0/3$};
+				\draw[very thick, ->]  (C) -- (D) node[midway,above left] () {$1/1$};
+				\draw[very thick, ->]  (C) -- (E) node[midway,below left] () {$0/2$};
+				\draw[very thick, ->]  (D) -- (E) node[midway,right] () {$1/2$};
+				\draw[very thick, ->]  (D) -- (F) node[midway,above] () {$3/6$};
+				\draw[very thick, ->]  (E) -- (B) node[midway,below] () {$0/1$};
+				\draw[very thick, ->]  (E) -- (G) node[midway,below] () {$1/1$};
+				\draw[very thick, ->]  (F) -- (G) node[midway,left] () {$3/9$};
+			\end{tikzpicture}
+		\end{center}
+	\end{frame}
+	
+	\begin{frame}[plain]{Example}
+		\begin{center}
+			\begin{tikzpicture}
+				\node[circle, draw, very thick] (A) at (0,0) {$s$};
+				\node[circle, draw, very thick] (B) at (0,-4) {$1$};
+				\node[circle, draw, very thick] (C) at (3,-2) {$2$};
+				\node[circle, draw, very thick] (D) at (6,0) {$3$};
+				\node[circle, draw, very thick] (E) at (6,-4) {$4$};
+				\node[circle, draw, very thick] (F) at (9,0) {$5$};
+				\node[circle, draw, very thick] (G) at (9,-4) {$t$};
+				
+				\draw[very thick, ->, blue]  (A) -- (B) node[midway,left] () {$2/3$};
+				\draw[very thick, ->]  (A) -- (D) node[midway,above] () {$3/3$};
+				\draw[very thick, ->, blue]  (B) -- (C) node[midway,below right] () {$2/4$};
+				\draw[very thick, ->]  (C) -- (A) node[midway,above right] () {$0/3$};
+				\draw[very thick, ->]  (C) -- (D) node[midway,above left] () {$1/1$};
+				\draw[very thick, ->, blue]  (C) -- (E) node[midway,below left] () {$1/2$};
+				\draw[very thick, ->, red]  (D) -- (E) node[midway,right] () {$0/2$};
+				\draw[very thick, ->, blue]  (D) -- (F) node[midway,above] () {$4/6$};
+				\draw[very thick, ->]  (E) -- (B) node[midway,below] () {$0/1$};
+				\draw[very thick, ->]  (E) -- (G) node[midway,below] () {$1/1$};
+				\draw[very thick, ->, blue]  (F) -- (G) node[midway,left] () {$4/9$};
+			\end{tikzpicture}
+		\end{center}
+	\end{frame}
+	
+	\begin{frame}[plain]{Reverse edges}
+		\begin{itemize}
+			\item "Stealing" flow from an edge and following it backwards maintains all conditions we need.
+			\item To program this the easiest way is just to add a backwards edge everywhere.
+			\item If we add flow to a forward edge we subtract it from the backward edge, and vice versa.
+			\item It can be proven that with this addition the algorithm always finds a max flow (try to think why).
+		\end{itemize}
+	\end{frame}
+	
+	\begin{frame}[plain]{Integers}
+		\begin{itemize}
 			\item Note that since our algorithm always increases the flow as much as it can along the path we choose, this means our flow will always have integer flow values if our capacities have integer values.
 			\item If we do not have integer values, the greedy algorithm might not terminate!
 		\end{itemize}
@@ -686,14 +893,60 @@ class FlowNetwork:
 	
 	\begin{frame}[plain]{Baseball league}
 		\begin{itemize}
-			\item TODO
+			\item Let's consider an example from baseball.
+			\item During a league a fixed schedule of games will be played, whichever teams has strictly the most wins at the end is the winner (let's just say for ties there are no winners).
+			\item At some point in the league you wonder, can your favourite team $x$ win the league?
 		\end{itemize}
 	\end{frame}
 	
-	\begin{frame}[plain]{Project selection}
+	\begin{frame}[plain]{Baseball league}
 		\begin{itemize}
-			\item TODO
+			\item Clearly it's best for team $x$ to win all remaining games, so let's assume that's the case.
+			\item Then we need to choose a winner for all other games such that no team gets as many wins as team $x$ has in this hypothetical full win scenario.
+			\item This is an assignment problem of games to winners, so we can model it with maximum flow.
+			\item Each game (or rather pairing of teams) gets a node which can flow to winners, and the winners have a limit of flow to the sink based on how many wins would put them ahead of $x$.
+			\item Then we just check if this graph has a saturating flow!
 		\end{itemize}
+	\end{frame}
+	
+	\begin{frame}[plain]{Baseball league}
+	\begin{center}
+		\begin{tikzpicture}[scale=1.2]
+			\node[circle, draw, very thick] (0) at (0,0) {$S$};
+			\node[circle, draw, very thick] (1) at (2,-2) {$\{y, z\}$};
+			\node[circle, draw, very thick] (2) at (2,-0.5) {$\{x, z\}$};
+			\node (3) at (2,0.75) {\Huge $\vdots$};
+			\node[circle, draw, very thick] (4) at (2,2) {$\{a, b\}$};
+			\node[circle, draw, very thick] (6) at (5,-2) {$z$};
+			\node (8) at (5,-0.75) {\Huge $\vdots$};
+			\node[circle, draw, very thick] (7) at (5,0.5) {$b$};
+			\node[circle, draw, very thick] (9) at (5,2) {$a$};
+			\node[circle, draw, very thick] (A) at (7,0) {$T$};
+			
+			\def\pp{0.25} 
+			
+			\draw[very thick, ->]  (0) -- (1) node[midway,below left] () {$g_{yz}$};
+			\draw[very thick, ->]  (0) -- (2) node[midway,above] () {$g_{xz}$};
+			\draw[very thick, ->]  (0) -- (4) node[midway,above left] () {$g_{ab}$};
+			
+			\draw[very thick, ->]  (6) -- (A) node[midway,below right] () {$w_k + g_k - w_z$};
+			\draw[very thick, ->]  (7) -- (A) node[midway,below left = 0.1 and -0.55] () {$w_k + g_k - w_b$};
+			\draw[very thick, ->]  (9) -- (A) node[midway,above right] () {$w_k + g_k - w_a$};
+			
+			\draw[very thick, ->] (4) -- (9) node[pos=\pp, above] {$\infty$};
+			\draw[very thick, ->] (4) -- (7) node[pos=\pp, above] {$\infty$};
+			
+			\draw[very thick, ->] (3) -- (9) node[pos=\pp, above] {$\infty$};
+			\draw[very thick, ->] (3) -- (7) node[pos=\pp, above] {$\infty$};
+			
+			\draw[very thick, ->] (2) -- (8) node[pos=\pp, above] {$\infty$};
+			\draw[very thick, ->] (2) -- (6) node[pos=\pp, above] {$\infty$};
+			
+			\draw[very thick, ->] (1) -- (8) node[pos=\pp, above] {$\infty$};
+			\draw[very thick, ->] (1) -- (6) node[pos=\pp, above] {$\infty$};
+			
+		\end{tikzpicture}
+	\end{center}
 	\end{frame}
 	
 	\begin{frame}[plain]{Theorems}
@@ -745,23 +998,633 @@ class FlowNetwork:
 		\end{itemize}
 	\end{frame}
 	
-	\begin{frame}[plain]{Dinic's}
+	\begin{frame}[plain]{Dinic's algorithm}
 		\begin{itemize}
-			\item TODO
+			\item Edmond-Karp is the original polynomial algorithm for maximum-flow, but there are (many) others.
+		\end{itemize}
+		\only<1>{
+		\begin{center}
+			\includegraphics[scale=0.3]{tp1}
+		\end{center}
+		}
+		\only<2>{
+			\begin{center}
+				\includegraphics[scale=0.3]{tp2}
+			\end{center}
+		}
+		\only<3>{
+			\begin{center}
+				\includegraphics[scale=0.3]{tp3}
+			\end{center}
+		}
+		\only<4>{
+			\begin{center}
+				\includegraphics[scale=0.3]{tp4}
+			\end{center}
+		}
+		\only<5>{
+			\begin{center}
+				\includegraphics[scale=0.3]{tp5}
+			\end{center}
+		}
+	\end{frame}
+	
+	\begin{frame}[plain]{Dinic's algorithm}
+		\begin{itemize}
+			\item Many of these are not that performant in practice as they don't start being faster until for unfeasibly large graphs.
+			\item But there are two that are commonly implemented as performance improvements over Edmond-Karp.
+			\item Those are Dinic's algorithm and the Push-Relabel algorithm.
+			\item We will not look at Push-Relabel as it is quite technical, but I recommend it for interested students. 
+			\item Instead we look at Dinic's algorithm.
+		\end{itemize}
+	\end{frame}
+	
+	\begin{frame}[plain]{Dinic's algorithm}
+		\begin{itemize}
+			\item We need two concepts. 
+			\item A blocking flow is a flow such that every path from the sink to the source has at least one saturated edge (note this is not necessarily a maximal flow).
+			\item A layered network of a graph $G$ is a graph constructed in the following manner:
+			\begin{itemize}
+				\item Let $L(v)$ be the length of the shortest (unweighted) path from the source to $v$ using only edges with capacity left.
+				\item Construct a subgraph of $G$ keeping only the edges $u \rightarrow v$ such that $L(v) = L(u) + 1$.
+			\end{itemize}
+		\end{itemize}
+	\end{frame}
+	
+	\begin{frame}[plain]{Dinic's algorithm}
+		\begin{itemize}
+			\item The algorithm proceeds by repeatedly constructing the layered network of our graph.
+			\item Each time we find a blocking flow in that layered network and add it to our total flow.
+			\item If we get no flow in the layered network we terminate.
+			\item If we found no flow, then the layered network has no unsaturated path from $s$ to $t$ and then $G$ doesn't either, so the flow is already maximum.
+		\end{itemize}
+	\end{frame}
+	
+	\begin{frame}[plain]{Example}
+		\begin{center}
+			\begin{tikzpicture}
+				\node[circle, draw, very thick] (S) at (0,0) {$s$};
+				\node[circle, draw, very thick] (1) at (3,2) {$1$};
+				\node[circle, draw, very thick] (2) at (3,-2) {$2$};
+				\node[circle, draw, very thick] (3) at (6,2) {$3$};
+				\node[circle, draw, very thick] (4) at (6,-2) {$4$};
+				\node[circle, draw, very thick] (T) at (9,0) {$t$};
+				
+				\draw[very thick, ->]  (S) -- (1) node[midway,above left] () {$0/10$};
+				\draw[very thick, ->]  (S) -- (2) node[midway,below left] () {$0/10$};
+				\draw[very thick, ->]  (1) -- (2) node[midway,left] () {$0/2$};
+				\draw[very thick, ->]  (1) -- (3) node[midway,above] () {$0/4$};
+				\draw[very thick, ->]  (1) -- (4) node[midway,above right] () {$0/8$};
+				\draw[very thick, ->]  (2) -- (4) node[midway,below] () {$0/9$};
+				\draw[very thick, ->]  (3) -- (T) node[midway,above right] () {$0/10$};
+				\draw[very thick, ->]  (4) -- (3) node[midway,right] () {$0/6$};
+				\draw[very thick, ->]  (4) -- (T) node[midway,below right] () {$0/10$};
+			\end{tikzpicture}
+		\end{center}
+	\end{frame}
+	
+	\begin{frame}[plain]{Example}
+		\begin{center}
+			\begin{tikzpicture}
+				\node[circle, draw, very thick] (S) at (0,0) {$s$};
+				\node[circle, draw, very thick] (1) at (3,2) {$1$};
+				\node[circle, draw, very thick] (2) at (3,-2) {$2$};
+				\node[circle, draw, very thick] (3) at (6,2) {$3$};
+				\node[circle, draw, very thick] (4) at (6,-2) {$4$};
+				\node[circle, draw, very thick] (T) at (9,0) {$t$};
+				
+				\node [below=0cm of S, blue] {$L = 0$};
+				\node [below=0cm of 2, blue] {$L = 1$};
+				\node [below=0cm of 4, blue] {$L = 2$};
+				\node [above=0cm of 1, blue] {$L = 1$};
+				\node [above=0cm of 3, blue] {$L = 2$};
+				\node [below=0cm of T, blue] {$L = 3$};
+				
+				\draw[very thick, ->]  (S) -- (1) node[midway,above left] () {$0/10$};
+				\draw[very thick, ->]  (S) -- (2) node[midway,below left] () {$0/10$};
+				\draw[very thick, ->]  (1) -- (2) node[midway,left] () {$0/2$};
+				\draw[very thick, ->]  (1) -- (3) node[midway,above] () {$0/4$};
+				\draw[very thick, ->]  (1) -- (4) node[midway,above right] () {$0/8$};
+				\draw[very thick, ->]  (2) -- (4) node[midway,below] () {$0/9$};
+				\draw[very thick, ->]  (3) -- (T) node[midway,above right] () {$0/10$};
+				\draw[very thick, ->]  (4) -- (3) node[midway,right] () {$0/6$};
+				\draw[very thick, ->]  (4) -- (T) node[midway,below right] () {$0/10$};
+			\end{tikzpicture}
+		\end{center}
+	\end{frame}
+	
+	\begin{frame}[plain]{Example}
+		\begin{center}
+			\begin{tikzpicture}
+				\node[circle, draw, very thick] (S) at (0,0) {$s$};
+				\node[circle, draw, very thick] (1) at (3,2) {$1$};
+				\node[circle, draw, very thick] (2) at (3,-2) {$2$};
+				\node[circle, draw, very thick] (3) at (6,2) {$3$};
+				\node[circle, draw, very thick] (4) at (6,-2) {$4$};
+				\node[circle, draw, very thick] (T) at (9,0) {$t$};
+				
+				\node [below=0cm of S, blue] {$L = 0$};
+				\node [below=0cm of 2, blue] {$L = 1$};
+				\node [below=0cm of 4, blue] {$L = 2$};
+				\node [above=0cm of 1, blue] {$L = 1$};
+				\node [above=0cm of 3, blue] {$L = 2$};
+				\node [below=0cm of T, blue] {$L = 3$};
+				
+				\draw[very thick, ->]  (S) -- (1) node[midway,above left] () {$0/10$};
+				\draw[very thick, ->]  (S) -- (2) node[midway,below left] () {$0/10$};
+				\draw[very thick, ->, opacity=0.25]  (1) -- (2) node[midway,left] () {$0/2$};
+				\draw[very thick, ->]  (1) -- (3) node[midway,above] () {$0/4$};
+				\draw[very thick, ->]  (1) -- (4) node[midway,above right] () {$0/8$};
+				\draw[very thick, ->]  (2) -- (4) node[midway,below] () {$0/9$};
+				\draw[very thick, ->]  (3) -- (T) node[midway,above right] () {$0/10$};
+				\draw[very thick, ->, opacity=0.25]  (4) -- (3) node[midway,right] () {$0/6$};
+				\draw[very thick, ->]  (4) -- (T) node[midway,below right] () {$0/10$};
+			\end{tikzpicture}
+		\end{center}
+	\end{frame}
+	
+	\begin{frame}[plain]{Example}
+		\begin{center}
+			\begin{tikzpicture}
+				\node[circle, draw, very thick] (S) at (0,0) {$s$};
+				\node[circle, draw, very thick] (1) at (3,2) {$1$};
+				\node[circle, draw, very thick] (2) at (3,-2) {$2$};
+				\node[circle, draw, very thick] (3) at (6,2) {$3$};
+				\node[circle, draw, very thick] (4) at (6,-2) {$4$};
+				\node[circle, draw, very thick] (T) at (9,0) {$t$};
+				
+				\node [below=0cm of S, blue] {$L = 0$};
+				\node [below=0cm of 2, blue] {$L = 1$};
+				\node [below=0cm of 4, blue] {$L = 2$};
+				\node [above=0cm of 1, blue] {$L = 1$};
+				\node [above=0cm of 3, blue] {$L = 2$};
+				\node [below=0cm of T, blue] {$L = 3$};
+				
+				\draw[very thick, ->, blue]  (S) -- (1) node[midway,above left] () {$4/10$};
+				\draw[very thick, ->]  (S) -- (2) node[midway,below left] () {$0/10$};
+				\draw[very thick, ->, opacity=0.25]  (1) -- (2) node[midway,left] () {$0/2$};
+				\draw[very thick, ->, blue]  (1) -- (3) node[midway,above] () {$4/4$};
+				\draw[very thick, ->]  (1) -- (4) node[midway,above right] () {$0/8$};
+				\draw[very thick, ->]  (2) -- (4) node[midway,below] () {$0/9$};
+				\draw[very thick, ->, blue]  (3) -- (T) node[midway,above right] () {$4/10$};
+				\draw[very thick, ->, opacity=0.25]  (4) -- (3) node[midway,right] () {$0/6$};
+				\draw[very thick, ->]  (4) -- (T) node[midway,below right] () {$0/10$};
+			\end{tikzpicture}
+		\end{center}
+	\end{frame}
+	
+	\begin{frame}[plain]{Example}
+		\begin{center}
+			\begin{tikzpicture}
+				\node[circle, draw, very thick] (S) at (0,0) {$s$};
+				\node[circle, draw, very thick] (1) at (3,2) {$1$};
+				\node[circle, draw, very thick] (2) at (3,-2) {$2$};
+				\node[circle, draw, very thick] (3) at (6,2) {$3$};
+				\node[circle, draw, very thick] (4) at (6,-2) {$4$};
+				\node[circle, draw, very thick] (T) at (9,0) {$t$};
+				
+				\node [below=0cm of S, blue] {$L = 0$};
+				\node [below=0cm of 2, blue] {$L = 1$};
+				\node [below=0cm of 4, blue] {$L = 2$};
+				\node [above=0cm of 1, blue] {$L = 1$};
+				\node [above=0cm of 3, blue] {$L = 2$};
+				\node [below=0cm of T, blue] {$L = 3$};
+				
+				\draw[very thick, ->, blue]  (S) -- (1) node[midway,above left] () {$10/10$};
+				\draw[very thick, ->]  (S) -- (2) node[midway,below left] () {$0/10$};
+				\draw[very thick, ->, opacity=0.25]  (1) -- (2) node[midway,left] () {$0/2$};
+				\draw[very thick, ->]  (1) -- (3) node[midway,above] () {$4/4$};
+				\draw[very thick, ->, blue]  (1) -- (4) node[midway,above right] () {$6/8$};
+				\draw[very thick, ->]  (2) -- (4) node[midway,below] () {$0/9$};
+				\draw[very thick, ->]  (3) -- (T) node[midway,above right] () {$4/10$};
+				\draw[very thick, ->, opacity=0.25]  (4) -- (3) node[midway,right] () {$0/6$};
+				\draw[very thick, ->, blue]  (4) -- (T) node[midway,below right] () {$6/10$};
+			\end{tikzpicture}
+		\end{center}
+	\end{frame}
+	
+	\begin{frame}[plain]{Example}
+		\begin{center}
+			\begin{tikzpicture}
+				\node[circle, draw, very thick] (S) at (0,0) {$s$};
+				\node[circle, draw, very thick] (1) at (3,2) {$1$};
+				\node[circle, draw, very thick] (2) at (3,-2) {$2$};
+				\node[circle, draw, very thick] (3) at (6,2) {$3$};
+				\node[circle, draw, very thick] (4) at (6,-2) {$4$};
+				\node[circle, draw, very thick] (T) at (9,0) {$t$};
+				
+				\node [below=0cm of S, blue] {$L = 0$};
+				\node [below=0cm of 2, blue] {$L = 1$};
+				\node [below=0cm of 4, blue] {$L = 2$};
+				\node [above=0cm of 1, blue] {$L = 1$};
+				\node [above=0cm of 3, blue] {$L = 2$};
+				\node [below=0cm of T, blue] {$L = 3$};
+				
+				\draw[very thick, ->]  (S) -- (1) node[midway,above left] () {$10/10$};
+				\draw[very thick, ->, blue]  (S) -- (2) node[midway,below left] () {$4/10$};
+				\draw[very thick, ->, opacity=0.25]  (1) -- (2) node[midway,left] () {$0/2$};
+				\draw[very thick, ->]  (1) -- (3) node[midway,above] () {$4/4$};
+				\draw[very thick, ->]  (1) -- (4) node[midway,above right] () {$6/8$};
+				\draw[very thick, ->, blue]  (2) -- (4) node[midway,below] () {$4/9$};
+				\draw[very thick, ->]  (3) -- (T) node[midway,above right] () {$4/10$};
+				\draw[very thick, ->, opacity=0.25]  (4) -- (3) node[midway,right] () {$0/6$};
+				\draw[very thick, ->, blue]  (4) -- (T) node[midway,below right] () {$10/10$};
+			\end{tikzpicture}
+		\end{center}
+	\end{frame}
+	
+	\begin{frame}[plain]{Example}
+		\begin{center}
+			\begin{tikzpicture}
+				\node[circle, draw, very thick] (S) at (0,0) {$s$};
+				\node[circle, draw, very thick] (1) at (3,2) {$1$};
+				\node[circle, draw, very thick] (2) at (3,-2) {$2$};
+				\node[circle, draw, very thick] (3) at (6,2) {$3$};
+				\node[circle, draw, very thick] (4) at (6,-2) {$4$};
+				\node[circle, draw, very thick] (T) at (9,0) {$t$};
+				
+				\node [below=0cm of S, blue] {$L = 0$};
+				\node [below=0cm of 2, blue] {$L = 1$};
+				\node [below=0cm of 4, blue] {$L = 2$};
+				\node [above=0cm of 1, blue] {$L = 1$};
+				\node [above=0cm of 3, blue] {$L = 2$};
+				\node [below=0cm of T, blue] {$L = 3$};
+				
+				\draw[very thick, ->]  (S) -- (1) node[midway,above left] () {$10/10$};
+				\draw[very thick, ->]  (S) -- (2) node[midway,below left] () {$4/10$};
+				\draw[very thick, ->, opacity=0.25]  (1) -- (2) node[midway,left] () {$0/2$};
+				\draw[very thick, ->]  (1) -- (3) node[midway,above] () {$4/4$};
+				\draw[very thick, ->]  (1) -- (4) node[midway,above right] () {$6/8$};
+				\draw[very thick, ->]  (2) -- (4) node[midway,below] () {$4/9$};
+				\draw[very thick, ->]  (3) -- (T) node[midway,above right] () {$4/10$};
+				\draw[very thick, ->, opacity=0.25]  (4) -- (3) node[midway,right] () {$0/6$};
+				\draw[very thick, ->]  (4) -- (T) node[midway,below right] () {$10/10$};
+			\end{tikzpicture}
+		\end{center}
+	\end{frame}
+	
+	
+	
+	\begin{frame}[plain]{Example}
+		\begin{center}
+			\begin{tikzpicture}
+				\node[circle, draw, very thick] (S) at (0,0) {$s$};
+				\node[circle, draw, very thick] (1) at (3,2) {$1$};
+				\node[circle, draw, very thick] (2) at (3,-2) {$2$};
+				\node[circle, draw, very thick] (3) at (6,2) {$3$};
+				\node[circle, draw, very thick] (4) at (6,-2) {$4$};
+				\node[circle, draw, very thick] (T) at (9,0) {$t$};
+				
+				\draw[very thick, ->]  (S) -- (1) node[midway,above left] () {$10/10$};
+				\draw[very thick, ->]  (S) -- (2) node[midway,below left] () {$4/10$};
+				\draw[very thick, ->]  (1) -- (2) node[midway,left] () {$0/2$};
+				\draw[very thick, ->]  (1) -- (3) node[midway,above] () {$4/4$};
+				\draw[very thick, ->]  (1) -- (4) node[midway,above right] () {$6/8$};
+				\draw[very thick, ->]  (2) -- (4) node[midway,below] () {$4/9$};
+				\draw[very thick, ->]  (3) -- (T) node[midway,above right] () {$4/10$};
+				\draw[very thick, ->]  (4) -- (3) node[midway,right] () {$0/6$};
+				\draw[very thick, ->]  (4) -- (T) node[midway,below right] () {$10/10$};
+			\end{tikzpicture}
+		\end{center}
+	\end{frame}
+	
+	\begin{frame}[plain]{Example}
+		\begin{center}
+			\begin{tikzpicture}
+				\node[circle, draw, very thick] (S) at (0,0) {$s$};
+				\node[circle, draw, very thick] (1) at (3,2) {$1$};
+				\node[circle, draw, very thick] (2) at (3,-2) {$2$};
+				\node[circle, draw, very thick] (3) at (6,2) {$3$};
+				\node[circle, draw, very thick] (4) at (6,-2) {$4$};
+				\node[circle, draw, very thick] (T) at (9,0) {$t$};
+				
+				\node [below=0cm of S, blue] {$L = 0$};
+				\node [below=0cm of 2, blue] {$L = 1$};
+				\node [below=0cm of 4, blue] {$L = 2$};
+				\node [above=0cm of 1, blue] {$L = 3$};
+				\node [above=0cm of 3, blue] {$L = 3$};
+				\node [below=0cm of T, blue] {$L = 4$};
+				
+				\draw[very thick, ->]  (S) -- (1) node[midway,above left] () {$10/10$};
+				\draw[very thick, ->]  (S) -- (2) node[midway,below left] () {$4/10$};
+				\draw[very thick, ->]  (1) -- (2) node[midway,left] () {$0/2$};
+				\draw[very thick, ->]  (1) -- (3) node[midway,above] () {$4/4$};
+				\draw[very thick, ->]  (1) -- (4) node[midway,above right] () {$6/8$};
+				\draw[very thick, ->]  (2) -- (4) node[midway,below] () {$4/9$};
+				\draw[very thick, ->]  (3) -- (T) node[midway,above right] () {$4/10$};
+				\draw[very thick, ->]  (4) -- (3) node[midway,right] () {$0/6$};
+				\draw[very thick, ->]  (4) -- (T) node[midway,below right] () {$10/10$};
+			\end{tikzpicture}
+		\end{center}
+	\end{frame}
+	
+	\begin{frame}[plain]{Example}
+		\begin{center}
+			\begin{tikzpicture}
+				\node[circle, draw, very thick] (S) at (0,0) {$s$};
+				\node[circle, draw, very thick] (1) at (3,2) {$1$};
+				\node[circle, draw, very thick] (2) at (3,-2) {$2$};
+				\node[circle, draw, very thick] (3) at (6,2) {$3$};
+				\node[circle, draw, very thick] (4) at (6,-2) {$4$};
+				\node[circle, draw, very thick] (T) at (9,0) {$t$};
+				
+				\node [below=0cm of S, blue] {$L = 0$};
+				\node [below=0cm of 2, blue] {$L = 1$};
+				\node [below=0cm of 4, blue] {$L = 2$};
+				\node [above=0cm of 1, blue] {$L = 3$};
+				\node [above=0cm of 3, blue] {$L = 3$};
+				\node [below=0cm of T, blue] {$L = 4$};
+				
+				\draw[very thick, ->, opacity=0.25]  (S) -- (1) node[midway,above left] () {$10/10$};
+				\draw[very thick, ->]  (S) -- (2) node[midway,below left] () {$4/10$};
+				\draw[very thick, ->, opacity=0.25]  (1) -- (2) node[midway,left] () {$0/2$};
+				\draw[very thick, ->, opacity=0.25]  (1) -- (3) node[midway,above] () {$4/4$};
+				\draw[very thick, ->, opacity=0.25]  (1) -- (4) node[midway,above right] () {$6/8$};
+				\draw[very thick, ->, red]  (4) to[bend left=20] node[midway,below left] () {$2/8$} (1) ;
+				\draw[very thick, ->]  (2) -- (4) node[midway,below] () {$4/9$};
+				\draw[very thick, ->]  (3) -- (T) node[midway,above right] () {$4/10$};
+				\draw[very thick, ->]  (4) -- (3) node[midway,right] () {$0/6$};
+				\draw[very thick, ->, opacity=0.25]  (4) -- (T) node[midway,below right] () {$10/10$};
+			\end{tikzpicture}
+		\end{center}
+	\end{frame}
+	
+	\begin{frame}[plain]{Example}
+		\begin{center}
+			\begin{tikzpicture}
+				\node[circle, draw, very thick] (S) at (0,0) {$s$};
+				\node[circle, draw, very thick] (1) at (3,2) {$1$};
+				\node[circle, draw, very thick] (2) at (3,-2) {$2$};
+				\node[circle, draw, very thick] (3) at (6,2) {$3$};
+				\node[circle, draw, very thick] (4) at (6,-2) {$4$};
+				\node[circle, draw, very thick] (T) at (9,0) {$t$};
+				
+				\node [below=0cm of S, blue] {$L = 0$};
+				\node [below=0cm of 2, blue] {$L = 1$};
+				\node [below=0cm of 4, blue] {$L = 2$};
+				\node [above=0cm of 1, blue] {$L = 3$};
+				\node [above=0cm of 3, blue] {$L = 3$};
+				\node [below=0cm of T, blue] {$L = 4$};
+				
+				\draw[very thick, ->, opacity=0.25]  (S) -- (1) node[midway,above left] () {$10/10$};
+				\draw[very thick, ->, blue]  (S) -- (2) node[midway,below left] () {$9/10$};
+				\draw[very thick, ->, opacity=0.25]  (1) -- (2) node[midway,left] () {$0/2$};
+				\draw[very thick, ->, opacity=0.25]  (1) -- (3) node[midway,above] () {$4/4$};
+				\draw[very thick, ->, opacity=0.25]  (1) -- (4) node[midway,above right] () {$6/8$};
+				\draw[very thick, ->]  (4) to[bend left=20] node[midway,below left] () {$2/8$} (1) ;
+				\draw[very thick, ->, blue]  (2) -- (4) node[midway,below] () {$9/9$};
+				\draw[very thick, ->, blue]  (3) -- (T) node[midway,above right] () {$9/10$};
+				\draw[very thick, ->, blue]  (4) -- (3) node[midway,right] () {$5/6$};
+				\draw[very thick, ->, opacity=0.25]  (4) -- (T) node[midway,below right] () {$10/10$};
+			\end{tikzpicture}
+		\end{center}
+	\end{frame}
+	
+	\begin{frame}[plain]{Example}
+		\begin{center}
+			\begin{tikzpicture}
+				\node[circle, draw, very thick] (S) at (0,0) {$s$};
+				\node[circle, draw, very thick] (1) at (3,2) {$1$};
+				\node[circle, draw, very thick] (2) at (3,-2) {$2$};
+				\node[circle, draw, very thick] (3) at (6,2) {$3$};
+				\node[circle, draw, very thick] (4) at (6,-2) {$4$};
+				\node[circle, draw, very thick] (T) at (9,0) {$t$};
+				
+				\node [below=0cm of S, blue] {$L = 0$};
+				\node [below=0cm of 2, blue] {$L = 1$};
+				\node [below=0cm of 4, blue] {$L = 2$};
+				\node [above=0cm of 1, blue] {$L = 3$};
+				\node [above=0cm of 3, blue] {$L = 3$};
+				\node [below=0cm of T, blue] {$L = 4$};
+				
+				\draw[very thick, ->, opacity=0.25]  (S) -- (1) node[midway,above left] () {$10/10$};
+				\draw[very thick, ->]  (S) -- (2) node[midway,below left] () {$9/10$};
+				\draw[very thick, ->, opacity=0.25]  (1) -- (2) node[midway,left] () {$0/2$};
+				\draw[very thick, ->, opacity=0.25]  (1) -- (3) node[midway,above] () {$4/4$};
+				\draw[very thick, ->, opacity=0.25]  (1) -- (4) node[midway,above right] () {$6/8$};
+				\draw[very thick, ->]  (4) to[bend left=20] node[midway,below left] () {$2/8$} (1) ;
+				\draw[very thick, ->]  (2) -- (4) node[midway,below] () {$9/9$};
+				\draw[very thick, ->]  (3) -- (T) node[midway,above right] () {$9/10$};
+				\draw[very thick, ->]  (4) -- (3) node[midway,right] () {$5/6$};
+				\draw[very thick, ->, opacity=0.25]  (4) -- (T) node[midway,below right] () {$10/10$};
+			\end{tikzpicture}
+		\end{center}
+	\end{frame}
+	
+	\begin{frame}[plain]{Example}
+		\begin{center}
+			\begin{tikzpicture}
+				\node[circle, draw, very thick] (S) at (0,0) {$s$};
+				\node[circle, draw, very thick] (1) at (3,2) {$1$};
+				\node[circle, draw, very thick] (2) at (3,-2) {$2$};
+				\node[circle, draw, very thick] (3) at (6,2) {$3$};
+				\node[circle, draw, very thick] (4) at (6,-2) {$4$};
+				\node[circle, draw, very thick] (T) at (9,0) {$t$};
+
+				
+				\draw[very thick, ->]  (S) -- (1) node[midway,above left] () {$10/10$};
+				\draw[very thick, ->]  (S) -- (2) node[midway,below left] () {$9/10$};
+				\draw[very thick, ->]  (1) -- (2) node[midway,left] () {$0/2$};
+				\draw[very thick, ->]  (1) -- (3) node[midway,above] () {$4/4$};
+				\draw[very thick, ->]  (1) -- (4) node[midway,above right] () {$6/8$};
+				\draw[very thick, ->]  (2) -- (4) node[midway,below] () {$9/9$};
+				\draw[very thick, ->]  (3) -- (T) node[midway,above right] () {$9/10$};
+				\draw[very thick, ->]  (4) -- (3) node[midway,right] () {$5/6$};
+				\draw[very thick, ->]  (4) -- (T) node[midway,below right] () {$10/10$};
+			\end{tikzpicture}
+		\end{center}
+	\end{frame}
+	
+	\begin{frame}[plain]{Example}
+		\begin{center}
+			\begin{tikzpicture}
+				\node[circle, draw, very thick] (S) at (0,0) {$s$};
+				\node[circle, draw, very thick] (1) at (3,2) {$1$};
+				\node[circle, draw, very thick] (2) at (3,-2) {$2$};
+				\node[circle, draw, very thick] (3) at (6,2) {$3$};
+				\node[circle, draw, very thick] (4) at (6,-2) {$4$};
+				\node[circle, draw, very thick] (T) at (9,0) {$t$};
+				
+				\node [below=0cm of S, blue] {$L = 0$};
+				\node [below=0cm of 2, blue] {$L = 1$};
+				\node [below=0cm of 4, blue] {$L = \infty$};
+				\node [above=0cm of 1, blue] {$L = \infty$};
+				\node [above=0cm of 3, blue] {$L = \infty$};
+				\node [below=0cm of T, blue] {$L = \infty$};
+				
+				\draw[very thick, ->]  (S) -- (1) node[midway,above left] () {$10/10$};
+				\draw[very thick, ->]  (S) -- (2) node[midway,below left] () {$9/10$};
+				\draw[very thick, ->]  (1) -- (2) node[midway,left] () {$0/2$};
+				\draw[very thick, ->]  (1) -- (3) node[midway,above] () {$4/4$};
+				\draw[very thick, ->]  (1) -- (4) node[midway,above right] () {$6/8$};
+				\draw[very thick, ->]  (2) -- (4) node[midway,below] () {$9/9$};
+				\draw[very thick, ->]  (3) -- (T) node[midway,above right] () {$9/10$};
+				\draw[very thick, ->]  (4) -- (3) node[midway,right] () {$5/6$};
+				\draw[very thick, ->]  (4) -- (T) node[midway,below right] () {$10/10$};
+			\end{tikzpicture}
+		\end{center}
+	\end{frame}
+					
+	
+	
+	\begin{frame}[plain]{Dinic's algorithm}
+		\begin{itemize}
+			\item Why do this?
+			\item Well, now in the layered network every edge out of a vertex $v$ is "toward the sink", so pushing along any one of them is good.
+			\item So when pushing flow out of $v$ we just push to the first non-saturated edge. 
+			\item Each vertex is given a counter which points to the first non-saturated edge, so we just push to that edge until it's full, then increment if it's full. 
+		\end{itemize}
+	\end{frame}
+	
+	\begin{frame}[plain]{Dinic's algorithm}
+		\begin{itemize}
+			\item How long does making a blocking flow take then?
+			\item Each DFS is $\mathcal{O}(n + V))$ where $n$ is the number of increments. 
+			\item Each DFS saturates one edge, so we do at most $E$ of them. And we can only increment each vertex $E$ times so the sum of all the $n$ is at most $VE$.
+			\item Thus the total time is $\mathcal{O}(VE)$.
+			\item Then one can prove this has to be done at most $V$ times as $L(t)$ increases each time (slightly technical, we omit it here)
+		\end{itemize}
+	\end{frame}
+	
+	\begin{frame}[plain]{Dinic's algorithm}
+		\begin{itemize}
+			\item Thus the total time complexity is $\mathcal{O}(V^2E)$, an improvement over $\mathcal{O}(VE^2)$.
+			\item But I promised $\mathcal{O}(E\sqrt{V})$?
+			\item Well, if all capacities are $1$ then each layered network will take $\mathcal{O}(E)$ since each edge is only considered once.
+			\item One can also prove that if all capacities are $1$ there are at most $\sqrt{E}$ phases.
+			\item If each vertex has either only 1 in-edge or only 1-out edge, then this can be improved to at most $\sqrt{V}$ phases.
+		\end{itemize}
+	\end{frame}
+	
+	\begin{frame}[plain, fragile]{Implementation - part 1}
+		\begin{scriptsize}
+		\begin{minted}{cpp}
+struct FlowEdge {
+	int v, u;
+	long long cap, flow = 0;
+	FlowEdge(int v, int u, long long cap) : v(v), u(u), cap(cap) {}
+};
+
+struct Dinic {
+	const long long flow_inf = 1e18;
+	vector<FlowEdge> edges;
+	vector<vector<int>> adj;
+	int n, m = 0;
+	int s, t;
+	vector<int> level, ptr;
+	queue<int> q;
+	
+	Dinic(int n, int s, int t) : n(n), s(s), t(t) {
+		adj.resize(n);
+		level.resize(n);
+		ptr.resize(n);
+	}
+		\end{minted}
+		\end{scriptsize}
+	\end{frame}
+	
+	\begin{frame}[plain, fragile]{Implementation - part 2}
+		\begin{scriptsize}
+			\begin{minted}{cpp}
+void add_edge(int v, int u, long long cap) {
+	edges.emplace_back(v, u, cap);
+	edges.emplace_back(u, v, 0);
+	adj[v].push_back(m);
+	adj[u].push_back(m + 1);
+	m += 2;
+}
+bool bfs() {
+	while (!q.empty()) {
+		int v = q.front();
+		q.pop();
+		for (int id : adj[v]) {
+			if (edges[id].cap == edges[id].flow)
+			    continue;
+			if (level[edges[id].u] != -1)
+			    continue;
+			level[edges[id].u] = level[v] + 1;
+			q.push(edges[id].u);
+		}
+	}
+	return level[t] != -1;
+}
+				\end{minted}
+			\end{scriptsize}
+		\end{frame}
+		
+	\begin{frame}[plain, fragile]{Implementation - part 3}
+		\begin{scriptsize}
+			\begin{minted}{cpp}
+long long dfs(int v, long long pushed) {
+	if (pushed == 0)
+	    return 0;
+	if (v == t)
+	    return pushed;
+	for (int& cid = ptr[v]; cid < (int)adj[v].size(); cid++) {
+		int id = adj[v][cid];
+		int u = edges[id].u;
+		if (level[v] + 1 != level[u])
+		    continue;
+		long long tr = dfs(u, 
+                    min(pushed, edges[id].cap - edges[id].flow));
+		if (tr == 0)
+		    continue;
+		edges[id].flow += tr;
+		edges[id ^ 1].flow -= tr;
+		return tr;
+	}
+	return 0;
+}
+			\end{minted}
+		\end{scriptsize}
+	\end{frame}
+	
+	\begin{frame}[plain, fragile]{Implementation - part 4}
+		\begin{scriptsize}
+			\begin{minted}{cpp}
+	long long flow() {
+		long long f = 0;
+		while (true) {
+			fill(level.begin(), level.end(), -1);
+			level[s] = 0;
+			q.push(s);
+			if (!bfs())
+			    break;
+			fill(ptr.begin(), ptr.end(), 0);
+			while (long long pushed = dfs(s, flow_inf)) {
+				f += pushed;
+			}
+		}
+		return f;
+	}
+};
+			\end{minted}
+		\end{scriptsize}
+	\end{frame}
+	
+	\begin{frame}[plain]{MCMF}
+		\begin{itemize}
+			\item Last algorithm of the day.
+			\item What if not all flow is created equal?
+			\item It costs much more to send something from $A$ to $B$ than from $A$ to $C$ perhaps
+			\item How could we modify Ford-Fulkerson to do this?
 		\end{itemize}
 	\end{frame}
 	
 	\begin{frame}[plain]{MCMF}
 		\begin{itemize}
-			\item TODO
+			\item Well we could simply take the shortest (cost) path each time instead of the shortest (edges) path each time.
+			\item This simply works! (Try to reason why)
+			\item If all the costs are $\geq 0$ we can use Dijkstra, otherwise Bellman-Ford is needed (or Johnson's, since negative cycles make the problem undefined anyway)
+			\item Only thing to be careful about is to make the reverse edge have cost $-c$ if the original edge has cost $c$, since we want things to cancel
 		\end{itemize}
 	\end{frame}
+	
 	
 	\begin{frame}[plain]{Hungarian}
 		\begin{itemize}
 			\item In the case of bipartite matchings where we want maximum/minimum weight, then MCMF will solve it, but there is a better solution
 			\item We won't cover it in detail here, but it's known as the Hungarian algorithm or Kuhn-Munkres algorithm
-			\item Interested students can also look into the push-relabel algorithm which is even faster than Dinic's
 		\end{itemize}
 	\end{frame}
 \end{document}
