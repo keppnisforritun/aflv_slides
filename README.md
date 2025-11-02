@@ -51,6 +51,9 @@
 ## Week 11
 - [Combinatorics](combinatorics/combinatorics.pdf)
 
+## Week 12
+- [Strings](strings/strings.pdf)
+
 ## Bonus
 
 - [Convex Hull Trick](convexhulltrick/convexhulltrick.pdf)
