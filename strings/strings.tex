@@ -1750,6 +1750,202 @@ int lcp(int x, int y) {
 		\item \textit{see example}
 	\end{itemize}
 \end{frame}
+
+\begin{frame}{The Core Idea: From Strings to Numbers}
+    \textbf{The Goal:} Represent a string as a single number (a \alert{hash}).
+
+    \begin{itemize}
+        \item Like a \alert{fingerprint}—a compact representation that (almost) uniquely identifies a longer string.
+        \item \textbf{Key Benefit:} Comparing two integers is \alert{much faster} than comparing two strings character-by-character.
+    \end{itemize}
+
+    \vspace{10pt}
+    \textbf{The Fundamental Rule:}
+    \begin{center}
+        \Large
+        If \alert{hashes are different} $\Rightarrow$ strings are \alert{definitely different}.\\
+        If \alert{hashes are the same} $\Rightarrow$ strings are \alert{probably the same}.
+    \end{center}
+
+    \vspace{10pt}
+    \begin{block}{Why This is Useful}
+        This allows us to quickly \alert{rule out} mismatches and only carefully check potential matches.
+    \end{block}
+\end{frame}
+
+\begin{frame}{Choosing a Hash Function}
+    \textbf{The Standard Approach: Polynomial Rolling Hash}
+
+    \begin{align*}
+        H(s) &= \left(s[0] \cdot b^{0} + s[1] \cdot b^{1} + \cdots + s[n-1] \cdot b^{n-1}\right) \mod m
+    \end{align*}
+
+    \textbf{Crucial Parameters:}
+    \begin{itemize}
+        \item \alert{Base (b):} Should be \alert{larger than the alphabet size}. Typically a \alert{prime number}.
+        \item \alert{Modulus (m):} A \alert{large prime} or \alert{$2^{64}$} (using natural integer overflow).
+    \end{itemize}
+
+    \vspace{10pt}
+    \begin{block}{Why these choices?}
+        They help achieve a \alert{uniform distribution} of hash values, minimizing the chance of \alert{collisions} (different strings having the same hash).
+    \end{block}
+
+    \begin{example}
+        For a string "abc" and $b=131$, $m=10^9+7$:\\
+        $H($``abc''$) = (``a'' \cdot 131^0 + ``b'' \cdot 131^1 + ``c'' \cdot 131^2) \mod m$
+    \end{example}
+\end{frame}
+
+\begin{frame}{The Power of Precomputation}
+    \textbf{Problem:} Calculating each substring hash individually is too slow ($O(n)$ per substring).
+
+    \vspace{10pt}
+    \textbf{Solution:} Precompute two arrays for constant-time substring hash queries.
+
+    \begin{columns}
+        \column{0.5\textwidth}
+        \textbf{Prefix Hash Array}
+        \begin{align*}
+            pref[0] &= 0\\
+            pref[i] &= H(s[0..i-1])
+        \end{align*}
+
+        \column{0.5\textwidth}
+        \textbf{Power Array}
+        \begin{align*}
+            pow[i] &= b^i \mod m
+        \end{align*}
+    \end{columns}
+
+    \vspace{15pt}
+    \textbf{Hash of substring } $s[i..j]$:
+    \begin{align*}
+        H(s[i..j]) = &\left(pref[j+1] - pref[i] \cdot pow[j - i + 1]\right) \mod m
+    \end{align*}
+
+    \begin{block}{}
+        This enables \alert{O(1)} time extraction of any substring's hash after \alert{O(n)} precomputation.
+    \end{block}
+\end{frame}
+
+
+\begin{frame}{The Rolling Hash - Efficient Updates}
+    \textbf{Core Algorithm:} The Rabin-Karp Algorithm
+
+    \textbf{Goal:} Find all occurrences of pattern \alert{P} in text \alert{T}.
+
+    \begin{enumerate}
+        \item Compute hash of pattern: $H(P)$.
+        \item Compute hash of the first $|P|$ characters of $T$.
+        \item For each starting position $i$ in $T$:
+            \begin{itemize}
+                \item Check if $H(T[i..i+|P|-1]) == H(P)$.
+                \item If true, \alert{potential match} (may need to verify).
+                \item Update the hash for the \alert{next window} in O(1) time:
+            \end{itemize}
+            \begin{align*}
+                H_{\text{next}} = &\left( (H_{\text{old}} - T[i] \cdot b^{|P|-1}) \cdot b + T[i+|P|] \right) \mod m
+            \end{align*}
+    \end{enumerate}
+
+    \begin{block}{The "Rolling" Update}
+        Remove the leftmost character's contribution, shift, and add the new rightmost character.
+    \end{block}
+\end{frame}
+
+\begin{frame}{Applications Beyond Matching}
+    String hashing is a versatile tool for many string problems.
+
+    \begin{block}{1. Checking Palindromes}
+        \begin{itemize}
+            \item Compute \alert{forward hash} and \alert{reverse hash}.
+            \item Check if $H(s[i..j]) = H(\text{reverse}(s[i..j]))$.
+        \end{itemize}
+    \end{block}
+
+    \begin{block}{2. Counting Unique Substrings}
+        \begin{itemize}
+            \item For each starting index $i$, compute hashes for all substrings starting at $i$.
+            \item Insert hashes into a \alert{hash set} to count distinct values.
+        \end{itemize}
+    \end{block}
+
+    \begin{block}{3. Finding the Longest Repeated Substring}
+        \begin{itemize}
+            \item Use hashing with \alert{binary search} on the length.
+            \item Check for hash collisions to find repeats.
+        \end{itemize}
+    \end{block}
+\end{frame}
+
+\begin{frame}{Extending the Idea: 2D \& Beyond}
+    \textbf{2D Pattern Matching:} Find a 2D pattern $P$ in a 2D grid $T$.
+
+    \vspace{10pt}
+    \textbf{Approach:} Extend the rolling hash to two dimensions.
+    \begin{itemize}
+        \item Precompute a hash for each row in the grid and pattern.
+        \item Use a \alert{vertical base} $B$ to combine row hashes.
+    \end{itemize}
+
+    \begin{align*}
+        H_{\text{2D}}(P) &= \sum_{i=0}^{h-1} H(\text{row } i) \cdot B^{i} \mod m \\
+        H_{\text{2D}}(T[x][y..y+w-1]) &= \sum_{i=0}^{h-1} H(T[x+i][y..y+w-1]) \cdot B^{i} \mod m
+    \end{align*}
+
+    \vspace{10pt}
+    \textbf{Other Extensions:}
+    \begin{itemize}
+        \item \alert{Palindromic Trees}: Efficiently find longest palindromic substring.
+        \item \alert{Rolling Hash for Files}: Check file integrity (e.g., rsync).
+        \item \alert{Weighted Sequences}: Hashing with non-uniform character importance.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Implementation Tips and Pitfalls}
+    \textbf{Common Pitfalls:}
+    \begin{itemize}
+        \item \alert{Modulo Arithmetic:} Always do computations under modulo to prevent overflow.
+        \item \alert{Negative Hash:} After subtraction, hash might be negative. Use $(x \mod m + m) \mod m$.
+        \item \alert{Base and Modulus:} Choose large, relatively prime numbers for $b$ and $m$.
+    \end{itemize}
+
+    \vspace{15pt}
+    \textbf{Optimization Tips:}
+    \begin{itemize}
+        \item Precompute the \alert{power array} for fast exponentiation.
+        \item Use \alert{double hashing} for critical applications to avoid collisions.
+        \item For competitive programming, use \alert{$b=31$} and $m=10^9+7$ or exploit \alert{unsigned integers} for $m=2^{64}$.
+    \end{itemize}
+
+    \vspace{15pt}
+    \begin{block}{}
+        Always remember: \alert{Verify on collision} for absolute correctness.
+    \end{block}
+\end{frame}
+
+\begin{frame}{Conclusion and Further Reading}
+    \textbf{Summary:}
+    \begin{itemize}
+        \item String hashing provides a \alert{versatile and efficient} tool for string processing.
+        \item The \alert{rolling hash} enables O(1) updates for sliding window problems.
+        \item It's \alert{probabilistic} but can be made very reliable with good parameters and double hashing.
+    \end{itemize}
+
+    \vspace{15pt}
+    \textbf{Where to Learn More:}
+    \begin{itemize}
+        \item \alert{Advanced Algorithms:} Aho-Corasick, Suffix Arrays, and the Knuth-Morris-Pratt algorithm.
+        \item \alert{Applications:} Plagiarism detection (Copyleaks), DNA sequence analysis (BLAST).
+        \item \alert{Theory:} The formal concept of \alert{Karp-Rabin fingerprints}.
+    \end{itemize}
+
+    \vspace{15pt}
+    \begin{center}
+        \textbf{Thank you!}
+    \end{center}
+\end{frame}
 	
 \end{document}
 
